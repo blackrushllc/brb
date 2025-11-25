@@ -1,0 +1,14 @@
+-- 006_admin.sql
+
+CREATE TABLE admin_users
+(
+    id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email         VARCHAR(191) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    display_name  VARCHAR(128) NOT NULL,
+    is_superadmin TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4;
