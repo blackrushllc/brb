@@ -186,8 +186,14 @@ VALUES ((SELECT id FROM guide_sections WHERE slug = 'getting-started'),
         'Your very first Basil / Basic / Basic.JS program.',
         '## Hello World
 
-      This is your first program in Basil.
+This is your first program in Basil.
 
-      ```basic
-      REM Hello World in Basil
-      PRINTLN "Hello, world!";
+```basic
+REM Hello World in Basil
+PRINTLN "Hello, world!";
+```
+',
+        'beginner',
+        'NULL',
+        10,
+        1);
