@@ -204,11 +204,19 @@ FUNCTION hex1%(c$)
 END
 
 
-FUNCTION parse_query_params$(query$)
-// TODO: parse query params
-  REM RETURN kv$();
-  RETURN 0
-END
+FUNCTION param$(name$) BEGIN
+    FOR EACH kv$ IN REQUEST$()
+        BEGIN
+            LET eq% = INSTR(kv$, "=");
+            IF eq% > 0 THEN BEGIN
+                LET k$ = LEFT$(kv$, eq%);
+                LET v$ = MID$(kv$, eq%+2);
+                IF k$ == name$ THEN RETURN v$;
+            END
+        END
+    NEXT
+    RETURN "";
+END FUNCTION
 
 REM run
 
