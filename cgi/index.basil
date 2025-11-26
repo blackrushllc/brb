@@ -16,23 +16,21 @@ END
 SUB handle_request(pathInfo$)
   LET p$ = normalize_path$(pathInfo$);
 
-  IF p$ = "/" THEN
-    render_home_page();
-    RETURN;
-  END
+  SELECT CASE p$
 
-  IF starts_with%(p$, "/guide") THEN
-    render_guide_placeholder();
-    RETURN;
-  END
+    CASE p$ = "/"
+        render_home_page();
 
-  IF starts_with%(p$, "/reference") THEN
-    REM We choose to show a simple stub linking to /reference (no redirect for now)
-    render_reference_link();
-    RETURN;
-  END
+    CASE starts_with%(p$, "/guide")
+        render_guide_placeholder();
 
-  render_not_found();
+    CASE starts_with%(p$, "/reference")
+        REM We choose to show a simple stub linking to /reference (no redirect for now)
+        render_reference_link();
+    CASE ELSE
+        //render_not_found();
+        render_home_page();
+    END SELECT
 END
 
 SUB render_home_page()
@@ -129,7 +127,7 @@ END
 FUNCTION normalize_path$(path$)
   IF LEN(path$) = 0 THEN RETURN "/";
   LET p$ = path$;
-  IF RIGHT$(p$, 1) = "/" AND LEN(p$) > 1 THEN
+  IF RIGHT$(p$, 1) = "/" AND LEN(p$) > 1 THEN BEGIN
     LET p$ = LEFT$(p$, LEN(p$) - 1);
   END
   RETURN p$;
@@ -146,15 +144,22 @@ FUNCTION html_escape$(s$)
   LET out$ = "";
   FOR i% = 1 TO LEN(s$)
     LET ch$ = MID$(s$, i%, 1);
-    IF ch$ = "&" THEN out$ = out$ + "&amp;";
-    ELSEIF ch$ = "<" THEN out$ = out$ + "&lt;";
-    ELSEIF ch$ = ">" THEN out$ = out$ + "&gt;";
-    ELSEIF ch$ = '"' THEN out$ = out$ + "&quot;";
-    ELSE out$ = out$ + ch$;
-    END
+    SELECT CASE ch$
+        CASE "&"
+            out$ = out$ + "&amp;";
+        CASE "<"
+            out$ = out$ + "&lt;";
+        CASE ">"
+            out$ = out$ + "&gt;";
+        CASE "\""
+            out$ = out$ + "&quot;";
+        CASE ELSE
+            out$ = out$ + ch$;
+    END SELECT
+
   NEXT i%
   RETURN out$;
-END
+END FUNCTION
 
 REM Minimal URL decoding for '+' and %XX (hex)
 FUNCTION url_decode$(s$)
@@ -162,21 +167,25 @@ FUNCTION url_decode$(s$)
   LET i% = 1;
   WHILE i% <= LEN(s$) BEGIN
     LET ch$ = MID$(s$, i%, 1);
-    IF ch$ = "+" THEN
-      out$ = out$ + " ";
-      LET i% = i% + 1;
-    ELSEIF ch$ = "%" AND i% + 2 <= LEN(s$) THEN
-      LET h1$ = MID$(s$, i%+1, 1);
-      LET h2$ = MID$(s$, i%+2, 1);
-      LET n% = hex2int%(h1$, h2$);
-      IF n% >= 0 THEN out$ = out$ + CHR$(n%);
-      ELSE out$ = out$ + ch$; END
-      LET i% = i% + 3;
-    ELSE
-      out$ = out$ + ch$;
-      LET i% = i% + 1;
-    END
-  END
+    SELECT CASE ch$
+        CASE "+"
+            out$ = out$ + " ";
+            i% = i% + 1;
+        CASE "%" AND i% + 2 <= LEN(s$)
+            h1$ = MID$(s$, i%+1, 1);
+            h2$ = MID$(s$, i%+2, 1);
+            n% = hex2int%(h1$, h2$);
+            IF n% >= 0 THEN BEGIN
+                out$ = out$ + CHR$(n%);
+            ELSE
+                out$ = out$ + ch$;
+            END
+            i% = i% + 3;
+        CASE ELSE
+           out$ = out$ + ch$;
+           i% = i% + 1;
+    END SELECT
+  END WHILE
   RETURN out$;
 END
 
@@ -194,45 +203,13 @@ FUNCTION hex1%(c$)
   RETURN -1;
 END
 
-REM Parse QUERY_STRING into a 2D array of [rows x 2] => key, value
-FUNCTION parse_query_params$[][](query$)
-  LET s$ = query$;
-  IF LEN(s$) = 0 THEN
-    DIM empty$(0,0);
-    RETURN empty$();
-  END
 
-  REM First pass: count pairs
-  LET count% = 1;
-  LET pos% = 1;
-  WHILE TRUE BEGIN
-    LET amp% = INSTR(s$, "&", pos%);
-    IF amp% = 0 THEN EXIT WHILE; END
-    LET count% = count% + 1;
-    LET pos% = amp% + 1;
-  END
-
-  DIM kv$[count%, 2];
-
-  LET i% = 0;
-  LET start% = 1;
-  WHILE start% <= LEN(s$) AND i% < count% BEGIN
-    LET amp% = INSTR(s$, "&", start%);
-    IF amp% = 0 THEN LET amp% = LEN(s$) + 1; END
-    LET part$ = MID$(s$, start%, amp% - start%);
-    LET eq% = INSTR(part$, "=");
-    IF eq% > 0 THEN
-      LET k$ = LEFT$(part$, eq% - 1);
-      LET v$ = MID$(part$, eq% + 1);
-      kv$(i%, 0) = url_decode$(k$);
-      kv$(i%, 1) = url_decode$(v$);
-    ELSE
-      kv$(i%, 0) = url_decode$(part$);
-      kv$(i%, 1) = "";
-    END
-    LET i% = i% + 1;
-    LET start% = amp% + 1;
-  END
-
-  RETURN kv$();
+FUNCTION parse_query_params$(query$)
+// TODO: parse query params
+  REM RETURN kv$();
+  RETURN 0
 END
+
+REM run
+
+MAIN()
