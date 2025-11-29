@@ -12,19 +12,23 @@ SUB handle_request(pathInfo$)
   p$ = normalize_path$(pathInfo$)
 
   send_header_ok_html()
-
+    REM PRINT p$ // cgi/index.basil
   SELECT CASE p$
 
     CASE "/"
         render_home_page()
 
+    CASE "/cgi/index.basil"
+        render_home_page()
+
     CASE starts_with%(p$, "/guide")
+        REM This doesn't go here.  We have /guide and /reference configured in Apache2 vhost config
         render_guide_placeholder()
 
     CASE ELSE
         PRINTLN p$
         render_not_found()
-        //render_home_page()
+        REM render_home_page()
     END SELECT
 END SUB
 
@@ -82,8 +86,8 @@ END SUB
 SUB render_not_found()
     REM Optionally, emit a 404 status (sending after content-type is ok for many CGI handlers but
     REM if needed, move headers to before printing anything). Keeping minimal as per spec.
-    PRINTLN "Status: 404 Not Found"
-    PRINTLN ""
+    REM PRINTLN "Status: 404 Not Found"
+    REM PRINTLN ""
 
     html_head("Not Found")
     PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"

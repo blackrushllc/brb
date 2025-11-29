@@ -15,7 +15,7 @@ SUB handle_request(pathInfo$)
 
   SELECT CASE p$
 
-    CASE "/"
+    CASE "/guide"
 
         render_guide_placeholder()
 
@@ -41,8 +41,8 @@ END SUB
 SUB render_not_found()
     REM Optionally, emit a 404 status (sending after content-type is ok for many CGI handlers but
     REM if needed, move headers to before printing anything). Keeping minimal as per spec.
-    PRINTLN "Status: 404 Not Found"
-    PRINTLN ""
+    REM PRINTLN "Status: 404 Not Found"
+    REM PRINTLN ""
 
     html_head("Not Found")
     PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"

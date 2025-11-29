@@ -15,26 +15,25 @@ SUB MAIN()
 
 END SUB
 
-
-
-
 SUB handle_reference_request(pathInfo$)
     REM Normalize path and route
-    p$ = normalize_path$(pathInfo$)
+    pinfo$ = normalize_path$(pathInfo$)
 REM    PRINTLN "Path: " + p$ <-- /reference
-    IF p$ = "/reference" THEN
+    IF pinfo$ = "/reference" THEN
         render_reference_index()
         RETURN
     END IF
 
-    segments$() = split_path_segments(p$)
-    n% = ARRAY_ROWS%(segments$)
-    IF n% >= 2 THEN
-        first$ = segments$(0)
+    LET segments$ = split_path_segments(pinfo$)
+
+    n% = LEN(segments$)
+
+    IF n% >= 3 THEN
+        first$ = segments$(1)
 
         IF first$ = "alpha" THEN
-            IF n% >= 3 THEN
-                render_alpha_listing(segments$(1))
+            IF n% >= 4 THEN
+                render_alpha_listing(segments$(2))
             ELSE
                 render_reference_not_found()
             END IF
@@ -42,8 +41,8 @@ REM    PRINTLN "Path: " + p$ <-- /reference
         END IF
 
         IF first$ = "category" THEN
-            IF n% >= 3 THEN
-                render_category_listing(segments$(1))
+            IF n% >= 4 THEN
+                render_category_listing(segments$(2))
             ELSE
                 render_reference_not_found()
             END IF
@@ -51,8 +50,8 @@ REM    PRINTLN "Path: " + p$ <-- /reference
         END IF
 
         IF first$ = "keyword" THEN
-            IF n% >= 3 THEN
-                render_keyword_detail(segments$(1))
+            IF n% >= 4 THEN
+                render_keyword_detail(segments$(2))
             ELSE
                 render_reference_not_found()
             END IF
@@ -76,10 +75,11 @@ SUB render_reference_index()
     REM Alpha block
     PRINTLN "  <section style=\"margin:1rem 0\">"
     PRINTLN "    <h3>Alphabetical Index</h3>"
-    letters() = get_alpha_letters()
-    PRINTLN "    <p>"
-    FOR i% = 0 TO ARRAY_ROWS%(letters$) - 1
-        L$ = letters(i%)
+
+    LET letters$ = get_alpha_letters()
+
+    PRINTLN "    <p>", letters$
+    FOR EACH L$ IN letters$
         PRINT "      <a href=\"/reference/alpha/" + html_escape$(L$) + "\" style=\"margin-right:.5rem\">" + html_escape$(L$) + "</a>"
     NEXT i%
     PRINTLN "    </p>"
@@ -88,13 +88,14 @@ SUB render_reference_index()
     REM Category block
     PRINTLN "  <section style=\"margin:1rem 0\">"
     PRINTLN "    <h3>Categories</h3>"
-    cats$() = get_all_categories()
+    LET cats$ = get_all_categories()
     rc% = ARRAY_ROWS%(cats$)
-    FOR i% = 0 TO rc% - 1
-        slug$ = cats$(i%, 0)
-        name$ = cats$(i%, 1)
+
+    FOR ii% = 0 TO rc% - 1
+        slug$ = cats$(ii%, 0)
+        name$ = cats$(ii%, 1)
         PRINTLN "    <div><a href=\"/reference/category/" + html_escape$(slug$) + "\">" + html_escape$(name$) + "</a></div>"
-    NEXT i%
+    NEXT
     PRINTLN "  </section>"
 
     PRINTLN "</main>"
@@ -109,7 +110,7 @@ SUB render_alpha_listing(letter$)
     PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
     PRINTLN "  <h1>Keywords starting with " + html_escape$(L$) + "</h1>"
 
-    rows$() = get_keywords_for_letter(L$)
+    rows$ = get_keywords_for_letter(L$)
     rc% = ARRAY_ROWS%(rows$)
     IF rc% = 0 THEN
         PRINTLN "  <p>No keywords found for this letter.</p>"
@@ -139,7 +140,7 @@ SUB render_category_listing(categorySlug$)
     PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
     PRINTLN "  <h1>Category: " + html_escape$(name$) + "</h1>"
 
-    rows$() = get_keywords_for_category(slug$)
+    rows$ = get_keywords_for_category(slug$)
     rc% = ARRAY_ROWS%(rows$)
     IF rc% = 0 THEN
         PRINTLN "  <p>No keywords found in this category.</p>"
@@ -167,7 +168,7 @@ SUB render_keyword_detail(keywordSlug$)
     slug$ = LOWER$(keywordSlug$)
 
     REM Load detail from stub provider
-    detail$() = get_keyword_detail(slug$)
+    detail$ = get_keyword_detail(slug$)
     IF ARRAY_ROWS%(detail$) = 0 THEN
         render_reference_not_found()
         RETURN
@@ -210,7 +211,7 @@ SUB render_keyword_detail(keywordSlug$)
     PRINTLN "  </section>"
 
     REM Examples (two styles)
-    ex$() = get_keyword_examples(slug$)
+    ex$ = get_keyword_examples(slug$)
     exn% = ARRAY_ROWS%(ex$)
     IF exn% > 0 THEN
         PRINTLN "  <section>"
@@ -232,7 +233,7 @@ SUB render_keyword_detail(keywordSlug$)
     PRINTLN "  <section>"
     PRINTLN "    <h3>See Also</h3>"
     PRINTLN "    <ul>"
-    li$() = split_csv(seeCsv$)
+    li$ = split_csv(seeCsv$)
     FOR i% = 0 TO ARRAY_ROWS%(li$) - 1
       name$ = TRIM$(li$(i%))
       slug2$ = to_slug$(name$)
@@ -250,8 +251,8 @@ SUB render_keyword_detail(keywordSlug$)
 END SUB
 
 SUB render_reference_not_found()
-    PRINTLN "Status: 404 Not Found"
-    PRINTLN ""
+    REM PRINTLN "Status: 404 Not Found"
+    REM PRINTLN ""
     html_head("Reference — Not Found")
     reference_header_nav()
     PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
@@ -294,13 +295,13 @@ REM Functions can return any data type, including arrays. For our convention, we
 REM to indicate that they probably return arrays.
 
 FUNCTION split_path_segments(path$)
-    REM path like "/alpha/A" -> ["alpha","A"]
+    REM path like "/reference/alpha/A" -> ["reference","alpha","A"]
     p$ = path$
     IF LEFT$(p$, 1) = "/" THEN p$ = MID$(p$, 2)
     REM count segments
     IF LEN(p$) = 0 THEN
         DIM empty$(0)
-        RETURN empty$()
+        RETURN empty$
     END IF
     count% = 1
     pos% = 1
@@ -311,16 +312,16 @@ FUNCTION split_path_segments(path$)
         pos% = slash% + 1
     END WHILE
     DIM segs$(count%)
-    i% = 0
+    iii% = 0
     start% = 1
-    WHILE start% <= LEN(p$) AND i% < count%
+    WHILE start% <= LEN(p$) AND iii% < count%
         slash% = INSTR(p$, "/", start%)
         IF slash% = 0 THEN slash% = LEN(p$) + 1
-        segs$(i%) = MID$(p$, start%, slash% - start%)
-        i% = i% + 1
+        segs$(iii%) = MID$(p$, start%, slash% - start%)
+        iii% = iii% + 1
         start% = slash% + 1
     END WHILE
-    RETURN segs$()
+    RETURN segs$
 END FUNCTION
 
 FUNCTION to_slug$(name$)
@@ -350,7 +351,7 @@ END FUNCTION
 FUNCTION split_csv(csv$)
     IF LEN(csv$) = 0 THEN
         DIM empty$(0)
-        RETURN empty$()
+        RETURN empty$
     END IF
     s$ = csv$
     count% = 1
@@ -361,7 +362,7 @@ FUNCTION split_csv(csv$)
 
         count% = count% + 1
         pos% = comma% + 1
-
+        PRINT count%
         DIM arr$(count%)
         i% = 0
         start% = 1
@@ -376,7 +377,7 @@ FUNCTION split_csv(csv$)
             start% = comma% + 1
         END WHILE
     END WHILE
-    RETURN arr$()
+    RETURN arr$
 END FUNCTION
 
 REM ---------- Stub data providers (to be replaced with MySQL/ORM) ----------
@@ -389,16 +390,19 @@ FUNCTION get_alpha_letters()
     letters$(2) = "C"
     letters$(3) = "D"
     letters$(4) = "E"
-    RETURN letters$()
+    RETURN letters$
 END FUNCTION
 
 FUNCTION get_all_categories()
     REM TODO: Replace with SELECT slug, name FROM categories ORDER BY name
     DIM cats$(3, 2)
-    cats$(0, 0) = "audio"; cats$(0, 1) = "Audio"
-    cats$(1, 0) = "midi";  cats$(1, 1) = "MIDI"
-    cats$(2, 0) = "media"; cats$(2, 1) = "Media"
-    RETURN cats$()
+    cats$(0, 0) = "audio";
+    cats$(0, 1) = "Audio"
+    cats$(1, 0) = "midi";
+    cats$(1, 1) = "MIDI"
+    cats$(2, 0) = "media";
+    cats$(2, 1) = "Media"
+    RETURN cats$
 END FUNCTION
 
 FUNCTION get_category_display_name$(slug$)
@@ -415,13 +419,13 @@ FUNCTION get_keywords_for_letter(letter$)
     L$ = UCASE$(LEFT$(letter$,1))
     IF L$ <> "A" THEN
         DIM empty$(0,0)
-        RETURN empty$()
+        RETURN empty$
     END IF
     DIM rows$(3, 3)
     rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names."
     rows$(1,0) = "audio_outputs";  rows$(1,1) = "AUDIO_OUTPUTS$";    rows$(1,2) = "Returns an array of audio output device names."
     rows$(2,0) = "audio_default";  rows$(2,1) = "AUDIO_DEFAULT_RATE%"; rows$(2,2) = "Default audio sample rate (Hz)."
-    RETURN rows$()
+    RETURN rows$
 END FUNCTION
 
 FUNCTION get_keywords_for_category(slug$)
@@ -432,22 +436,22 @@ FUNCTION get_keywords_for_category(slug$)
         rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names."
         rows$(1,0) = "audio_outputs";  rows$(1,1) = "AUDIO_OUTPUTS$";    rows$(1,2) = "Returns an array of audio output device names."
         rows$(2,0) = "audio_default";  rows$(2,1) = "AUDIO_DEFAULT_RATE%"; rows$(2,2) = "Default audio sample rate (Hz)."
-        RETURN rows$()
+        RETURN rows$
     END IF
 
     IF s$ = "midi" THEN
         DIM rows2$(1,3)
         rows2$(0,0) = "midi_list"; rows2$(0,1) = "MIDI_DEVICES$"; rows2$(0,2) = "List available MIDI devices."
-        RETURN rows2$()
+        RETURN rows2$
     END IF
 
     IF s$ = "media" THEN
         DIM rows3$(1,3)
         rows3$(0,0) = "media_open"; rows3$(0,1) = "MEDIA_OPEN@"; rows3$(0,2) = "Open a media file."
-        RETURN rows3$()
+        RETURN rows3$
     END IF
     DIM empty$(0,0)
-    RETURN empty$()
+    RETURN empty$
 END FUNCTION
 
 FUNCTION get_keyword_detail(slug$)
@@ -462,7 +466,7 @@ FUNCTION get_keyword_detail(slug$)
         row$(0, 4) = "Basil";      REM languages CSV
         row$(0, 5) = "Audio, MIDI, Media"; REM categories CSV
         row$(0, 6) = "AUDIO_OUTPUTS$, AUDIO_DEFAULT_RATE%, AUDIO_DEFAULT_CHANS%"; REM see also CSV
-        RETURN row$()
+        RETURN row$
     END IF
 
     IF s$ = "audio_outputs" THEN
@@ -474,11 +478,11 @@ FUNCTION get_keyword_detail(slug$)
         row2$(0, 4) = "Basil"
         row2$(0, 5) = "Audio"
         row2$(0, 6) = "AUDIO_INPUTS$, AUDIO_DEFAULT_RATE%"
-        RETURN row2$()
+        RETURN row2$
     END IF
 
     DIM none$(0,0)
-    RETURN none$()
+    RETURN none$
 END FUNCTION
 
 FUNCTION get_keyword_examples(slug$)
@@ -487,19 +491,19 @@ FUNCTION get_keyword_examples(slug$)
     IF s$ = "audio_inputs" THEN
         DIM ex$(2, 2)
         ex$(0, 0) = "Blocky BASIC"
-        ex$(0, 1) = "DIM ins$(0)\nins$() = AUDIO_INPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(ins$) - 1\n  PRINTLN ins$(i%)\nNEXT i%"
+        ex$(0, 1) = "DIM ins$(0)\nins$ = AUDIO_INPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(ins$) - 1\n  PRINTLN ins$(i%)\nNEXT i%"
         ex$(1, 0) = "Curly"
         ex$(1, 1) = "ins$ = AUDIO_INPUTS$();\nfor (i% = 0; i% < ins$.length; i% += 1) {\n  println(ins$(i%));\n}"
-        RETURN ex$()
+        RETURN ex$
     END IF
     IF s$ = "audio_outputs" THEN
         DIM ex2$(1, 2)
         ex2$(0, 0) = "Blocky BASIC"
-        ex2$(0, 1) = "DIM outs$(0)\nouts$() = AUDIO_OUTPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(outs$) - 1\n  PRINTLN outs$(i%)\nNEXT i%"
-        RETURN ex2$()
+        ex2$(0, 1) = "DIM outs$(0)\nouts$ = AUDIO_OUTPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(outs$) - 1\n  PRINTLN outs$(i%)\nNEXT i%"
+        RETURN ex2$
     END IF
     DIM none$(0,0)
-    RETURN none$()
+    RETURN none$
 END FUNCTION
 
 MAIN()
