@@ -10,7 +10,7 @@ PRINTLN "Wrapped: ", wrapped$
 LET already$ = JSON_STRINGIFY$(raw$)
 PRINTLN "Already JSON -> normalized: ", already$
 
-DIM A$(100);
+DIM A$(100)
 
 FOR i = 0 TO 100
     LET A$(i) = "Hello, World!"

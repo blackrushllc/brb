@@ -11,4 +11,4 @@ CREATE TABLE keyword_relations
     CONSTRAINT fk_kw_rel_related
         FOREIGN KEY (related_keyword_id) REFERENCES keywords (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4

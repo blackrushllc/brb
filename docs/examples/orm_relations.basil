@@ -3,7 +3,7 @@
 #USE DB_MYSQL, ORM
 
 REM  Read the .env file
-PRINTLN "Read .env file:";
+PRINTLN "Read .env file:"
 LET b% = LOADENV%(); // defaults to .env
 
 REM  Get the DSN from the environment and create a DB and ORM objects

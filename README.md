@@ -44,14 +44,14 @@ CREATE TABLE languages (
   code        VARCHAR(32) NOT NULL UNIQUE,   -- 'basic', 'basil', 'basicjs'
   name        VARCHAR(64) NOT NULL,          -- 'Basic', 'Basil', 'Basic.JS'
   sort_order  INT UNSIGNED NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
 CREATE TABLE feature_libraries (
   id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   code        VARCHAR(64) NOT NULL UNIQUE,   -- 'standard', 'obj-audio', 'obj-ai'
   name        VARCHAR(128) NOT NULL,
   description TEXT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
 CREATE TABLE categories (
   id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -59,7 +59,7 @@ CREATE TABLE categories (
   slug        VARCHAR(128) NOT NULL UNIQUE,  -- 'audio', 'midi', 'variables'
   description TEXT NULL,
   sort_order  INT UNSIGNED NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
 ### 2.2 Reference: keywords, examples, relations
@@ -89,7 +89,7 @@ CREATE TABLE keywords (
     ON DELETE SET NULL,
   INDEX idx_keywords_keyword (keyword),
   FULLTEXT INDEX ft_keywords_text (short_desc, long_desc_md)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
 CREATE TABLE keyword_languages (
   keyword_id   INT UNSIGNED NOT NULL,
@@ -99,7 +99,7 @@ CREATE TABLE keyword_languages (
     FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE,
   CONSTRAINT fk_kw_lang_language
     FOREIGN KEY (language_id) REFERENCES languages(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
 CREATE TABLE keyword_categories (
   keyword_id   INT UNSIGNED NOT NULL,
@@ -109,7 +109,7 @@ CREATE TABLE keyword_categories (
     FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE,
   CONSTRAINT fk_kw_cat_category
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
 **Code examples** (reusable across multiple keywords, with both blocky and curly styles):
@@ -123,7 +123,7 @@ CREATE TABLE code_examples (
   style       ENUM('blocky', 'curly') NOT NULL,
   body_md     MEDIUMTEXT NOT NULL,         -- Markdown-wrapped code block
   notes       TEXT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
 CREATE TABLE keyword_examples (
   keyword_id  INT UNSIGNED NOT NULL,
@@ -134,7 +134,7 @@ CREATE TABLE keyword_examples (
     FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE,
   CONSTRAINT fk_kw_ex_example
     FOREIGN KEY (example_id) REFERENCES code_examples(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
 **See-also / related relations:**
@@ -151,7 +151,7 @@ CREATE TABLE keyword_relations (
     FOREIGN KEY (keyword_id) REFERENCES keywords(id) ON DELETE CASCADE,
   CONSTRAINT fk_kw_rel_related
     FOREIGN KEY (related_keyword_id) REFERENCES keywords(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
 This lets you:
@@ -170,7 +170,7 @@ CREATE TABLE guide_sections (
   title       VARCHAR(255) NOT NULL,
   description TEXT NULL,
   sort_order  INT UNSIGNED NOT NULL DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 
 CREATE TABLE guide_pages (
   id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -194,7 +194,7 @@ CREATE TABLE guide_pages (
   CONSTRAINT fk_guide_pages_parent
     FOREIGN KEY (parent_id) REFERENCES guide_pages(id) ON DELETE SET NULL,
   FULLTEXT INDEX ft_guide_text (title, abstract, body_md)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
 This lets you:
@@ -217,7 +217,7 @@ CREATE TABLE admin_users (
   created_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
                     ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
 ```
 
 (You can implement login/session using Basil CGI + cookies later.)
@@ -234,7 +234,7 @@ You can put this in `010_seed.sql` for convenience.
 INSERT INTO languages (code, name, sort_order) VALUES
   ('basic',   'Basic',     1),
   ('basil',   'Basil',     2),
-  ('basicjs', 'Basic.JS',  3);
+  ('basicjs', 'Basic.JS',  3)
 ```
 
 ### 3.2 Feature libraries
@@ -245,7 +245,7 @@ INSERT INTO feature_libraries (code, name, description) VALUES
   ('obj-audio',  'Audio / MIDI Module',
      'Audio / MIDI / DAW functions such as AUDIO_INPUTS$, AUDIO_OUTPUTS$, etc.'),
   ('obj-ai',     'AI Module', 'AI/LLM helpers and utilities.'),
-  ('obj-sql',    'SQL Module', 'SQL client for MySQL and others.');
+  ('obj-sql',    'SQL Module', 'SQL client for MySQL and others.')
 ```
 
 ### 3.3 Categories
@@ -258,7 +258,7 @@ INSERT INTO categories (name, slug, description, sort_order) VALUES
   ('Logical Operators',      'logical-ops',    'Boolean operators and comparisons',   40),
   ('Audio',                  'audio',          'Audio device management',             50),
   ('MIDI',                   'midi',           'MIDI routing and devices',            60),
-  ('Media',                  'media',          'Media playback and recording',        70);
+  ('Media',                  'media',          'Media playback and recording',        70)
 ```
 
 ### 3.4 AUDIO_* keyword examples
@@ -270,23 +270,23 @@ INSERT INTO code_examples (title, style, body_md) VALUES
   'List audio inputs and outputs (blocky BASIC)',
   'blocky',
   '```basic
-REM List devices and defaults;
-PRINTLN "== Outputs ==";
-outs$[] = AUDIO_OUTPUTS$[];
+REM List devices and defaults
+PRINTLN "== Outputs =="
+outs$[] = AUDIO_OUTPUTS$[]
 FOR i% = 0 TO LEN(outs$[]) - 1 BEGIN
-  PRINT "  "; PRINT i%; PRINT ": "; PRINTLN outs$[](i%);
+  PRINT "  "; PRINT i%; PRINT ": "; PRINTLN outs$[](i%)
 END
 
-PRINTLN "== Inputs ==";
-ins$[] = AUDIO_INPUTS$[];
+PRINTLN "== Inputs =="
+ins$[] = AUDIO_INPUTS$[]
 FOR i% = 0 TO LEN(ins$[]) - 1 BEGIN
-  PRINT "  "; PRINT i%; PRINT ": "; PRINTLN ins$[](i%);
+  PRINT "  "; PRINT i%; PRINT ": "; PRINTLN ins$[](i%)
 END
 
-PRINT "Default rate: ";  PRINTLN AUDIO_DEFAULT_RATE%();
-PRINT "Default chans: "; PRINTLN AUDIO_DEFAULT_CHANS%();
+PRINT "Default rate: ";  PRINTLN AUDIO_DEFAULT_RATE%()
+PRINT "Default chans: "; PRINTLN AUDIO_DEFAULT_CHANS%()
 ```'
-);
+)
 
 -- The same logic in curly style (rough sketch)
 INSERT INTO code_examples (title, style, body_md) VALUES
@@ -295,22 +295,22 @@ INSERT INTO code_examples (title, style, body_md) VALUES
   'curly',
   '```basil
 // List devices and defaults
-println "== Outputs ==";
-let outs$[] = audio_outputs$();
+println "== Outputs =="
+let outs$[] = audio_outputs$()
 for (let i% = 0; i% < len(outs$); i%++) {
-  print "  "; print i%; print ": "; println outs$[i%];
+  print "  "; print i%; print ": "; println outs$[i%]
 }
 
-println "== Inputs ==";
-let ins$[] = audio_inputs$();
+println "== Inputs =="
+let ins$[] = audio_inputs$()
 for (let i% = 0; i% < len(ins$); i%++) {
-  print "  "; print i%; print ": "; println ins$[i%];
+  print "  "; print i%; print ": "; println ins$[i%]
 }
 
-print "Default rate: ";  println audio_default_rate%();
-print "Default chans: "; println audio_default_chans%();
+print "Default rate: ";  println audio_default_rate%()
+print "Default chans: "; println audio_default_chans%()
 ```'
-);
+)
 ````
 
 Assume these got IDs `1` (blocky) and `2` (curly).
@@ -333,7 +333,7 @@ INSERT INTO keywords (
   (SELECT id FROM feature_libraries WHERE code = 'obj-audio'),
   0,
   'Basil 1.x'
-);
+)
 
 -- AUDIO_OUTPUTS$
 INSERT INTO keywords (
@@ -350,7 +350,7 @@ INSERT INTO keywords (
   (SELECT id FROM feature_libraries WHERE code = 'obj-audio'),
   0,
   'Basil 1.x'
-);
+)
 
 -- AUDIO_DEFAULT_RATE%
 INSERT INTO keywords (
@@ -367,7 +367,7 @@ INSERT INTO keywords (
   (SELECT id FROM feature_libraries WHERE code = 'obj-audio'),
   0,
   'Basil 1.x'
-);
+)
 
 -- AUDIO_DEFAULT_CHANS%
 INSERT INTO keywords (
@@ -384,7 +384,7 @@ INSERT INTO keywords (
   (SELECT id FROM feature_libraries WHERE code = 'obj-audio'),
   0,
   'Basil 1.x'
-);
+)
 ```
 
 Make them **Basil only** and assign categories + examples:
@@ -395,14 +395,14 @@ INSERT INTO keyword_languages (keyword_id, language_id)
 SELECT k.id, l.id
 FROM keywords k, languages l
 WHERE l.code = 'basil'
-  AND k.keyword IN ('AUDIO_INPUTS$', 'AUDIO_OUTPUTS$', 'AUDIO_DEFAULT_RATE%', 'AUDIO_DEFAULT_CHANS%');
+  AND k.keyword IN ('AUDIO_INPUTS$', 'AUDIO_OUTPUTS$', 'AUDIO_DEFAULT_RATE%', 'AUDIO_DEFAULT_CHANS%')
 
 -- Assign categories Audio/MIDI/Media
 INSERT INTO keyword_categories (keyword_id, category_id)
 SELECT k.id, c.id
 FROM keywords k, categories c
 WHERE k.keyword IN ('AUDIO_INPUTS$', 'AUDIO_OUTPUTS$', 'AUDIO_DEFAULT_RATE%', 'AUDIO_DEFAULT_CHANS%')
-  AND c.slug IN ('audio', 'midi', 'media');
+  AND c.slug IN ('audio', 'midi', 'media')
 
 -- Reuse the same examples for all of them
 INSERT INTO keyword_examples (keyword_id, example_id, is_primary)
@@ -423,7 +423,7 @@ SELECT k1.id, k2.id, 'see_also'
 FROM keywords k1
 JOIN keywords k2
   ON k2.keyword IN ('AUDIO_OUTPUTS$', 'AUDIO_DEFAULT_RATE%', 'AUDIO_DEFAULT_CHANS%')
-WHERE k1.keyword = 'AUDIO_INPUTS$';
+WHERE k1.keyword = 'AUDIO_INPUTS$'
 
 -- Symmetric or additional see-also can be added similarly
 ```
@@ -442,7 +442,7 @@ INSERT INTO guide_sections (slug, title, description, sort_order) VALUES
   ('ai', 'AI', 'Using AI helpers and obj-ai.', 70),
   ('compiler', 'Compiler Guide', 'Using the Basil compiler.', 80),
   ('encryption', 'Encryption', 'Crypto and security.', 90),
-  ('smtp', 'Sending Email with SMTP', 'Using SMTP libraries.', 100);
+  ('smtp', 'Sending Email with SMTP', 'Using SMTP libraries.', 100)
 
 -- Example "Hello World" beginner page
 INSERT INTO guide_pages (
@@ -460,13 +460,13 @@ This is your first program in Basil.
 
 ```basic
 REM Hello World in Basil
-PRINTLN "Hello, world!";
+PRINTLN "Hello, world!"
 ````
 
 In Basic.JS, the same program might look like:
 
 ```javascript
-print("Hello, world!");
+print("Hello, world!")
 ```
 
 We''ll explain how to run these programs in the next section.',
@@ -474,7 +474,7 @@ We''ll explain how to run these programs in the next section.',
 NULL,  -- visible for all languages
 10,
 1
-);
+)
 
 ````
 
@@ -489,7 +489,7 @@ NULL,  -- visible for all languages
 ```sql
 SELECT DISTINCT UPPER(LEFT(keyword, 1)) AS initial
 FROM keywords
-ORDER BY initial;
+ORDER BY initial
 ````
 
 * To get all keywords under a given letter:
@@ -498,7 +498,7 @@ ORDER BY initial;
 SELECT *
 FROM keywords
 WHERE UPPER(LEFT(keyword, 1)) = 'A'
-ORDER BY keyword;
+ORDER BY keyword
 ```
 
 * For operators / symbols (e.g. `+`, `-`, `==`):
@@ -514,7 +514,7 @@ SELECT c.*
 FROM categories c
 JOIN keyword_categories kc ON kc.category_id = c.id
 GROUP BY c.id
-ORDER BY c.sort_order, c.name;
+ORDER BY c.sort_order, c.name
 ```
 
 * To get all keywords in a category (for `/reference/category/{slug}`):
@@ -525,7 +525,7 @@ FROM keywords k
 JOIN keyword_categories kc ON kc.keyword_id = k.id
 JOIN categories c ON c.id = kc.category_id
 WHERE c.slug = 'audio'
-ORDER BY k.keyword;
+ORDER BY k.keyword
 ```
 
 ### 4.3 Keyword detail page
@@ -550,7 +550,7 @@ SELECT s.id, s.slug, s.title,
 FROM guide_sections s
 LEFT JOIN guide_pages p
   ON p.section_id = s.id AND p.is_published = 1
-ORDER BY s.sort_order, p.position;
+ORDER BY s.sort_order, p.position
 ```
 
 * Each page page at `/guide/{slug}`:
@@ -558,7 +558,7 @@ ORDER BY s.sort_order, p.position;
 ```sql
 SELECT *
 FROM guide_pages
-WHERE slug = :slug AND is_published = 1;
+WHERE slug = :slug AND is_published = 1
 ```
 
 * You store Markdown in `body_md`, and then:
@@ -606,7 +606,7 @@ WHERE g.is_published = 1
   AND MATCH(g.title, g.abstract, g.body_md) AGAINST (:q IN NATURAL LANGUAGE MODE)
   AND (:lang IS NULL OR g.language_filter IS NULL OR FIND_IN_SET(:lang, g.language_filter))
 ORDER BY score DESC
-LIMIT 50;
+LIMIT 50
 ```
 
 The UI can let users choose:
@@ -719,7 +719,7 @@ Using the Basil SQL/ORM guides, you can:
 
 ```basic
 REM pseudocode-ish Basil
-LET db@ = DB_CONNECT_MYSQL$("hostname", "user", "pass", "basil_docs_db");
+LET db@ = DB_CONNECT_MYSQL$("hostname", "user", "pass", "basil_docs_db")
 ```
 
 * Then use either:
@@ -744,9 +744,9 @@ For performance, you can use connection pooling if Basil’s SQL module supports
 
 ```js
 document.querySelectorAll('[data-markdown]').forEach(el => {
-  const md = el.getAttribute('data-markdown');
-  el.innerHTML = marked.parse(md);
-});
+  const md = el.getAttribute('data-markdown')
+  el.innerHTML = marked.parse(md)
+})
 ```
 
 This keeps Basil’s backend simple while still giving you Markdown storage.

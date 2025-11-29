@@ -28,8 +28,8 @@
 ```rust
 // WHILE <expr> BEGIN ... END  or  WHILE <expr> { ... }  or  WHILE <expr> ... END [WHILE]
 if self.match_k(TokenKind::While) {
-    let cond = self.parse_expr_bp(0)?;
-    let mut body = Vec::new();
+    let cond = self.parse_expr_bp(0)?
+    let mut body = Vec::new()
     if self.match_k(TokenKind::Begin) {
         // existing BEGIN/END branch...
     } else if self.match_k(TokenKind::LBrace) {
@@ -39,23 +39,23 @@ if self.match_k(TokenKind::While) {
         loop {
             while self.match_k(TokenKind::Semicolon) {}
             if self.check(TokenKind::End) {
-                let _ = self.next();
+                let _ = self.next()
                 self.consume_optional_end_suffix(); // (accept END WHILE)
-                break;
+                break
             }
             if self.check(TokenKind::Eof) {
                 return Err(BasilError(format!(
                     "parse error at line {}: unterminated WHILE body: expected 'END'",
                     self.peek_line()
-                )));
+                )))
             }
-            let line = self.peek_line();
-            let stmt = self.parse_stmt()?;
-            body.push(Stmt::Line(line));
-            body.push(stmt);
+            let line = self.peek_line()
+            let stmt = self.parse_stmt()?
+            body.push(Stmt::Line(line))
+            body.push(stmt)
         }
     }
-    return Ok(Stmt::While { cond, body: Box::new(Stmt::Block(body)) });
+    return Ok(Stmt::While { cond, body: Box::new(Stmt::Block(body)) })
 }
 ```
 - This preserves braces and `BEGIN`, and simply adds the classic implicit form.
@@ -71,7 +71,7 @@ let body: Stmt = if self.match_k(TokenKind::Begin) {
     // existing
 } else {
     // NEW: implicit until NEXT
-    let mut inner = Vec::new();
+    let mut inner = Vec::new()
     loop {
         while self.match_k(TokenKind::Semicolon) {}
         if self.check(TokenKind::Next) { break; }
@@ -79,21 +79,21 @@ let body: Stmt = if self.match_k(TokenKind::Begin) {
             return Err(BasilError(format!(
                 "parse error at line {}: unterminated FOR EACH body: expected 'NEXT'",
                 self.peek_line()
-            )));
+            )))
         }
-        let line = self.peek_line();
-        let s = self.parse_stmt()?;
-        inner.push(Stmt::Line(line));
-        inner.push(s);
+        let line = self.peek_line()
+        let s = self.parse_stmt()?
+        inner.push(Stmt::Line(line))
+        inner.push(s)
     }
     Stmt::Block(inner)
-};
+}
 // Expect NEXT [ident] (as today)
 while self.match_k(TokenKind::Semicolon) {}
-self.expect(TokenKind::Next)?;
+self.expect(TokenKind::Next)?
 if self.check(TokenKind::Ident) { let _ = self.next(); }
-let _ = self.terminate_stmt();
-return Ok(Stmt::ForEach { var, enumerable, body: Box::new(body) });
+let _ = self.terminate_stmt()
+return Ok(Stmt::ForEach { var, enumerable, body: Box::new(body) })
 ```
 - Classic FOR change (around lines ~857–905) is analogous: stop the implicit body when you see `NEXT` and leave `NEXT` consumption to the existing code path just below.
 
@@ -125,17 +125,17 @@ if self.match_k(TokenKind::Begin) {
     // existing { } path
 } else if self.implicit_multiline_if && self.check(TokenKind::Semicolon /* or look for NL */) {
     // NEW (opt-in): implicit THEN-block until ELSE or END [IF]
-    let mut then_body = Vec::new();
+    let mut then_body = Vec::new()
     loop {
         while self.match_k(TokenKind::Semicolon) {}
         if self.check(TokenKind::Else) || self.check(TokenKind::End) { break; }
         if self.check(TokenKind::Eof) { return Err(BasilError(format!("parse error at line {}: unterminated IF body", self.peek_line()))); }
-        let line = self.peek_line();
-        let stmt = self.parse_stmt()?;
-        then_body.push(Stmt::Line(line));
-        then_body.push(stmt);
+        let line = self.peek_line()
+        let stmt = self.parse_stmt()?
+        then_body.push(Stmt::Line(line))
+        then_body.push(stmt)
     }
-    let then_s = Box::new(Stmt::Block(then_body));
+    let then_s = Box::new(Stmt::Block(then_body))
     let else_s = if self.match_k(TokenKind::Else) {
         // For ELSE, mirror the same implicit/BEGIN/{ } logic and require END [IF]
         while self.match_k(TokenKind::Semicolon) {}
@@ -143,22 +143,22 @@ if self.match_k(TokenKind::Begin) {
         else if self.match_k(TokenKind::LBrace) { /* ... */ }
         else {
             // implicit ELSE-block until END [IF]
-            let mut else_body = Vec::new();
+            let mut else_body = Vec::new()
             loop {
                 while self.match_k(TokenKind::Semicolon) {}
                 if self.check(TokenKind::End) { break; }
                 if self.check(TokenKind::Eof) { return Err(BasilError(format!("parse error at line {}: unterminated ELSE body", self.peek_line()))); }
-                let line = self.peek_line();
-                let stmt = self.parse_stmt()?;
-                else_body.push(Stmt::Line(line));
-                else_body.push(stmt);
+                let line = self.peek_line()
+                let stmt = self.parse_stmt()?
+                else_body.push(Stmt::Line(line))
+                else_body.push(stmt)
             }
             Some(Box::new(Stmt::Block(else_body)))
         }
-    } else { None };
+    } else { None }
     while self.match_k(TokenKind::Semicolon) {}
     self.expect_end_any()?; // accept END or END IF
-    return Ok(Stmt::If { cond, then_branch: then_s, else_branch: else_s });
+    return Ok(Stmt::If { cond, then_branch: then_s, else_branch: else_s })
 } else {
     // existing single-statement THEN/ELSE path (backward compatible default)
 }
@@ -219,11 +219,11 @@ END WHILE
 - FOR without BEGIN (body runs until NEXT):
 ```basic
 FOR j = 5 TO 1 STEP -1
-    PRINT j;
+    PRINT j
     FOR i = 1 TO 5
-        PRINTLN i;
-    NEXT i;
-NEXT j;
+        PRINTLN i
+    NEXT i
+NEXT j
 ```
 - IF: unchanged by default; still need `BEGIN … END` or `{ … }` for multi-statement bodies unless you enable the experimental flag.
 

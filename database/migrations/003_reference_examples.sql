@@ -8,7 +8,7 @@ CREATE TABLE code_examples
     body_md MEDIUMTEXT               NOT NULL, -- Markdown-wrapped code block
     notes   TEXT                     NULL
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
 
 CREATE TABLE keyword_examples
 (
@@ -21,4 +21,4 @@ CREATE TABLE keyword_examples
     CONSTRAINT fk_kw_ex_example
         FOREIGN KEY (example_id) REFERENCES code_examples (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4

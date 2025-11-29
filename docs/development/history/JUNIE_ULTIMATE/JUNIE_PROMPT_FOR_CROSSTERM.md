@@ -118,36 +118,36 @@ If a name/number is out of range, return error (see errors).
 **`01_colors_and_cls.basil`**
 
 ```basic
-COLOR("brightyellow", "blue"); CLS;
+COLOR("brightyellow", "blue"); CLS
 PRINTLN "Hello, colorful world!"; 
-COLOR_RESET; PRINTLN "Back to defaults.";
+COLOR_RESET; PRINTLN "Back to defaults."
 ```
 
 **`02_locate_save_restore.basil`**
 
 ```basic
-CLS; COLOR(15, 4);  REM bright white on blue;
+CLS; COLOR(15, 4);  REM bright white on blue
 LOCATE(10, 3); PRINT "Title"; 
-CURSOR_SAVE;
-LOCATE(5, 6);  PRINT "Menu item A";
-LOCATE(5, 7);  PRINT "Menu item B";
-CURSOR_RESTORE; PRINTLN "  (cursor restored next to Title)";
+CURSOR_SAVE
+LOCATE(5, 6);  PRINT "Menu item A"
+LOCATE(5, 7);  PRINT "Menu item B"
+CURSOR_RESTORE; PRINTLN "  (cursor restored next to Title)"
 ```
 
 **`03_size_and_hide_cursor.basil`**
 
 ```basic
-CLS; CURSOR_HIDE;
-PRINT "Terminal: "; PRINT TERM_COLS%(); PRINT "x"; PRINTLN TERM_ROWS%();
-SLEEP 1500;
-CURSOR_SHOW;
+CLS; CURSOR_HIDE
+PRINT "Terminal: "; PRINT TERM_COLS%(); PRINT "x"; PRINTLN TERM_ROWS%()
+SLEEP 1500
+CURSOR_SHOW
 ```
 
 **`04_home_clear_aliases.basil`**
 
 ```basic
-COLOR(10, -1); PRINTLN "I’ll clear in 1s…"; SLEEP 1000;
-HOME;  REM alias of CLS;
+COLOR(10, -1); PRINTLN "I’ll clear in 1s…"; SLEEP 1000
+HOME;  REM alias of CLS
 ```
 
 *(If `HOME` should only “move to 1,1” without clearing, implement that instead and keep `CLS` as clear+home; your call—document the choice.)*
@@ -185,7 +185,7 @@ HOME;  REM alias of CLS;
       bold: bool, underline: bool, reverse: bool,
       pos_stack: Vec<(u16,u16)>,
   }
-  static GLOBAL: OnceLock<Mutex<TermState>> = ...;
+  static GLOBAL: OnceLock<Mutex<TermState>> = ...
   ```
 * Register functions:
 

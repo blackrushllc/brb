@@ -219,20 +219,20 @@ Skeleton code (snippets to implement):
 crates/basil_web/src/server.rs
 
 ```rust
-use axum::{Router, extract::State, routing::get};
-use tokio::net::TcpListener;
-use crate::{config::Config, handlers, AppState};
-use std::sync::Arc;
+use axum::{Router, extract::State, routing::get}
+use tokio::net::TcpListener
+use crate::{config::Config, handlers, AppState}
+use std::sync::Arc
 
 pub async fn serve(cfg: Config) -> anyhow::Result<()> {
-    let state = Arc::new(AppState::new(cfg.clone()));
+    let state = Arc::new(AppState::new(cfg.clone()))
     let app = Router::new()
         .fallback(get(handlers::entry))
-        .with_state(state.clone());
-    let addr = format!("{}:{}", cfg.host, cfg.port).parse()?;
-    let listener = TcpListener::bind(addr).await?;
-    tracing::info!("basil-serve listening on http://{}", listener.local_addr()?);
-    axum::serve(listener, app).await?;
+        .with_state(state.clone())
+    let addr = format!("{}:{}", cfg.host, cfg.port).parse()?
+    let listener = TcpListener::bind(addr).await?
+    tracing::info!("basil-serve listening on http://{}", listener.local_addr()?)
+    axum::serve(listener, app).await?
     Ok(())
 }
 ```
@@ -240,16 +240,16 @@ pub async fn serve(cfg: Config) -> anyhow::Result<()> {
 crates/basil_web/src/handlers.rs
 
 ```rust
-use axum::{http::{Request, StatusCode}, response::Response, extract::State};
-use bytes::Bytes;
-use std::sync::Arc;
-use crate::{AppState, static_files, template, script};
+use axum::{http::{Request, StatusCode}, response::Response, extract::State}
+use bytes::Bytes
+use std::sync::Arc
+use crate::{AppState, static_files, template, script}
 
 pub async fn entry(State(app): State<Arc<AppState>>, req: Request<axum::body::Body>) -> Response {
     match static_files::dispatch(&app, req).await {
         Ok(resp) => resp,
         Err(err) => {
-            let msg = format!("Internal Server Error: {:#}", err);
+            let msg = format!("Internal Server Error: {:#}", err)
             (StatusCode::INTERNAL_SERVER_ERROR, msg).into_response()
         }
     }
@@ -260,15 +260,15 @@ crates/basil_web/src/static_files.rs (core idea)
 
 ```rust
 pub async fn dispatch(app: &AppState, req: Request<Body>) -> anyhow::Result<Response> {
-    let (parts, body) = req.into_parts();
-    let method = parts.method.clone();
-    let uri_path = percent_decode_str(parts.uri.path()).decode_utf8_lossy();
-    let path = resolve_path(&app.cfg.root, &uri_path)?;
+    let (parts, body) = req.into_parts()
+    let method = parts.method.clone()
+    let uri_path = percent_decode_str(parts.uri.path()).decode_utf8_lossy()
+    let path = resolve_path(&app.cfg.root, &uri_path)?
     if path.is_dir() {
-        let idx = path.join(&app.cfg.index);
-        return serve_file(&app.cfg, parts, idx).await;
+        let idx = path.join(&app.cfg.index)
+        return serve_file(&app.cfg, parts, idx).await
     }
-    let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("");
+    let ext = path.extension().and_then(|s| s.to_str()).unwrap_or("")
     match ext {
         "basil" | "bas" => return crate::script::run_script(app, Request::from_parts(parts, Body::from(body)), path).await,
         "html" if crate::template::file_contains_basil(&path).await? =>
@@ -285,18 +285,18 @@ pub struct ScriptOutput { pub status: Option<StatusCode>, pub headers: HeaderMap
 
 pub fn split_headers_and_body(mut raw: Vec<u8>) -> ScriptOutput {
     let sep = raw.windows(4).position(|w| w == b"\r\n\r\n")
-        .or_else(|| raw.windows(2).position(|w| w == b"\n\n"));
-    let (head, body) = if let Some(i) = sep { raw.split_at(i + 4) } else { (&raw[..], &raw[..0]) };
-    let mut status = None;
-    let mut headers = HeaderMap::new();
+        .or_else(|| raw.windows(2).position(|w| w == b"\n\n"))
+    let (head, body) = if let Some(i) = sep { raw.split_at(i + 4) } else { (&raw[..], &raw[..0]) }
+    let mut status = None
+    let mut headers = HeaderMap::new()
     for line in head.split(|&b| b == b'\n') {
-        let line = String::from_utf8_lossy(line).trim().to_string();
+        let line = String::from_utf8_lossy(line).trim().to_string()
         if line.is_empty() { continue; }
         if let Some((k, v)) = line.split_once(':') {
-            let k = k.trim();
-            let v = v.trim();
+            let k = k.trim()
+            let v = v.trim()
             if k.eq_ignore_ascii_case("Status") { status = parse_status(v); continue; }
-            headers.append(HeaderName::from_bytes(k.as_bytes()).unwrap_or(header::INVALID_HEADER_NAME), HeaderValue::from_str(v).unwrap_or(HeaderValue::from_static("")));
+            headers.append(HeaderName::from_bytes(k.as_bytes()).unwrap_or(header::INVALID_HEADER_NAME), HeaderValue::from_str(v).unwrap_or(HeaderValue::from_static("")))
         }
     }
     ScriptOutput { status, headers, body: Bytes::copy_from_slice(body) }

@@ -46,38 +46,38 @@ Got it — here’s a tight “Phase 2” add-on brief you can paste to Junie la
 **`01_pollkey_echo.basil`**
 
 ```basic
-TERM.INIT; TERM.RAW ON; CURSOR_HIDE; CLS;
-PRINT "Press ESC to quit…"; TERM.FLUSH;
+TERM.INIT; TERM.RAW ON; CURSOR_HIDE; CLS
+PRINT "Press ESC to quit…"; TERM.FLUSH
 DO
-  k$ = TERM.POLLKEY$();
+  k$ = TERM.POLLKEY$()
   IF k$ <> "" THEN
-     IF k$ = "Esc" THEN EXIT DO;
-     PRINT "\rKey: "; PRINT k$; PRINT "     "; TERM.FLUSH;
+     IF k$ = "Esc" THEN EXIT DO
+     PRINT "\rKey: "; PRINT k$; PRINT "     "; TERM.FLUSH
   ENDIF
 LOOP
-CURSOR_SHOW; TERM.RAW OFF; TERM.END;
+CURSOR_SHOW; TERM.RAW OFF; TERM.END
 ```
 
 **`02_altscreen_title.basil`**
 
 ```basic
-TERM.INIT; ALTSCREEN_ON; CLS;
-PRINTLN "Basil + Crossterm (Alt Screen)";
-PRINTLN "Press any key to exit…"; TERM.FLUSH;
+TERM.INIT; ALTSCREEN_ON; CLS
+PRINTLN "Basil + Crossterm (Alt Screen)"
+PRINTLN "Press any key to exit…"; TERM.FLUSH
 DO : k$ = TERM.POLLKEY$() : LOOP WHILE k$ = ""
-ALTSCREEN_OFF; TERM.END;
+ALTSCREEN_OFF; TERM.END
 ```
 
 **`03_buffered_redraw.basil`**
 
 ```basic
-TERM.INIT; ALTSCREEN_ON; CLS;
+TERM.INIT; ALTSCREEN_ON; CLS
 FOR i% = 1 TO 20
-  LOCATE(1,1); PRINT "Frame "; PRINT i%;
-  LOCATE(1,3); PRINT STRING$(i% MOD 60, "#");
-  TERM.FLUSH; SLEEP 33;
-NEXT i%;
-ALTSCREEN_OFF; TERM.END;
+  LOCATE(1,1); PRINT "Frame "; PRINT i%
+  LOCATE(1,3); PRINT STRING$(i% MOD 60, "#")
+  TERM.FLUSH; SLEEP 33
+NEXT i%
+ALTSCREEN_OFF; TERM.END
 ```
 
 ## Tests

@@ -74,103 +74,103 @@ The IVR will:
 
 3. **Write the Rust ARI IVR Code** (in `src/main.rs`):
    ```rust
-   use futures::{SinkExt, StreamExt};
-   use reqwest::Client;
-   use serde::{Deserialize, Serialize};
-   use serde_json::Value;
-   use tokio_tungstenite::{connect_async, tungstenite::protocol::Message};
-   use url::Url;
+   use futures::{SinkExt, StreamExt}
+   use reqwest::Client
+   use serde::{Deserialize, Serialize}
+   use serde_json::Value
+   use tokio_tungstenite::{connect_async, tungstenite::protocol::Message}
+   use url::Url
 
    #[tokio::main]
    async fn main() -> Result<(), Box<dyn std::error::Error>> {
        // ARI connection details
-       let ari_url = "http://localhost:8088/ari";
-       let ws_url = "ws://localhost:8088/ari/events";
-       let user = "ari_user";
-       let password = "yourpassword";
-       let app_name = "rust_ivr";
+       let ari_url = "http://localhost:8088/ari"
+       let ws_url = "ws://localhost:8088/ari/events"
+       let user = "ari_user"
+       let password = "yourpassword"
+       let app_name = "rust_ivr"
 
        // HTTP client for ARI REST API
-       let client = Client::new();
+       let client = Client::new()
 
        // Connect to ARI WebSocket for events
-       let ws_url = format!("{}?app={}&api_key={}:{}}", ws_url, app_name, user, password);
-       let (ws_stream, _) = connect_async(Url::parse(&ws_url)?).await?;
-       let (mut ws_write, mut ws_read) = ws_stream.split();
+       let ws_url = format!("{}?app={}&api_key={}:{}}", ws_url, app_name, user, password)
+       let (ws_stream, _) = connect_async(Url::parse(&ws_url)?).await?
+       let (mut ws_write, mut ws_read) = ws_stream.split()
 
-       println!("Connected to ARI WebSocket");
+       println!("Connected to ARI WebSocket")
 
        // Handle WebSocket events
        while let Some(msg) = ws_read.next().await {
-           let msg = msg?;
+           let msg = msg?
            if let Message::Text(text) = msg {
-               let event: Value = serde_json::from_str(&text)?;
+               let event: Value = serde_json::from_str(&text)?
                match event["type"].as_str() {
                    Some("StasisStart") => {
-                       let channel_id = event["channel"]["id"].as_str().unwrap_or("");
-                       println!("New call on channel: {}", channel_id);
+                       let channel_id = event["channel"]["id"].as_str().unwrap_or("")
+                       println!("New call on channel: {}", channel_id)
 
                        // Answer the call
-                       let answer_url = format!("{}/channels/{}/answer", ari_url, channel_id);
+                       let answer_url = format!("{}/channels/{}/answer", ari_url, channel_id)
                        client
                            .post(&answer_url)
                            .basic_auth(user, Some(password))
                            .send()
-                           .await?;
+                           .await?
 
                        // Play welcome prompt
-                       let playback_url = format!("{}/channels/{}/play?media=sound:welcome", ari_url, channel_id);
+                       let playback_url = format!("{}/channels/{}/play?media=sound:welcome", ari_url, channel_id)
                        client
                            .post(&playback_url)
                            .basic_auth(user, Some(password))
                            .send()
-                           .await?;
+                           .await?
                    }
                    Some("ChannelDtmfReceived") => {
-                       let digit = event["digit"].as_str().unwrap_or("");
-                       let channel_id = event["channel"]["id"].as_str().unwrap_or("");
-                       println!("Received DTMF {} on channel {}", digit, channel_id);
+                       let digit = event["digit"].as_str().unwrap_or("")
+                       let channel_id = event["channel"]["id"].as_str().unwrap_or("")
+                       println!("Received DTMF {} on channel {}", digit, channel_id)
 
                        match digit {
                            "1" => {
                                // Play sales prompt and route
-                               let playback_url = format!("{}/channels/{}/play?media=sound:sales", ari_url, channel_id);
+                               let playback_url = format!("{}/channels/{}/play?media=sound:sales", ari_url, channel_id)
                                client
                                    .post(&playback_url)
                                    .basic_auth(user, Some(password))
                                    .send()
-                                   .await?;
+                                   .await?
                                // Example: Route to SIP/101
-                               let dial_url = format!("{}/channels/{}/dial?endpoint=SIP/101", ari_url, channel_id);
+                               let dial_url = format!("{}/channels/{}/dial?endpoint=SIP/101", ari_url, channel_id)
                                client
                                    .post(&dial_url)
                                    .basic_auth(user, Some(password))
                                    .send()
-                                   .await?;
+                                   .await?
                            }
                            "2" => {
                                // Play support prompt
-                               let playback_url = format!("{}/channels/{}/play?media=sound:support", ari_url, channel_id);
+                               let playback_url = format!("{}/channels/{}/play?media=sound:support", ari_url, channel_id)
                                client
                                    .post(&playback_url)
                                    .basic_auth(user, Some(password))
                                    .send()
-                                   .await?;
+                                   .await?
                            }
                            _ => {
                                // Play invalid prompt and hang up
-                               let playback_url = format!("{}/channels/{}/play?media=sound:invalid", ari_url, channel_id);
+                               let playback_url = format!("{}/channels/{}/play?media=sound:invalid", ari_url, channel_id)
                                client
                                    .post(&playback_url)
                                    .basic_auth(user, Some(password))
                                    .send()
-                                   .await?;
-                               let hangup_url = format!("{}/channels/{}", ari_url, channel_id);
+                                   .await?
+                               let hangup_url = format!("{}/channels/{}", ari_url, channel_id)
                                client
                                    .delete(&hangup_url)
                                    .basic_auth(user, Some(password))
                                    .send()
-                                   .await?;
+                                   .await?
                            }
                        }
                    }

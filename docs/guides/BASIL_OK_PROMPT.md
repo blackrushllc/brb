@@ -134,7 +134,7 @@ basilc cli
 
 OK
 
-1 + 2 * 3 ;;
+1 + 2 * 3 ;
 7
 
 OK
@@ -171,7 +171,7 @@ RUN
 ```
 basilc cli examples\init.basil
 OK
-PRINT GREET$ + " from REPL" ;;
+PRINT GREET$ + " from REPL" ;
 Hi from REPL
 
 OK

@@ -56,9 +56,9 @@
 
 4. **Add tests** (tempdir based) for:
 
-    * listing;
-    * writing a single file;
-    * writing a directory;
+    * listing
+    * writing a single file
+    * writing a directory
     * rejecting `..` and absolute paths.
 
 ---
@@ -87,21 +87,21 @@ use std::{
     fs::{self, File},
     io::Write,
     path::{Path, PathBuf},
-};
+}
 
 fn main() {
-    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
-    let includes_root = manifest_dir.join("includes");
-    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let dest = out_dir.join("embedded_includes.rs");
+    let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap())
+    let includes_root = manifest_dir.join("includes")
+    let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap())
+    let dest = out_dir.join("embedded_includes.rs")
 
     // If there is no includes/ folder, emit an empty table (no error).
-    let mut entries: Vec<String> = Vec::new();
+    let mut entries: Vec<String> = Vec::new()
     if includes_root.exists() {
-        collect_files(&includes_root, &includes_root, &mut entries).unwrap();
+        collect_files(&includes_root, &includes_root, &mut entries).unwrap()
     }
 
-    let mut f = File::create(&dest).unwrap();
+    let mut f = File::create(&dest).unwrap()
     writeln!(
         f,
         r#"#[derive(Debug, Clone, Copy)]
@@ -109,37 +109,37 @@ pub struct EmbeddedFile {{ pub path: &'static str, pub contents: &'static [u8] }
 
 pub static EMBEDDED_FILES: &[EmbeddedFile] = &["#
     )
-    .unwrap();
+    .unwrap()
 
     for logical in entries {
         // We generate lines like:
         // EmbeddedFile { path: "examples/hello.basil", contents: include_bytes!("includes/examples/hello.basil") },
-        let include_path = format!("includes/{}", logical);
+        let include_path = format!("includes/{}", logical)
         writeln!(
             f,
             "    EmbeddedFile {{ path: {lp:?}, contents: include_bytes!({ip:?}) }},",
             lp = logical,
             ip = include_path
         )
-        .unwrap();
+        .unwrap()
     }
 
-    writeln!(f, "];").unwrap();
-    println!("cargo:rerun-if-changed=includes");
+    writeln!(f, "];").unwrap()
+    println!("cargo:rerun-if-changed=includes")
 }
 
 fn collect_files(root: &Path, dir: &Path, out: &mut Vec<String>) -> std::io::Result<()> {
     for ent in fs::read_dir(dir)? {
-        let ent = ent?;
-        let p = ent.path();
-        let meta = ent.metadata()?;
+        let ent = ent?
+        let p = ent.path()
+        let meta = ent.metadata()?
         if meta.is_dir() {
-            collect_files(root, &p, out)?;
+            collect_files(root, &p, out)?
         } else if meta.is_file() {
-            let rel = p.strip_prefix(root).unwrap();
+            let rel = p.strip_prefix(root).unwrap()
             // Normalize to forward slashes for a stable logical path
-            let logical = rel.to_string_lossy().replace('\\', "/");
-            out.push(logical);
+            let logical = rel.to_string_lossy().replace('\\', "/")
+            out.push(logical)
         }
     }
     Ok(())
@@ -155,21 +155,21 @@ Create this module:
 
 #![allow(dead_code)]
 
-include!(concat!(env!("OUT_DIR"), "/embedded_includes.rs"));
+include!(concat!(env!("OUT_DIR"), "/embedded_includes.rs"))
 
-use std::fs;
-use std::path::{Path, PathBuf};
+use std::fs
+use std::path::{Path, PathBuf}
 
 pub fn list_all_paths() -> impl Iterator<Item = &'static str> {
     EMBEDDED_FILES.iter().map(|f| f.path)
 }
 
 pub fn list_top_level_dirs() -> Vec<&'static str> {
-    let mut dirs = Vec::new();
+    let mut dirs = Vec::new()
     for p in list_all_paths() {
         if let Some((first, _rest)) = p.split_once('/') {
             if !dirs.contains(&first) {
-                dirs.push(first);
+                dirs.push(first)
             }
         }
     }
@@ -178,44 +178,44 @@ pub fn list_top_level_dirs() -> Vec<&'static str> {
 
 pub fn find_file(logical: &str) -> Option<&'static EmbeddedFile> {
     if let Some(f) = EMBEDDED_FILES.iter().find(|f| f.path == logical) {
-        return Some(f);
+        return Some(f)
     }
     // convenience: try "<name>.basil" for bare names like "upgrade"
-    let fallback = format!("{logical}.basil");
+    let fallback = format!("{logical}.basil")
     EMBEDDED_FILES.iter().find(|f| f.path == fallback)
 }
 
 pub fn has_dir(dir: &str) -> bool {
-    let prefix = ensure_trailing_slash(dir);
+    let prefix = ensure_trailing_slash(dir)
     EMBEDDED_FILES.iter().any(|f| f.path.starts_with(&prefix))
 }
 
 pub fn write_single(logical: &str, dest_root: &Path) -> std::io::Result<PathBuf> {
-    let file = find_file(logical).ok_or_else(|| not_found(logical))?;
-    let out = resolved_output_path_for_file(logical, dest_root);
+    let file = find_file(logical).ok_or_else(|| not_found(logical))?
+    let out = resolved_output_path_for_file(logical, dest_root)
     if let Some(parent) = out.parent() {
-        fs::create_dir_all(parent)?;
+        fs::create_dir_all(parent)?
     }
-    fs::write(&out, file.contents)?;
+    fs::write(&out, file.contents)?
     Ok(out)
 }
 
 pub fn extract_dir(dir: &str, dest_root: &Path) -> std::io::Result<()> {
-    let prefix = ensure_trailing_slash(dir);
-    let mut found_any = false;
+    let prefix = ensure_trailing_slash(dir)
+    let mut found_any = false
     for f in EMBEDDED_FILES.iter() {
         if f.path.starts_with(&prefix) {
-            found_any = true;
+            found_any = true
             let rel = &f.path[prefix.len()..]; // e.g. "hello.basil"
-            let out = dest_root.join(dir).join(rel);
+            let out = dest_root.join(dir).join(rel)
             if let Some(parent) = out.parent() {
-                fs::create_dir_all(parent)?;
+                fs::create_dir_all(parent)?
             }
-            fs::write(&out, f.contents)?;
+            fs::write(&out, f.contents)?
         }
     }
     if !found_any {
-        return Err(not_found(dir));
+        return Err(not_found(dir))
     }
     Ok(())
 }
@@ -255,10 +255,10 @@ Pseudocode (adjust to your arg parser):
 ```rust
 // basilc/src/main.rs (or wherever CLI dispatch happens)
 
-mod embedded;
+mod embedded
 
-use std::env;
-use std::path::PathBuf;
+use std::env
+use std::path::PathBuf
 
 fn main() -> anyhow::Result<()> {
     // ... existing CLI parsing ...
@@ -266,10 +266,10 @@ fn main() -> anyhow::Result<()> {
     match cmd {
         Command::Make { target, list } => {
             if list {
-                print_embedded_inventory();
-                return Ok(());
+                print_embedded_inventory()
+                return Ok(())
             }
-            handle_make(&target)?;
+            handle_make(&target)?
         }
         // ... other subcommands ...
     }
@@ -277,45 +277,45 @@ fn main() -> anyhow::Result<()> {
 }
 
 fn print_embedded_inventory() {
-    println!("Embedded files:");
+    println!("Embedded files:")
     for p in embedded::list_all_paths() {
-        println!("  {}", p);
+        println!("  {}", p)
     }
-    let dirs = embedded::list_top_level_dirs();
+    let dirs = embedded::list_top_level_dirs()
     if !dirs.is_empty() {
-        println!("\nTop-level dirs: {}", dirs.join(", "));
+        println!("\nTop-level dirs: {}", dirs.join(", "))
     }
 }
 
 fn handle_make(target: &str) -> anyhow::Result<()> {
     if embedded::is_unsafe_target(target) {
-        anyhow::bail!("Refusing unsafe target: {target}");
+        anyhow::bail!("Refusing unsafe target: {target}")
     }
 
-    let cwd = env::current_dir()?;
+    let cwd = env::current_dir()?
 
-    let is_dir = embedded::has_dir(target);
-    let file = embedded::find_file(target);
+    let is_dir = embedded::has_dir(target)
+    let file = embedded::find_file(target)
 
     if is_dir && file.is_none() {
-        embedded::extract_dir(target, &cwd)?;
-        println!("Wrote directory: {target}/");
-        return Ok(());
+        embedded::extract_dir(target, &cwd)?
+        println!("Wrote directory: {target}/")
+        return Ok(())
     }
 
     if file.is_some() {
-        let out = embedded::write_single(target, &cwd)?;
-        println!("Wrote file: {}", out.display());
+        let out = embedded::write_single(target, &cwd)?
+        println!("Wrote file: {}", out.display())
 
         // If it's a single file, run it.
-        run_script(&out)?;
-        return Ok(());
+        run_script(&out)?
+        return Ok(())
     }
 
     if is_dir {
-        embedded::extract_dir(target, &cwd)?;
-        println!("Wrote directory: {target}/");
-        return Ok(());
+        embedded::extract_dir(target, &cwd)?
+        println!("Wrote directory: {target}/")
+        return Ok(())
     }
 
     // Nothing matched
@@ -326,8 +326,8 @@ fn handle_make(target: &str) -> anyhow::Result<()> {
 fn run_script(path: &PathBuf) -> anyhow::Result<()> {
     // Reuse your existing 'run' flow
     // Example:
-    //   let src = std::fs::read_to_string(path)?;
-    //   basil::execute(&src)?;
+    //   let src = std::fs::read_to_string(path)?
+    //   basil::execute(&src)?
     crate::cli::run_path(path) // or whatever your existing function is
 }
 ```

@@ -89,11 +89,11 @@ bcc aot <input.basil>
 * Public API used by both VM and compiled output:
 
   ```rust
-  pub struct Str(/* Arc<str> or String */);
+  pub struct Str(/* Arc<str> or String */)
   pub enum Val { Int(i64), Bool(bool), Str(Str), Obj(ObjHandle) }
-  pub type RtResult<T> = Result<T, RtError>;
-  pub fn print(v:&Val)->RtResult<()>;  pub fn println(v:&Val)->RtResult<()>;
-  pub fn input_line(prompt:&Str)->Str;
+  pub type RtResult<T> = Result<T, RtError>
+  pub fn print(v:&Val)->RtResult<()>;  pub fn println(v:&Val)->RtResult<()>
+  pub fn input_line(prompt:&Str)->Str
   pub mod features { /* gated modules: audio, midi, daw, term, ... */ }
   ```
 * Gate `features::*` modules behind Cargo features; keep APIs monomorphic for fast builds.
@@ -320,7 +320,7 @@ Generate this verbatim, then substitute the {{}} placeholders. Keep the code mon
 // - All I/O & features go through libbasilrt to match VM semantics.
 // - Each statement line carries a @basil comment for diagnostics.
 
-use libbasilrt as rt;
+use libbasilrt as rt
 
 // --- Literal helpers (inlined) ---
 #[inline(always)]
@@ -339,7 +339,7 @@ fn lit_val_str(s: &'static str) -> rt::Val { rt::Val::Str(rt::Str::from_static(s
 fn basil_main() -> rt::RtResult<()> {
     // @basil: {{FILE}}:{{LINE}}:{{COL}}
     // (Example of a simple println)
-    // rt::println(&lit_val_str("Hello from Basil"))?;
+    // rt::println(&lit_val_str("Hello from Basil"))?
 
     // {{BEGIN_EMITTED_BODY}}
     {{EMITTED_BODY}}
@@ -351,8 +351,8 @@ fn basil_main() -> rt::RtResult<()> {
 // --- Optional: simple top-level error surfacing ---
 fn main() {
     if let Err(e) = basil_main() {
-        eprintln!("{}", e);
-        std::process::exit(1);
+        eprintln!("{}", e)
+        std::process::exit(1)
     }
 }
 
@@ -378,10 +378,10 @@ These are “lego bricks” Junie can map from our IR:
 
 
 ```rust
-// PRINT <val>;
+// PRINT <val>
 rt::print(&VAL)?;                        // @basil: {{f:l:c}}
 
-// PRINTLN <val>;
+// PRINTLN <val>
 rt::println(&VAL)?;                      // @basil: {{f:l:c}}
 
 // IF cond THEN ...
@@ -396,12 +396,12 @@ while COND_BOOL {
 
 // FOR i = a TO b STEP s
 {
-    let mut i: i64 = A;
-    let end_: i64 = B;
-    let step_: i64 = S;
+    let mut i: i64 = A
+    let end_: i64 = B
+    let step_: i64 = S
     while if step_ >= 0 { i <= end_ } else { i >= end_ } {
         // body ...
-        i = i.saturating_add(step_);
+        i = i.saturating_add(step_)
     }
 }                                        // @basil: {{f:l:c}}
 
@@ -409,7 +409,7 @@ while COND_BOOL {
 let s_ab: rt::Str = rt::concat(&A_STR, &B_STR);    // @basil: {{f:l:c}}
 
 // FEATURE CALL (example)
-let rc: i32 = rt::features::audio::record(/* args */)?;
+let rc: i32 = rt::features::audio::record(/* args */)?
 
 ```
 

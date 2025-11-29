@@ -1,7 +1,7 @@
 REM RDS TLS example (show RootCertPath$ usage)
 
 // Read the .env file
-PRINTLN "Read .env file:";
+PRINTLN "Read .env file:"
 LET b% = LOADENV%(); // defaults to .env
 LET dsn$ = ENV$("DB_DSN")
 

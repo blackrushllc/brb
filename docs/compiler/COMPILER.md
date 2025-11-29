@@ -73,23 +73,23 @@ Define a C-ABI surface that both the VM and AOT compiler can call:
 
 ```c
 // libbasilrt.h
-typedef struct { const char* ptr; uint32_t len; } BasilStr;
-typedef int32_t BasilI32;
+typedef struct { const char* ptr; uint32_t len; } BasilStr
+typedef int32_t BasilI32
 typedef void*   BasilObj;   // opaque handle
 
 typedef struct {
-  BasilI32 (*audio_open_in)(BasilObj* out_dev, BasilStr name, BasilStr* err);
-  BasilI32 (*audio_record)(BasilObj dev, BasilStr* err);
+  BasilI32 (*audio_open_in)(BasilObj* out_dev, BasilStr name, BasilStr* err)
+  BasilI32 (*audio_record)(BasilObj dev, BasilStr* err)
   // ...
-} BasilFeature_Audio;
+} BasilFeature_Audio
 
 typedef struct {
-  BasilFeature_Audio audio;
+  BasilFeature_Audio audio
   // other features exposed here
-} BasilFeatures;
+} BasilFeatures
 
 // Provided by runtime on program start:
-const BasilFeatures* basil_get_features(void);
+const BasilFeatures* basil_get_features(void)
 ```
 
 Your generated code links against `libbasilrt` (static or dynamic). Each feature (obj-audio, obj-midi, obj-daw, future obj-term) registers its vtable during startup.

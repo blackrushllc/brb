@@ -333,14 +333,14 @@ Each Rust object crate would:
 Then your main `basil-object/src/lib.rs` just adds:
 
 ```rust
-#[cfg(feature = "obj-zip")]  mod zip;
-#[cfg(feature = "obj-curl")] mod curl;
-#[cfg(feature = "obj-pdf")]  mod pdf;
+#[cfg(feature = "obj-zip")]  mod zip
+#[cfg(feature = "obj-curl")] mod curl
+#[cfg(feature = "obj-pdf")]  mod pdf
 
 pub fn register_objects(reg: &mut Registry) {
-    #[cfg(feature = "obj-zip")]  zip::register(reg);
-    #[cfg(feature = "obj-curl")] curl::register(reg);
-    #[cfg(feature = "obj-pdf")]  pdf::register(reg);
+    #[cfg(feature = "obj-zip")]  zip::register(reg)
+    #[cfg(feature = "obj-curl")] curl::register(reg)
+    #[cfg(feature = "obj-pdf")]  pdf::register(reg)
 }
 ```
 This keeps the core Basil runtime small and lets users pick exactly which capabilities they want by enabling features when building Basil.

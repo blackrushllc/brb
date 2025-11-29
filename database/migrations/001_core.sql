@@ -7,7 +7,7 @@ CREATE TABLE languages
     name       VARCHAR(64)  NOT NULL,        -- 'Basic', 'Basil', 'Basic.JS'
     sort_order INT UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
 
 CREATE TABLE feature_libraries
 (
@@ -16,7 +16,7 @@ CREATE TABLE feature_libraries
     name        VARCHAR(128) NOT NULL,
     description TEXT         NULL
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
 
 CREATE TABLE categories
 (
@@ -26,4 +26,4 @@ CREATE TABLE categories
     description TEXT         NULL,
     sort_order  INT UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4

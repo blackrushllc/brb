@@ -62,27 +62,27 @@
 ## Rust (WASM-facing API)
 
 ```rust
-use wasm_bindgen::prelude::*;
-use serde::{Serialize, Deserialize};
+use wasm_bindgen::prelude::*
+use serde::{Serialize, Deserialize}
 
 #[wasm_bindgen]
 extern "C" {
     // JS callbacks supplied by the host page
     #[wasm_bindgen(js_namespace = BasilHost)]
-    fn js_println(s: &str);
+    fn js_println(s: &str)
     #[wasm_bindgen(js_namespace = BasilHost)]
-    fn js_need_input();
+    fn js_need_input()
     #[wasm_bindgen(js_namespace = BasilHost)]
-    fn js_rand_u32() -> u32;
+    fn js_rand_u32() -> u32
     #[wasm_bindgen(js_namespace = BasilHost)]
-    fn js_now_ms() -> f64;
+    fn js_now_ms() -> f64
 }
 
 pub trait Host {
-    fn println(&mut self, s: &str);
+    fn println(&mut self, s: &str)
     fn need_input(&mut self);            // signal the UI to prompt
-    fn rand_u32(&mut self) -> u32;
-    fn now_ms(&mut self) -> f64;
+    fn rand_u32(&mut self) -> u32
+    fn now_ms(&mut self) -> f64
     fn take_stdin_line(&mut self) -> Option<String>; // provided by UI
 }
 
@@ -112,7 +112,7 @@ pub struct BasilVmHandle {
 impl BasilVmHandle {
     #[wasm_bindgen(constructor)]
     pub fn new() -> BasilVmHandle {
-        console_error_panic_hook::set_once();
+        console_error_panic_hook::set_once()
         BasilVmHandle { vm: basil_vm::Vm::new(WebHost::new()) }
     }
 
@@ -133,7 +133,7 @@ impl BasilVmHandle {
 
     #[wasm_bindgen]
     pub fn provide_input(&mut self, line: String) {
-        self.vm.host_mut().provide_input(line);
+        self.vm.host_mut().provide_input(line)
     }
 }
 
@@ -152,46 +152,46 @@ pub enum RunState {
 
 ```html
 <script type="module">
-import init, { BasilVmHandle } from './pkg/basil_wasm.js';
+import init, { BasilVmHandle } from './pkg/basil_wasm.js'
 
-const out = document.getElementById('out');
-const input = document.getElementById('in');
-const runBtn = document.getElementById('run');
+const out = document.getElementById('out')
+const input = document.getElementById('in')
+const runBtn = document.getElementById('run')
 
 window.BasilHost = {
   js_println: (s) => { out.value += s + "\n"; out.scrollTop = out.scrollHeight; },
   js_need_input: () => { input.disabled = false; input.focus(); },
   js_rand_u32: () => Math.floor(Math.random() * 0xFFFFFFFF),
   js_now_ms: () => performance.now()
-};
+}
 
 await init(); // loads .wasm
-const vm = new BasilVmHandle();
+const vm = new BasilVmHandle()
 
 runBtn.onclick = async () => {
-  out.value = "";
-  input.disabled = true;
-  const resp = await fetch('examples/hello.basilx');
-  const buffer = new Uint8Array(await resp.arrayBuffer());
-  await vm.load_bytecode(buffer);
+  out.value = ""
+  input.disabled = true
+  const resp = await fetch('examples/hello.basilx')
+  const buffer = new Uint8Array(await resp.arrayBuffer())
+  await vm.load_bytecode(buffer)
 
   // pump VM until it asks for input or completes
-  let state = vm.run_slice();
-  if (state === 'NeedsInput') input.disabled = false;
-  else if (state === 'Completed') console.log('done');
-};
+  let state = vm.run_slice()
+  if (state === 'NeedsInput') input.disabled = false
+  else if (state === 'Completed') console.log('done')
+}
 
 input.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
-    e.preventDefault();
-    const line = input.value;
-    input.value = '';
-    input.disabled = true;
-    vm.provide_input(line);
-    const state = vm.run_slice();
-    if (state === 'NeedsInput') input.disabled = false;
+    e.preventDefault()
+    const line = input.value
+    input.value = ''
+    input.disabled = true
+    vm.provide_input(line)
+    const state = vm.run_slice()
+    if (state === 'NeedsInput') input.disabled = false
   }
-});
+})
 </script>
 <textarea id="out" rows="16" cols="80" readonly></textarea><br/>
 <input id="in" placeholder="type and hit Enter" disabled />

@@ -69,24 +69,24 @@ This requires a small wrapper crate that exposes an ergonomic JS API using `wasm
 
 - `basil-wasm\src\lib.rs`:
   ```rust
-  use wasm_bindgen::prelude::*;
-  use basil_lexer::Lexer;
-  use basil_parser::parse;
-  use basil_compiler::compile;
-  use basil_vm::VM;
+  use wasm_bindgen::prelude::*
+  use basil_lexer::Lexer
+  use basil_parser::parse
+  use basil_compiler::compile
+  use basil_vm::VM
 
   #[wasm_bindgen]
   pub fn compile_and_run(source: &str) -> Result<String, JsValue> {
       // lex, parse, compile
-      let mut lexer = Lexer::new(source);
-      let ast = parse(&mut lexer).map_err(|e| JsValue::from_str(&format!("parse error: {}", e)))?;
-      let program = compile(&ast).map_err(|e| JsValue::from_str(&format!("compile error: {}", e)))?;
+      let mut lexer = Lexer::new(source)
+      let ast = parse(&mut lexer).map_err(|e| JsValue::from_str(&format!("parse error: {}", e)))?
+      let program = compile(&ast).map_err(|e| JsValue::from_str(&format!("compile error: {}", e)))?
 
       // run on the VM, capture stdout
-      let mut vm = VM::new();
-      let mut out = Vec::new();
-      vm.set_output(Box::new(&mut out));
-      vm.run(&program).map_err(|e| JsValue::from_str(&format!("vm error: {}", e)))?;
+      let mut vm = VM::new()
+      let mut out = Vec::new()
+      vm.set_output(Box::new(&mut out))
+      vm.run(&program).map_err(|e| JsValue::from_str(&format!("vm error: {}", e)))?
 
       Ok(String::from_utf8_lossy(&out).to_string())
   }
@@ -106,10 +106,10 @@ This requires a small wrapper crate that exposes an ergonomic JS API using `wasm
 3) Use from JavaScript
   ```html
   <script type="module">
-  import init, { compile_and_run } from './pkg/basil_wasm.js';
-  await init();
-  const output = compile_and_run('PRINT "Hello from Basil!"');
-  console.log(output);
+  import init, { compile_and_run } from './pkg/basil_wasm.js'
+  await init()
+  const output = compile_and_run('PRINT "Hello from Basil!"')
+  console.log(output)
   </script>
   ```
 

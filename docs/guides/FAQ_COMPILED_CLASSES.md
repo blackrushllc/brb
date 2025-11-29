@@ -2,7 +2,7 @@
 
 > The syntax of the CLASS function is, for example:
 >
-> DIM user@ AS CLASS("my_class.basil");
+> DIM user@ AS CLASS("my_class.basil")
 >
 > Clearly this is a dynamic creation of an object in Basil.
 >

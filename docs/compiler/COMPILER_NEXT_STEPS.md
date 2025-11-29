@@ -223,7 +223,7 @@ features = ["daw","audio","midi"]
 
 ```
 -- 01_hello.basil
-PRINTLN "Hello, Basil!";
+PRINTLN "Hello, Basil!"
 ```
 
 ```
@@ -263,15 +263,15 @@ fail=0
 parse_cases() {
   awk -v RS= -v ORS= '
     /[[case]]/ {
-      name=""; file=""; features="";
-      n=split($0, lines, "\n");
+      name=""; file=""; features=""
+      n=split($0, lines, "\n")
       for (i=1;i<=n;i++){
-        if (match(lines[i], /name *= *"(.*)"/, m)) name=m[1];
-        if (match(lines[i], /file *= *"(.*)"/, m)) file=m[1];
-        if (match(lines[i], /features *= *\[(.*)\]/, m)) features=m[1];
+        if (match(lines[i], /name *= *"(.*)"/, m)) name=m[1]
+        if (match(lines[i], /file *= *"(.*)"/, m)) file=m[1]
+        if (match(lines[i], /features *= *\[(.*)\]/, m)) features=m[1]
       }
-      gsub(/ /, "", features);
-      print name "|" file "|" features "\n";
+      gsub(/ /, "", features)
+      print name "|" file "|" features "\n"
     }
   ' "$MANI"
 }

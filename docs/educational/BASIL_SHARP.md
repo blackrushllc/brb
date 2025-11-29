@@ -38,13 +38,13 @@ Classic BASIC style:
 REM BOTH SYNTAXES ARE VALID:
 
 REM Infinite loop with BREAK (will break at 3)
-LET i = 0;
+LET i = 0
 WHILE TRUE BEGIN
-    LET i = i + 1;
+    LET i = i + 1
     IF i == 3 THEN BEGIN // Block IF
-        BREAK;
+        BREAK
     END
-    PRINT i;
+    PRINT i
 END
 ```
 
@@ -52,13 +52,13 @@ Modern brace style (THEN is implied when you open a brace):
 
 ```
 // Infinite loop with BREAK (will break at 3)
-let i = 0;
+let i = 0
 while true {
-    let i = i + 1;
+    let i = i + 1
     if i == 3 { // Block IF
-        break;
+        break
     }
-    print i;
+    print i
 }
 ```
 

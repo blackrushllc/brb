@@ -41,9 +41,9 @@ Concrete examples:
 - `examples/hello.basil` lines 7–11:
   ```
   IF ans$ == "Y" THEN BEGIN
-    PRINT "\nWinken";
-    PRINT "\nBlinken";
-    PRINT "\nNod;
+    PRINT "\nWinken"
+    PRINT "\nBlinken"
+    PRINT "\nNod
   END
   ```
 - WHILE without `BEGIN`:

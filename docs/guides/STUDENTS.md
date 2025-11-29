@@ -86,7 +86,7 @@ The lexer reads characters and groups them into meaningful pieces called tokens:
 - Numbers: 42, 3.14
 - Strings: "Hello"
 - Names: PRINT, LET, myVar
-- Punctuation: ( ) , ;
+- Punctuation: ( ) , 
 - Operators: + - * / == != < <= > >=
 
 Comments and spaces are skipped. Strings support common escapes like \n.
@@ -96,8 +96,8 @@ Comments and spaces are skipped. Strings support common escapes like \n.
 The parser looks at the token stream and builds a tree (AST) that captures structure and meaning. For example:
 
 ```
-LET a = 2 + 3 * 4;
-PRINTLN a;
+LET a = 2 + 3 * 4
+PRINTLN a
 ```
 
 The parser knows this means “compute 3*4 first, then add 2,” then “print the result,” not just a flat list of words.
@@ -159,10 +159,10 @@ The VM supports numbers (ints and floats), strings, arrays, functions, and objec
 Example:
 
 ```
-DIM x(3);
-LET x(0) = 1.5;
-LET x(3) = 2.5;
-PRINTLN "x(0)=", x(0), ", x(3)=", x(3);
+DIM x(3)
+LET x(0) = 1.5
+LET x(3) = 2.5
+PRINTLN "x(0)=", x(0), ", x(3)=", x(3)
 ```
 
 ## 10) Control flow: IF, loops, functions
@@ -170,11 +170,11 @@ PRINTLN "x(0)=", x(0), ", x(3)=", x(3);
 - IF/ELSE with optional blocks:
 
 ```
-LET ans$ = "Y";
+LET ans$ = "Y"
 IF ans$ == "Y" THEN BEGIN
-  PRINTLN "YES";
+  PRINTLN "YES"
 ELSE
-  PRINTLN "NO";
+  PRINTLN "NO"
 END
 ```
 
@@ -184,7 +184,7 @@ END
 ```
 FUNC Add(a, b)
 BEGIN
-  RETURN a + b;
+  RETURN a + b
 END
 ```
 
@@ -200,11 +200,11 @@ used to hold object references.
 Example (from the repo examples):
 
 ```
-DIM user@ AS CLASS("my_class.basil");
-PRINTLN "Initial:", user@.Description$;
-LET user@.Description$ = "Updated description";
-user@.AddUser("Erik");
-PRINTLN "Count:", user@.CountMyUsers%();
+DIM user@ AS CLASS("my_class.basil")
+PRINTLN "Initial:", user@.Description$
+LET user@.Description$ = "Updated description"
+user@.AddUser("Erik")
+PRINTLN "Count:", user@.CountMyUsers%()
 ```
 
 What’s happening inside:

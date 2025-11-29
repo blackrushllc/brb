@@ -16,9 +16,9 @@ Related process control that commonly interacts with env vars:
 - Behavior: returns the value if set, otherwise an empty string `""`.
 - Usage:
 ```basil
-PRINTLN "PATH=", ENV$("PATH");
-LET tmp$ = ENV$("TMPDIR");
-IF LEN(tmp$) == 0 THEN LET tmp$ = ENV$("TEMP");
+PRINTLN "PATH=", ENV$("PATH")
+LET tmp$ = ENV$("TMPDIR")
+IF LEN(tmp$) == 0 THEN LET tmp$ = ENV$("TEMP")
 ```
 
 ### `SETENV` — set a process‑local environment variable
@@ -27,7 +27,7 @@ IF LEN(tmp$) == 0 THEN LET tmp$ = ENV$("TEMP");
 - The right‑hand side can be a quoted string, number, boolean, or scalar variable; it is stored as a string.
 - Usage:
 ```basil
-SETENV DEMO_VAR = "42";
+SETENV DEMO_VAR = "42"
 PRINTLN ENV$("DEMO_VAR");  ' -> 42
 ```
 
@@ -38,8 +38,8 @@ PRINTLN ENV$("DEMO_VAR");  ' -> 42
   - On non‑Windows: persistence to the parent shell is generally not possible; Basil still sets the process‑local value so children see it.
 - Usage:
 ```basil
-EXPORTENV DEMO_EXPORT = "HELLO WORLD";
-PRINTLN ENV$("DEMO_EXPORT");
+EXPORTENV DEMO_EXPORT = "HELLO WORLD"
+PRINTLN ENV$("DEMO_EXPORT")
 ```
 
 ### `LOADENV%` — load environment variables from a file
@@ -48,34 +48,34 @@ PRINTLN ENV$("DEMO_EXPORT");
 - If no filename is provided, or it is blank, defaults to `.env` in the current directory.
 - Usage:
 ```basil
-IF LOADENV%() THEN PRINTLN "Loaded .env"; ELSE PRINTLN "No .env file";
-PRINTLN "API_KEY=", ENV$("API_KEY");
+IF LOADENV%() THEN PRINTLN "Loaded .env"; ELSE PRINTLN "No .env file"
+PRINTLN "API_KEY=", ENV$("API_KEY")
 ```
 
 ### Related: `SHELL` and `EXIT`
 - `SHELL "cmd";` executes the string in the system shell and waits for completion. Child processes inherit any variables you set with `SETENV`/`EXPORTENV` during this run.
 ```basil
-SHELL "cmd /C echo Value is %DEMO_VAR%";
+SHELL "cmd /C echo Value is %DEMO_VAR%"
 ```
 - `EXIT n;` exits the interpreter with code `n` (default `0`). Handy when using env vars to signal status to calling scripts.
 
 ### Practical examples
 ```basil
-PRINTLN "USERNAME:", ENV$("USERNAME");
-PRINTLN "PATH (prefix):", LEFT$(ENV$("PATH"), 60), "...";
+PRINTLN "USERNAME:", ENV$("USERNAME")
+PRINTLN "PATH (prefix):", LEFT$(ENV$("PATH"), 60), "..."
 
 ' Process-local set (visible to this Basil run and its children)
-SETENV APP_MODE = "dev";
-PRINTLN "APP_MODE=", ENV$("APP_MODE");
+SETENV APP_MODE = "dev"
+PRINTLN "APP_MODE=", ENV$("APP_MODE")
 
 ' Persist for future shells where supported (Windows best effort via SETX)
-EXPORTENV MY_TOOL_HOME = "C:\\Tools\\MyTool";
+EXPORTENV MY_TOOL_HOME = "C:\\Tools\\MyTool"
 
 ' Use the variable in a child process
-SHELL "cmd /C echo MY_TOOL_HOME is %MY_TOOL_HOME%";
+SHELL "cmd /C echo MY_TOOL_HOME is %MY_TOOL_HOME%"
 
 ' Exit with a code based on presence
-IF LEN(ENV$("REQUIRED_KEY")) == 0 THEN EXIT 2; ELSE EXIT 0;
+IF LEN(ENV$("REQUIRED_KEY")) == 0 THEN EXIT 2; ELSE EXIT 0
 ```
 
 ### Notes and gotchas
@@ -85,7 +85,7 @@ IF LEN(ENV$("REQUIRED_KEY")) == 0 THEN EXIT 2; ELSE EXIT 0;
 - `EXPORTENV` on Windows uses `setx`, which has practical limits and may truncate very long values; it also only affects new shells started after the change.
 - To modify `PATH` for child processes during this run:
 ```basil
-SETENV PATH = ENV$("PATH") + ";C:\\MyBin";
+SETENV PATH = ENV$("PATH") + ";C:\\MyBin"
 ```
 - Common envs you might read in web/CGI contexts include `REQUEST_METHOD`, `QUERY_STRING`, and `HTTP_COOKIE` via `ENV$()`.
 

@@ -1,6 +1,6 @@
 REM MySQL quickstart (adapt host/user/pass/db)
 // Read the .env file
-PRINTLN "Read .env file:";
+PRINTLN "Read .env file:"
 LET b% = LOADENV%(); // defaults to .env
 LET dsn$ = ENV$("DB_DSN")
 DIM db@ AS DB_MYSQL(dsn$)

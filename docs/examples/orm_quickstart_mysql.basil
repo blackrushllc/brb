@@ -1,7 +1,7 @@
 #USE DB_MYSQL, ORM
 
 REM  Read the .env file
-PRINTLN "Read .env file:";
+PRINTLN "Read .env file:"
 LET b% = LOADENV%(); // defaults to .env
 
 REM  Get the DSN from the environment and create a DB and ORM objects
@@ -10,12 +10,12 @@ LET dsn$ = ENV$("DB_DSN")
 DIM db@ AS DB_MYSQL(dsn$)
 DIM orm@ AS ORM(db@)
 
-DIM A$(2);
+DIM A$(2)
 
 REM  Create a model
-LET A$(0)="id%";
-LET A$(1)="name$";
-LET A$(2)="email$";
+LET A$(0)="id%"
+LET A$(1)="name$"
+LET A$(2)="email$"
 
 REM We don't support this syntax yet :(
 REM orm@.Model("users", ["id%","name$","email$"], "id%")

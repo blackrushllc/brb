@@ -164,33 +164,33 @@ Add unit and integration tests:
 **Basic read/write**
 
 ```basil
-LET fh% = FOPEN("notes.txt", "w");
-FWRITELN fh%, "Hello, Basil!";
-FCLOSE fh%;
+LET fh% = FOPEN("notes.txt", "w")
+FWRITELN fh%, "Hello, Basil!"
+FCLOSE fh%
 
-LET fh% = FOPEN("notes.txt", "r");
+LET fh% = FOPEN("notes.txt", "r")
 WHILE NOT FEOF(fh%) BEGIN
-  PRINT FREADLINE$(fh%);
+  PRINT FREADLINE$(fh%)
 END
-FCLOSE fh%;
+FCLOSE fh%
 ```
 
 **Whole-file helpers**
 
 ```basil
-WRITEFILE "out.txt", "Alpha\nBeta\nGamma\n";
-APPENDFILE "out.txt", "Delta\n";
+WRITEFILE "out.txt", "Alpha\nBeta\nGamma\n"
+APPENDFILE "out.txt", "Delta\n"
 
-LET all$ = READFILE$("out.txt");
-PRINT all$;
+LET all$ = READFILE$("out.txt")
+PRINT all$
 ```
 
 **Glob listing**
 
 ```basil
-LET files$ = DIR$("*.basil");
+LET files$ = DIR$("*.basil")
 FOR i% = 0 TO UBOUND(files$)
-  PRINT files$(i%);
+  PRINT files$(i%)
 NEXT
 ```
 
@@ -202,25 +202,25 @@ REM CLASS Logger file logger.basil
 fh%=0;  // class field, persists
 
 FUNC Init(path$)
-  LET fh% = FOPEN(path$, "a");
+  LET fh% = FOPEN(path$, "a")
 END
 
 FUNC Log(msg$)
-  FWRITELN fh%, msg$;
+  FWRITELN fh%, msg$
 END
 
 FUNC Close()
-  IF fh% <> 0 THEN FCLOSE fh%;
+  IF fh% <> 0 THEN FCLOSE fh%
 END
 ```
 
 ```basil
 REM Use the logger.basil class:
-DIM lg@ AS CLASS("logger.basil");
-lg@.Init("app.log");
-lg@.Log("Started");
+DIM lg@ AS CLASS("logger.basil")
+lg@.Init("app.log")
+lg@.Log("Started")
 ' ... later ...
-lg@.Close();
+lg@.Close()
 ```
 
 ---

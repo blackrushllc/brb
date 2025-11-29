@@ -91,7 +91,7 @@ FUNC migrate()
             id   INTEGER PRIMARY KEY AUTOINCREMENT,
             text TEXT NOT NULL,
             done BOOLEAN NOT NULL DEFAULT 0
-        );
+        )
     ")
 END
 ```
@@ -106,7 +106,7 @@ END
 ### 3.1 🌱 Define a WIT interface (component model)
 
 ```wit
-package basil:plugins@1.0.0;
+package basil:plugins@1.0.0
 
 world text-utils {
   import host-log: func(msg: string)
@@ -158,10 +158,10 @@ Keep it tiny and stable. Think **“Lua-like”** API with handles and explicit 
   #define BASIL_API __attribute__((visibility("default")))
 #endif
 
-typedef struct basil_vm*        basil_vm_t;
-typedef struct basil_value*     basil_val_t;
-typedef struct basil_string*    basil_str_t;
-typedef struct basil_buffer*    basil_buf_t;
+typedef struct basil_vm*        basil_vm_t
+typedef struct basil_value*     basil_val_t
+typedef struct basil_string*    basil_str_t
+typedef struct basil_buffer*    basil_buf_t
 
 /* Error codes */
 typedef enum {
@@ -169,29 +169,29 @@ typedef enum {
   BASIL_ERR_OOM,
   BASIL_ERR_TYPE,
   BASIL_ERR_PANIC
-} basil_err_t;
+} basil_err_t
 
 /* Value creation */
-BASIL_API basil_val_t basil_make_int(basil_vm_t vm, int64_t v);
-BASIL_API basil_val_t basil_make_bool(basil_vm_t vm, int v);
-BASIL_API basil_val_t basil_make_string(basil_vm_t vm, const char* s, size_t n);
-BASIL_API basil_val_t basil_make_bytes(basil_vm_t vm, const uint8_t* p, size_t n);
+BASIL_API basil_val_t basil_make_int(basil_vm_t vm, int64_t v)
+BASIL_API basil_val_t basil_make_bool(basil_vm_t vm, int v)
+BASIL_API basil_val_t basil_make_string(basil_vm_t vm, const char* s, size_t n)
+BASIL_API basil_val_t basil_make_bytes(basil_vm_t vm, const uint8_t* p, size_t n)
 
 /* Introspection */
-BASIL_API int64_t     basil_as_int(basil_vm_t vm, basil_val_t v, basil_err_t* err);
-BASIL_API const char* basil_as_string(basil_vm_t vm, basil_val_t v, size_t* n, basil_err_t* err);
+BASIL_API int64_t     basil_as_int(basil_vm_t vm, basil_val_t v, basil_err_t* err)
+BASIL_API const char* basil_as_string(basil_vm_t vm, basil_val_t v, size_t* n, basil_err_t* err)
 
 /* Foreign functions register */
-typedef basil_err_t (*basil_cfunc)(basil_vm_t vm, int argc, basil_val_t* argv, basil_val_t* ret);
+typedef basil_err_t (*basil_cfunc)(basil_vm_t vm, int argc, basil_val_t* argv, basil_val_t* ret)
 
 BASIL_API basil_err_t basil_register(basil_vm_t vm,
                                      const char* module,
                                      const char* name,
-                                     basil_cfunc fn);
+                                     basil_cfunc fn)
 
 /* Memory & lifetime */
-BASIL_API void basil_retain(basil_vm_t vm, basil_val_t v);
-BASIL_API void basil_release(basil_vm_t vm, basil_val_t v);
+BASIL_API void basil_retain(basil_vm_t vm, basil_val_t v)
+BASIL_API void basil_release(basil_vm_t vm, basil_val_t v)
 
 #endif /* BASIL_H */
 ```
@@ -203,19 +203,19 @@ BASIL_API void basil_release(basil_vm_t vm, basil_val_t v);
 #include <zlib.h>
 
 static basil_err_t fn_crc32(basil_vm_t vm, int argc, basil_val_t* argv, basil_val_t* ret) {
-    if (argc != 1) return BASIL_ERR_TYPE;
-    size_t n=0;
-    basil_err_t err=BASIL_OK;
-    const char* p = (const char*) basil_as_string(vm, argv[0], &n, &err);
-    if (err) return err;
-    uLong c = crc32(0L, Z_NULL, 0);
-    c = crc32(c, (const Bytef*)p, (uInt)n);
-    *ret = basil_make_int(vm, (int64_t)c);
-    return BASIL_OK;
+    if (argc != 1) return BASIL_ERR_TYPE
+    size_t n=0
+    basil_err_t err=BASIL_OK
+    const char* p = (const char*) basil_as_string(vm, argv[0], &n, &err)
+    if (err) return err
+    uLong c = crc32(0L, Z_NULL, 0)
+    c = crc32(c, (const Bytef*)p, (uInt)n)
+    *ret = basil_make_int(vm, (int64_t)c)
+    return BASIL_OK
 }
 
 BASIL_API basil_err_t basil_init(basil_vm_t vm) {
-    return basil_register(vm, "hash", "crc32", fn_crc32);
+    return basil_register(vm, "hash", "crc32", fn_crc32)
 }
 ```
 

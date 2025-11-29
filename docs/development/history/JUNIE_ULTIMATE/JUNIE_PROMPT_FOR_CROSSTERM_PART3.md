@@ -152,39 +152,39 @@ Extend the **non-interactive** selftest to:
 **`mouse_echo.basil`**
 
 ```basic
-ALTSCREEN_ON; TERM.INIT; TERM.RAW ON; TERM.MOUSE ON; CLS;
-PRINTLN "Mouse/Key/Resize events (Esc to quit)…";
+ALTSCREEN_ON; TERM.INIT; TERM.RAW ON; TERM.MOUSE ON; CLS
+PRINTLN "Mouse/Key/Resize events (Esc to quit)…"
 WHILE TRUE BEGIN
-  LET ev$ = TERM.NEXT_EVENT$();
-  IF ev$ <> "" THEN PRINTLN ev$;
-  IF ev$ <> "" AND INSTR(ev$, "\"type\":\"key\"") > 0 AND INSTR(ev$, "Esc") > 0 THEN BREAK;
-  SLEEP 10;
+  LET ev$ = TERM.NEXT_EVENT$()
+  IF ev$ <> "" THEN PRINTLN ev$
+  IF ev$ <> "" AND INSTR(ev$, "\"type\":\"key\"") > 0 AND INSTR(ev$, "Esc") > 0 THEN BREAK
+  SLEEP 10
 END
-TERM.MOUSE OFF; TERM.RAW OFF; ALTSCREEN_OFF; TERM.END;
+TERM.MOUSE OFF; TERM.RAW OFF; ALTSCREEN_OFF; TERM.END
 ```
 
 **`mouse_draw.basil`**
 
 ```basic
-ALTSCREEN_ON; TERM.INIT; TERM.RAW ON; TERM.MOUSE ON; CLS;
-LET drawing% = 0;
+ALTSCREEN_ON; TERM.INIT; TERM.RAW ON; TERM.MOUSE ON; CLS
+LET drawing% = 0
 WHILE TRUE BEGIN
-  LET ev$ = TERM.NEXT_EVENT$();
-  IF ev$ = "" THEN SLEEP 5; CONTINUE;
-  IF INSTR(ev$, "\"type\":\"key\"") > 0 AND INSTR(ev$, "Esc") > 0 THEN BREAK;
+  LET ev$ = TERM.NEXT_EVENT$()
+  IF ev$ = "" THEN SLEEP 5; CONTINUE
+  IF INSTR(ev$, "\"type\":\"key\"") > 0 AND INSTR(ev$, "Esc") > 0 THEN BREAK
 
   IF INSTR(ev$, "\"type\":\"mouse\"") > 0 THEN
     LET x% = VAL(MID$(ev$, INSTR(ev$, "\"x\":")+4));  REM naive parse ok for demo
-    LET y% = VAL(MID$(ev$, INSTR(ev$, "\"y\":")+4));
-    IF INSTR(ev$, "\"kind\":\"Down\"") > 0 AND INSTR(ev$, "\"button\":\"Left\"") > 0 THEN LET drawing% = 1;
-    IF INSTR(ev$, "\"kind\":\"Up\"") > 0 THEN LET drawing% = 0;
+    LET y% = VAL(MID$(ev$, INSTR(ev$, "\"y\":")+4))
+    IF INSTR(ev$, "\"kind\":\"Down\"") > 0 AND INSTR(ev$, "\"button\":\"Left\"") > 0 THEN LET drawing% = 1
+    IF INSTR(ev$, "\"kind\":\"Up\"") > 0 THEN LET drawing% = 0
     IF drawing% = 1 AND INSTR(ev$, "\"kind\":\"Drag\"") > 0 OR INSTR(ev$, "\"kind\":\"Move\"") > 0 THEN
-      LOCATE(x%, y%); PRINT "#"; TERM.FLUSH;
+      LOCATE(x%, y%); PRINT "#"; TERM.FLUSH
     ENDIF
-    IF INSTR(ev$, "\"button\":\"Right\"") > 0 AND INSTR(ev$, "\"kind\":\"Down\"") > 0 THEN CLS;
+    IF INSTR(ev$, "\"button\":\"Right\"") > 0 AND INSTR(ev$, "\"kind\":\"Down\"") > 0 THEN CLS
   ENDIF
 END
-TERM.MOUSE OFF; TERM.RAW OFF; ALTSCREEN_OFF; TERM.END;
+TERM.MOUSE OFF; TERM.RAW OFF; ALTSCREEN_OFF; TERM.END
 ```
 
 ---

@@ -63,7 +63,7 @@ async fn main() -> anyhow::Result<()> {
         .resource_dir("docs", "./docs")              // serve docs as resources
         .resource_file("reference", "./docs/BASIL_REFERENCE.md")
         .prompt("fix-diagnostic", fix_prompt_template())
-        .build();
+        .build()
 
     server.serve().await
 }

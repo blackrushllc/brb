@@ -81,12 +81,12 @@ Implement a small handle table and minimal API.
 
 ```rust
 use basil_runtime::prelude::*; // Registry, Value, RuntimeError, etc.
-use once_cell::sync::Lazy;
-use rusqlite::{Connection, params};
-use std::collections::HashMap;
-use std::sync::Mutex;
+use once_cell::sync::Lazy
+use rusqlite::{Connection, params}
+use std::collections::HashMap
+use std::sync::Mutex
 
-static CONNS: Lazy<Mutex<ConnTable>> = Lazy::new(|| Mutex::new(ConnTable::default()));
+static CONNS: Lazy<Mutex<ConnTable>> = Lazy::new(|| Mutex::new(ConnTable::default()))
 
 #[derive(Default)]
 struct ConnTable {
@@ -96,9 +96,9 @@ struct ConnTable {
 
 impl ConnTable {
     fn insert(&mut self, conn: Connection) -> i32 {
-        self.next += 1;
-        let id = self.next;
-        self.map.insert(id, conn);
+        self.next += 1
+        let id = self.next
+        self.map.insert(id, conn)
         id
     }
     fn get(&mut self, id: i32) -> Option<&mut Connection> {
@@ -143,11 +143,11 @@ fn arg_int(args: &[Value], idx: usize, name: &str) -> Result<i32, RuntimeError> 
 
 ```rust
 fn sqlite_open(args: &[Value]) -> Result<Value, RuntimeError> {
-    let path = arg_str(args, 0, "SQLITE_OPEN%: path$")?;
+    let path = arg_str(args, 0, "SQLITE_OPEN%: path$")?
     match Connection::open(path) {
         Ok(conn) => {
-            let mut tbl = CONNS.lock().unwrap();
-            let id = tbl.insert(conn);
+            let mut tbl = CONNS.lock().unwrap()
+            let id = tbl.insert(conn)
             Ok(Value::Int(id))
         }
         Err(_e) => Ok(Value::Int(0)), // per spec: 0 on failure
@@ -155,17 +155,17 @@ fn sqlite_open(args: &[Value]) -> Result<Value, RuntimeError> {
 }
 
 fn sqlite_close(args: &[Value]) -> Result<Value, RuntimeError> {
-    let handle = arg_int(args, 0, "SQLITE_CLOSE: handle%")?;
-    let mut tbl = CONNS.lock().unwrap();
-    let _ = tbl.remove(handle);
+    let handle = arg_int(args, 0, "SQLITE_CLOSE: handle%")?
+    let mut tbl = CONNS.lock().unwrap()
+    let _ = tbl.remove(handle)
     Ok(Value::Empty)
 }
 
 fn sqlite_exec(args: &[Value]) -> Result<Value, RuntimeError> {
-    let handle = arg_int(args, 0, "SQLITE_EXEC%: handle%")?;
-    let sql = arg_str(args, 1, "SQLITE_EXEC%: sql$")?;
-    let mut tbl = CONNS.lock().unwrap();
-    let conn = tbl.get(handle).ok_or_else(|| RuntimeError::new("SQLITE_EXEC%: invalid handle"))?;
+    let handle = arg_int(args, 0, "SQLITE_EXEC%: handle%")?
+    let sql = arg_str(args, 1, "SQLITE_EXEC%: sql$")?
+    let mut tbl = CONNS.lock().unwrap()
+    let conn = tbl.get(handle).ok_or_else(|| RuntimeError::new("SQLITE_EXEC%: invalid handle"))?
     match conn.execute(sql, []) {
         Ok(affected) => Ok(Value::Int(affected as i32)),
         Err(_e) => Ok(Value::Int(-1)),
@@ -173,49 +173,49 @@ fn sqlite_exec(args: &[Value]) -> Result<Value, RuntimeError> {
 }
 
 fn sqlite_query2d(args: &[Value]) -> Result<Value, RuntimeError> {
-    let handle = arg_int(args, 0, "SQLITE_QUERY2D$: handle%")?;
-    let sql = arg_str(args, 1, "SQLITE_QUERY2D$: sql$")?;
+    let handle = arg_int(args, 0, "SQLITE_QUERY2D$: handle%")?
+    let sql = arg_str(args, 1, "SQLITE_QUERY2D$: sql$")?
 
-    let mut tbl = CONNS.lock().unwrap();
-    let conn = tbl.get(handle).ok_or_else(|| RuntimeError::new("SQLITE_QUERY2D$: invalid handle"))?;
+    let mut tbl = CONNS.lock().unwrap()
+    let conn = tbl.get(handle).ok_or_else(|| RuntimeError::new("SQLITE_QUERY2D$: invalid handle"))?
 
     let mut stmt = conn.prepare(sql)
-        .map_err(|e| RuntimeError::new(&format!("SQLITE_QUERY2D$: prepare failed: {e}")))?;
+        .map_err(|e| RuntimeError::new(&format!("SQLITE_QUERY2D$: prepare failed: {e}")))?
 
-    let col_cnt = stmt.column_count() as usize;
+    let col_cnt = stmt.column_count() as usize
 
     let rows_iter = stmt.query_map([], |row| {
-        let mut out: Vec<String> = Vec::with_capacity(col_cnt);
+        let mut out: Vec<String> = Vec::with_capacity(col_cnt)
         for i in 0..col_cnt {
             // to string; NULL -> ""
-            let v: rusqlite::types::Value = row.get::<usize, rusqlite::types::Value>(i)?;
+            let v: rusqlite::types::Value = row.get::<usize, rusqlite::types::Value>(i)?
             let s = match v {
                 rusqlite::types::Value::Null => String::new(),
                 rusqlite::types::Value::Integer(n) => n.to_string(),
                 rusqlite::types::Value::Real(f) => {
                     // keep it readable
-                    let mut s = f.to_string();
+                    let mut s = f.to_string()
                     if s.ends_with(".0") { s.truncate(s.len()-2); }
                     s
                 }
                 rusqlite::types::Value::Text(t) => String::from_utf8_lossy(&t).to_string(),
                 rusqlite::types::Value::Blob(b) => base64::engine::general_purpose::STANDARD.encode(b),
-            };
-            out.push(s);
+            }
+            out.push(s)
         }
         Ok(out)
-    }).map_err(|e| RuntimeError::new(&format!("SQLITE_QUERY2D$: query failed: {e}")))?;
+    }).map_err(|e| RuntimeError::new(&format!("SQLITE_QUERY2D$: query failed: {e}")))?
 
     // Collect all rows, flatten row-major
-    let mut data: Vec<String> = Vec::new();
-    let mut row_cnt = 0usize;
+    let mut data: Vec<String> = Vec::new()
+    let mut row_cnt = 0usize
     for r in rows_iter {
-        let row = r.map_err(|e| RuntimeError::new(&format!("SQLITE_QUERY2D$: row read failed: {e}")))?;
+        let row = r.map_err(|e| RuntimeError::new(&format!("SQLITE_QUERY2D$: row read failed: {e}")))?
         if row.len() != col_cnt {
-            return Err(RuntimeError::new("SQLITE_QUERY2D$: inconsistent column count"));
+            return Err(RuntimeError::new("SQLITE_QUERY2D$: inconsistent column count"))
         }
-        data.extend(row);
-        row_cnt += 1;
+        data.extend(row)
+        row_cnt += 1
     }
 
     // Return special 2D string array value → assignment will auto-redim target
@@ -223,10 +223,10 @@ fn sqlite_query2d(args: &[Value]) -> Result<Value, RuntimeError> {
 }
 
 fn sqlite_last_insert_id(args: &[Value]) -> Result<Value, RuntimeError> {
-    let handle = arg_int(args, 0, "SQLITE_LAST_INSERT_ID%: handle%")?;
-    let mut tbl = CONNS.lock().unwrap();
-    let conn = tbl.get(handle).ok_or_else(|| RuntimeError::new("SQLITE_LAST_INSERT_ID%: invalid handle"))?;
-    let id = conn.last_insert_rowid();
+    let handle = arg_int(args, 0, "SQLITE_LAST_INSERT_ID%: handle%")?
+    let mut tbl = CONNS.lock().unwrap()
+    let conn = tbl.get(handle).ok_or_else(|| RuntimeError::new("SQLITE_LAST_INSERT_ID%: invalid handle"))?
+    let id = conn.last_insert_rowid()
     Ok(Value::Int(id as i32))
 }
 ```
@@ -239,7 +239,7 @@ fn sqlite_last_insert_id(args: &[Value]) -> Result<Value, RuntimeError> {
 
 ```rust
 #[cfg(feature = "obj-sqlite")]
-mod sqlite;
+mod sqlite
 
 pub fn register_objects(reg: &mut Registry) {
     #[cfg(feature = "obj-sqlite")] { sqlite::register(reg); }

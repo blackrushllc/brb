@@ -213,19 +213,19 @@ Example usage:
 ````basil
 REM Demo: Using CLASS to instantiate and interact with a class instance
 
-DIM user@ AS CLASS("my_class.basil");
+DIM user@ AS CLASS("my_class.basil")
 
 REM Access and modify a public variable
-PRINTLN "Initial description:", user@.Description$;
-LET user@.Description$ = "These are my favorite users.";
-PRINTLN "Updated description:", user@.Description$;
+PRINTLN "Initial description:", user@.Description$
+LET user@.Description$ = "These are my favorite users."
+PRINTLN "Updated description:", user@.Description$
 
 REM Call public functions
-user@.AddUser("Erik");
-user@.AddUser("Junie");
-user@.AddUser("ChatGPT");
+user@.AddUser("Erik")
+user@.AddUser("Junie")
+user@.AddUser("ChatGPT")
 
-PRINTLN "User count:", user@.CountMyUsers%();
+PRINTLN "User count:", user@.CountMyUsers%()
 
 ````
 
@@ -233,8 +233,8 @@ PRINTLN "User count:", user@.CountMyUsers%();
 REM Example Basil Class: my_class.basil
 REM Demonstrates public variables and public functions
 
-DIM UserNames$(100);
-LET Description$ = "Default description";
+DIM UserNames$(100)
+LET Description$ = "Default description"
 
 FUNC AddUser(name$)
 BEGIN
@@ -242,7 +242,7 @@ BEGIN
   FOR i% = 0 TO 99
     IF UserNames$(i%) == "" THEN
       BEGIN
-        LET UserNames$(i%) = name$;
+        LET UserNames$(i%) = name$
         RETURN
       END
   NEXT
@@ -255,10 +255,10 @@ BEGIN
   FOR i% = 0 TO 99
     IF UserNames$(i%) != "" THEN
       BEGIN
-        LET count% = count% + 1;
+        LET count% = count% + 1
       END
   NEXT
-  RETURN count%;
+  RETURN count%
 END
 
 ````
@@ -281,7 +281,7 @@ Output:
 > cargo run -q -p basilc --features obj-bmx -- test examples/input.basil
 
 COMMENT: Demo of INPUT$ and IF statements.
-COMMENT: LET A$ = INPUT$("\nEnter your name:");
+COMMENT: LET A$ = INPUT$("\nEnter your name:")
 
 Hello, Bob!
 Do you want to do something else? (Y/N): YMock input to INPUTC$ given as Y
@@ -312,8 +312,8 @@ Goodbye!
 #CGI_NO_HEADER
 <?basil
   // Manual header mode: send headers explicitly, then a blank line
-  PRINT "Status: 200 OK\r\n";
-  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n";
+  PRINT "Status: 200 OK\r\n"
+  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n"
 ?>
 <!doctype html>
 <html lang="en">
@@ -330,7 +330,7 @@ Goodbye!
   <ul>
   <?basil
     FOR EACH p$ IN REQUEST$()
-      PRINT "<li>" + HTML$(p$) + "</li>\n";
+      PRINT "<li>" + HTML$(p$) + "</li>\n"
     NEXT
   ?>
   </ul>
@@ -348,52 +348,52 @@ Goodbye!
 
 ````basil
 
-LET x = 0;
+LET x = 0
 WHILE x < 3 BEGIN
-    PRINT x;
-    LET x = x + 1;
+    PRINT x
+    LET x = x + 1
 END
 
 ' Infinite loop with BREAK (will break at 3)
-LET i = 0;
+LET i = 0
 WHILE TRUE BEGIN
-    LET i = i + 1;
+    LET i = i + 1
     IF i == 3 THEN BEGIN // Block IF
-        BREAK;
+        BREAK
     END
-    PRINT i;
+    PRINT i
 END
 
 ' Using CONTINUE (skip 3)
-LET j = 0;
+LET j = 0
 WHILE j < 5 BEGIN
-    LET j = j + 1;
+    LET j = j + 1
     IF j == 3 THEN BEGIN
-        CONTINUE;
+        CONTINUE
     END
-    PRINT j;
+    PRINT j
 END
 
 ' Infinite loop with BREAK (will break at 3)
-LET i = 0;
+LET i = 0
 WHILE TRUE BEGIN
-    LET i = i + 1;
+    LET i = i + 1
     IF i == 3 THEN BREAK; // Immediate IF
-    PRINT i;
+    PRINT i
 END
 
 ' Using CONTINUE (skip 3)
-LET j = 0;
+LET j = 0
 WHILE j < 5 BEGIN
-    LET j = j + 1;
-    IF j == 3 THEN  CONTINUE;
-    PRINT j;
+    LET j = j + 1
+    IF j == 3 THEN  CONTINUE
+    PRINT j
 END
 
 
 ' FALSE as never-enter condition
 WHILE FALSE BEGIN
-    PRINT "You should never see this";
+    PRINT "You should never see this"
 END
 
 
@@ -405,29 +405,29 @@ END
 
 #USE BMX_RIDER, BMX_TEAM
 
-DIM riders@(2) AS BMX_RIDER;
-LET riders@(0) = NEW BMX_RIDER("Alice", 17, "Expert", 12, 3);
-LET riders@(1) = NEW BMX_RIDER("Bob",   21, "Expert",  8, 9);
-LET riders@(2) = NEW BMX_RIDER("Carol", 19, "Pro",    30, 4);
+DIM riders@(2) AS BMX_RIDER
+LET riders@(0) = NEW BMX_RIDER("Alice", 17, "Expert", 12, 3)
+LET riders@(1) = NEW BMX_RIDER("Bob",   21, "Expert",  8, 9)
+LET riders@(2) = NEW BMX_RIDER("Carol", 19, "Pro",    30, 4)
 
 FOR EACH r@ IN riders@
-  PRINT "Rider - ", r@.Describe$();
+  PRINT "Rider - ", r@.Describe$()
 NEXT
 
-DIM nums%(4);
+DIM nums%(4)
 FOR EACH n% IN nums%
-  LET nums%(n%) = n% * n%;
+  LET nums%(n%) = n% * n%
 NEXT
 
-DIM t@ AS BMX_TEAM("Rocket Foxes", 2015, PRO);
-t@.AddRider(riders@(0)); t@.AddRider(riders@(1)); t@.AddRider(riders@(2));
+DIM t@ AS BMX_TEAM("Rocket Foxes", 2015, PRO)
+t@.AddRider(riders@(0)); t@.AddRider(riders@(1)); t@.AddRider(riders@(2))
 
 FOR EACH name$ IN t@.RiderNames$()
-  PRINT name$;
+  PRINT name$
 NEXT
 
 FOR EACH desc$ IN t@.RiderDescriptions$()
-  PRINT desc$;
+  PRINT desc$
 NEXT
 
 ````
@@ -453,29 +453,29 @@ REM This example assumes object support is compiled in with features enabling BM
 
 #USE BMX_RIDER, BMX_TEAM
 
-DIM riders@(2) AS BMX_RIDER;
-LET riders@(0) = NEW BMX_RIDER("Alice", 17, "Expert", 12, 3);
-LET riders@(1) = NEW BMX_RIDER("Bob",   21, "Expert",  8, 9);
-LET riders@(2) = NEW BMX_RIDER("Carol", 19, "Pro",    30, 4);
+DIM riders@(2) AS BMX_RIDER
+LET riders@(0) = NEW BMX_RIDER("Alice", 17, "Expert", 12, 3)
+LET riders@(1) = NEW BMX_RIDER("Bob",   21, "Expert",  8, 9)
+LET riders@(2) = NEW BMX_RIDER("Carol", 19, "Pro",    30, 4)
 
 FOR EACH r@ IN riders@
-  PRINT "Rider - ",r@.Describe$();
+  PRINT "Rider - ",r@.Describe$()
 NEXT
 
-DIM nums%(4);
+DIM nums%(4)
 FOR EACH n% IN nums%
-  LET nums%(n%) = n% * n%;
+  LET nums%(n%) = n% * n%
 NEXT
 
-DIM t@ AS BMX_TEAM("Rocket Foxes", 2015, PRO);
-t@.AddRider(riders@(0)); t@.AddRider(riders@(1)); t@.AddRider(riders@(2));
+DIM t@ AS BMX_TEAM("Rocket Foxes", 2015, PRO)
+t@.AddRider(riders@(0)); t@.AddRider(riders@(1)); t@.AddRider(riders@(2))
 
 FOR EACH name$ IN t@.RiderNames$()
-  PRINTLN name$;
+  PRINTLN name$
 NEXT
 
 FOR EACH desc$ IN t@.RiderDescriptions$()
-  PRINTLN desc$;
+  PRINTLN desc$
 NEXT
 
 ```
@@ -502,30 +502,30 @@ REM Arrays example for BASIL
 REM Demonstrates DIM for string ($), integer (%), and float arrays, with up to 2 dimensions
 
 REM --- 1D integer array (0..5 inclusive => length 6) ---
-DIM N%(5);
-LET N%(0) = 10;
-LET N%(5) = 99;
-PRINT "N%(0)=", N%(0), ", N%(5)=", N%(5);
-PRINT "LEN(N%)=", LEN(N%);
+DIM N%(5)
+LET N%(0) = 10
+LET N%(5) = 99
+PRINT "N%(0)=", N%(0), ", N%(5)=", N%(5)
+PRINT "LEN(N%)=", LEN(N%)
 
 REM --- 1D float array (0..3 inclusive => length 4) ---
-DIM X(3);
-LET X(0) = 1.5;
-LET X(3) = 2.5;
-PRINT "X(0)=", X(0), ", X(3)=", X(3);
-PRINT "LEN(X)=", LEN(X);
+DIM X(3)
+LET X(0) = 1.5
+LET X(3) = 2.5
+PRINT "X(0)=", X(0), ", X(3)=", X(3)
+PRINT "LEN(X)=", LEN(X)
 
 REM --- 2D string array (0..2 by 0..1 => 3 x 2 = 6 elements) ---
-DIM S$(2,1);
-LET S$(0,0) = "Hello";
-LET S$(2,1) = "World";
-PRINT "S$(0,0)=", S$(0,0), ", S$(2,1)=", S$(2,1);
-PRINT "LEN(S$)=", LEN(S$);
+DIM S$(2,1)
+LET S$(0,0) = "Hello"
+LET S$(2,1) = "World"
+PRINT "S$(0,0)=", S$(0,0), ", S$(2,1)=", S$(2,1)
+PRINT "LEN(S$)=", LEN(S$)
 
 REM Show that re-DIM resets the array
 DIM S$(1,0); REM now capacity is 2 x 1 = 2 elements, previous contents cleared
-LET S$(1,0) = "Reset";
-PRINT "After re-DIM, LEN(S$)=", LEN(S$), "; S$(1,0)=", S$(1,0);
+LET S$(1,0) = "Reset"
+PRINT "After re-DIM, LEN(S$)=", LEN(S$), "; S$(1,0)=", S$(1,0)
 
 
 ```
@@ -545,17 +545,17 @@ TODO in this vein:
 ```
 
 FOR i = 1 TO 5
-    PRINTLN i;
-NEXT i;
+    PRINTLN i
+NEXT i
 
 FOR j = 5 TO 1 STEP -1
     BEGIN
-        PRINT j;
+        PRINT j
         FOR i = 1 TO 5
-            PRINTLN i;
-        NEXT i;
+            PRINTLN i
+        NEXT i
     END
-NEXT j;
+NEXT j
 
 
 
@@ -806,40 +806,40 @@ basil/
 ## 2) 🌱 Language subset / Extended Backus-Naur Form (EBNF)
 
 ```
-program     := { declaration } EOF ;
+program     := { declaration } EOF 
 
 declaration := "FUNC" ident "(" [parameters] ")" [":" type] block
              | "LET" ident [":" type] "=" expression ";"
-             | statement ;
+             | statement 
 
-parameters  := ident [":" type] { ", " ident [":" type] } ;
+parameters  := ident [":" type] { ", " ident [":" type] } 
 
 statement   := expr_stmt
              | if_stmt
              | while_stmt
              | return_stmt
-             | block ;
+             | block 
 
 block       := "BEGIN" { declaration } "END" ;      // BASIC-y but modernized
 
-expr_stmt   := expression ";" ;
-if_stmt     := "IF" expression "THEN" statement [ "ELSE" statement ] ;
-while_stmt  := "WHILE" expression "DO" statement ;
-return_stmt := "RETURN" [ expression ] ";" ;
+expr_stmt   := expression ";" 
+if_stmt     := "IF" expression "THEN" statement [ "ELSE" statement ] 
+while_stmt  := "WHILE" expression "DO" statement 
+return_stmt := "RETURN" [ expression ] ";" 
 
-expression  := assignment ;
-assignment  := IDENT "=" assignment | logic_or ;
-logic_or    := logic_and { "OR" logic_and } ;
-logic_and   := equality  { "AND" equality } ;
-equality    := comparison { ("==" | "!=") comparison } ;
-comparison  := term      { ("<" | "<=" | ">" | ">=") term } ;
-term        := factor    { ("+" | "-") factor } ;
-factor      := unary     { ("*" | "/") unary } ;
-unary       := ("NOT" | "-" | "+") unary | call ;
-call        := primary { "(" [ arguments ] ")" } ;
-primary     := NUMBER | STRING | TRUE | FALSE | NULL | IDENT | "(" expression ")" ;
+expression  := assignment 
+assignment  := IDENT "=" assignment | logic_or 
+logic_or    := logic_and { "OR" logic_and } 
+logic_and   := equality  { "AND" equality } 
+equality    := comparison { ("==" | "!=") comparison } 
+comparison  := term      { ("<" | "<=" | ">" | ">=") term } 
+term        := factor    { ("+" | "-") factor } 
+factor      := unary     { ("*" | "/") unary } 
+unary       := ("NOT" | "-" | "+") unary | call 
+call        := primary { "(" [ arguments ] ")" } 
+primary     := NUMBER | STRING | TRUE | FALSE | NULL | IDENT | "(" expression ")" 
 
-arguments   := expression { ", " expression } ;
+arguments   := expression { ", " expression } 
 
 type        := IDENT ; // placeholder for v0, optional annotations only
 ```
@@ -892,12 +892,12 @@ primary    : 100
 fn parse_bp(&mut self, min_bp: u8) -> Expr {
     let mut lhs = self.parse_prefix()?; // nud
     loop {
-        let op = self.peek();
+        let op = self.peek()
         let (lbp, rbp) = infix_binding_power(op)?; // led
         if lbp < min_bp { break; }
-        self.bump();
-        let rhs = self.parse_bp(rbp)?;
-        lhs = Expr::Binary { op, lhs: box lhs, rhs: box rhs };
+        self.bump()
+        let rhs = self.parse_bp(rbp)?
+        lhs = Expr::Binary { op, lhs: box lhs, rhs: box rhs }
     }
     Ok(lhs)
 }
@@ -1019,28 +1019,28 @@ struct VM {
 
 ```rust
 fn run(&mut self) -> Result<(), VMError> {
-    use Op::*;
+    use Op::*
     loop {
-        let op = self.read_op();
+        let op = self.read_op()
         match op {
             CONST_U8 => {
-                let idx = self.read_u8() as usize;
-                let v = self.chunk.consts[idx].clone();
-                self.stack.push(v);
+                let idx = self.read_u8() as usize
+                let v = self.chunk.consts[idx].clone()
+                self.stack.push(v)
             }
             POP => { self.stack.pop(); }
 
             LOAD_LOCAL => {
-                let i = self.read_u8() as usize;
-                let base = self.cur().base;
-                let v = self.stack[base + i].clone();
-                self.stack.push(v);
+                let i = self.read_u8() as usize
+                let base = self.cur().base
+                let v = self.stack[base + i].clone()
+                self.stack.push(v)
             }
             STORE_LOCAL => {
-                let i = self.read_u8() as usize;
-                let v = self.pop();
-                let base = self.cur().base;
-                self.stack[base + i] = v;
+                let i = self.read_u8() as usize
+                let v = self.pop()
+                let base = self.cur().base
+                self.stack[base + i] = v
             }
 
             ADD => bin_num(self, |a, b| a+b)?, 
@@ -1060,13 +1060,13 @@ fn run(&mut self) -> Result<(), VMError> {
 
             JUMP => { let off = self.read_u16(); self.ip += off as usize; }
             JUMP_IF_FALSE => {
-                let off = self.read_u16();
-                let cond = !is_truthy(&self.pop());
+                let off = self.read_u16()
+                let cond = !is_truthy(&self.pop())
                 if cond { self.ip += off as usize; }
             }
 
             CALL => {
-                let argc = self.read_u8() as usize;
+                let argc = self.read_u8() as usize
                 self.call(argc)?; // resolves Native or Func, sets new frame
             }
             RET => {
@@ -1083,11 +1083,11 @@ Helpers (sketch):
 
 ```rust
 fn bin_num<F: Fn(f64, f64)->f64>(vm: &mut VM, f: F) -> Result<(), VMError> {
-    let b = as_num(vm.pop())?; let a = as_num(vm.pop())?;
+    let b = as_num(vm.pop())?; let a = as_num(vm.pop())?
     vm.stack.push(Value::Num(f(a, b))); Ok(())
 }
 fn bin_cmp<F: Fn(&Value, &Value)->bool>(vm: &mut VM, f: F) -> Result<(), VMError> {
-    let b = vm.pop(); let a = vm.pop();
+    let b = vm.pop(); let a = vm.pop()
     vm.stack.push(Value::Bool(f(&a, &b))); Ok(())
 }
 ```
@@ -1102,34 +1102,34 @@ fn bin_cmp<F: Fn(&Value, &Value)->bool>(vm: &mut VM, f: F) -> Result<(), VMError
 fn emit_expr(&mut self, e: &Expr) {
   match e {
     Expr::Literal(v) => {
-      let idx = self.add_const(v.clone().into_value());
-      self.emit(Op::CONST_U8);
-      self.emit_u8(idx as u8);
+      let idx = self.add_const(v.clone().into_value())
+      self.emit(Op::CONST_U8)
+      self.emit_u8(idx as u8)
     }
     Expr::Var(id) => {
       let slot = self.resolve_local(*id); // or global
-      self.emit(Op::LOAD_LOCAL);
-      self.emit_u8(slot);
+      self.emit(Op::LOAD_LOCAL)
+      self.emit_u8(slot)
     }
     Expr::Assign { name, value } => {
-      let slot = self.resolve_local(*name);
-      self.emit_expr(value);
-      self.emit(Op::STORE_LOCAL);
-      self.emit_u8(slot);
+      let slot = self.resolve_local(*name)
+      self.emit_expr(value)
+      self.emit(Op::STORE_LOCAL)
+      self.emit_u8(slot)
       self.emit(Op::LOAD_LOCAL); // leave value on stack as expression result
-      self.emit_u8(slot);
+      self.emit_u8(slot)
     }
     Expr::Unary { op, rhs } => { self.emit_expr(rhs); match op { TokenKind::Minus => self.emit(Op::NEG), TokenKind::Not => self.emit(Op::NOT), _ => unreachable!() } }
     Expr::Binary { op, lhs, rhs } => {
-      self.emit_expr(lhs); self.emit_expr(rhs);
+      self.emit_expr(lhs); self.emit_expr(rhs)
       self.emit(match op { TokenKind::Plus=>Op::ADD, TokenKind::Minus=>Op::SUB, TokenKind::Star=>Op::MUL, TokenKind::Slash=>Op::DIV, 
                            TokenKind::EqEq=>Op::EQ, TokenKind::BangEq=>Op::NE, TokenKind::Lt=>Op::LT, TokenKind::Le=>Op::LE, 
-                           TokenKind::Gt=>Op::GT, TokenKind::Ge=>Op::GE, _=>unreachable!() });
+                           TokenKind::Gt=>Op::GT, TokenKind::Ge=>Op::GE, _=>unreachable!() })
     }
     Expr::Call { callee, args } => {
-      self.emit_expr(callee);
+      self.emit_expr(callee)
       for a in args { self.emit_expr(a); }
-      self.emit(Op::CALL); self.emit_u8(args.len() as u8);
+      self.emit(Op::CALL); self.emit_u8(args.len() as u8)
     }
   }
 }
@@ -1139,17 +1139,17 @@ fn emit_expr(&mut self, e: &Expr) {
 
 ```rust
 fn emit_if(&mut self, cond: &Expr, then_s: &Stmt, else_s: Option<&Stmt>) {
-  self.emit_expr(cond);
-  self.emit(Op::JUMP_IF_FALSE);
+  self.emit_expr(cond)
+  self.emit(Op::JUMP_IF_FALSE)
   let jf = self.emit_u16_placeholder(); // record position
-  self.emit(Op::POP);
-  self.emit_stmt(then_s);
-  self.emit(Op::JUMP);
-  let je = self.emit_u16_placeholder();
-  self.patch_u16(jf, self.here_offset_from(jf));
-  self.emit(Op::POP);
+  self.emit(Op::POP)
+  self.emit_stmt(then_s)
+  self.emit(Op::JUMP)
+  let je = self.emit_u16_placeholder()
+  self.patch_u16(jf, self.here_offset_from(jf))
+  self.emit(Op::POP)
   if let Some(e) = else_s { self.emit_stmt(e); }
-  self.patch_u16(je, self.here_offset_from(je));
+  self.patch_u16(je, self.here_offset_from(je))
 }
 ```
 
@@ -1168,15 +1168,15 @@ fn emit_if(&mut self, cond: &Expr, then_s: &Stmt, else_s: Option<&Stmt>) {
 **examples/hello.basil**
 
 ```basil
-PRINT "Hello, Basil!";
+PRINT "Hello, Basil!"
 ```
 
 **examples/expr.basil**
 
 ```basil
-LET a = 2 + 3 * 4;
+LET a = 2 + 3 * 4
 PRINT a;         // 14
-LET b = (2 + 3) * 4;
+LET b = (2 + 3) * 4
 PRINT b;         // 20
 ```
 
@@ -1185,8 +1185,8 @@ PRINT b;         // 20
 ```basil
 FUNC fib(n)
 BEGIN
-  IF n < 2 THEN RETURN n;
-  RETURN fib(n - 1) + fib(n - 2);
+  IF n < 2 THEN RETURN n
+  RETURN fib(n - 1) + fib(n - 2)
 END
 
 PRINT fib(10); // 55

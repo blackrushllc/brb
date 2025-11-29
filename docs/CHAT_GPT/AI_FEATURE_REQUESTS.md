@@ -126,18 +126,18 @@ When creating a new Basil feature (e.g. `obj-regex`, `obj-pdf`, `obj-crypto`), f
 
    ```rust
    pub fn register(reg: &mut Registry) {
-       reg.func("FUNCNAME$", func_name);
-       reg.proc("PROCNAME", proc_name);
+       reg.func("FUNCNAME$", func_name)
+       reg.proc("PROCNAME", proc_name)
    }
    ```
 3. Register it in `basil-object/src/lib.rs`:
 
    ```rust
    #[cfg(feature = "obj-<name>")]
-   mod <name>;
+   mod <name>
 
    pub fn register_objects(reg: &mut Registry) {
-       #[cfg(feature = "obj-<name>")] <name>::register(reg);
+       #[cfg(feature = "obj-<name>")] <name>::register(reg)
        // ...
    }
    ```

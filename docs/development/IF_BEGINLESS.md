@@ -106,27 +106,27 @@ Pseudocode sketch for the new part (inside IF arm)
   else if match(Begin) { /* existing */ }
   else if self.opts.implicit_multiline_if && sep > 0 {
       // THEN implicit body until ELSE or END
-      let then_vec = collect_stmts_until(|p| p.check(Else) || p.check(End))?;
-      let then_s = Box::new(Stmt::Block(then_vec));
+      let then_vec = collect_stmts_until(|p| p.check(Else) || p.check(End))?
+      let then_s = Box::new(Stmt::Block(then_vec))
       let else_s = if match(Else) {
           while match(Semicolon) {}
           if match(LBrace) { /* existing */ }
           else if match(Begin) { /* existing */ }
           else if self.check(If) {
               // ELSE IF … → single-statement ELSE (nested IF as one statement)
-              let s = self.parse_stmt()?;
+              let s = self.parse_stmt()?
               while match(Semicolon) {}
-              self.expect_end_any()?;
+              self.expect_end_any()?
               Some(Box::new(s))
           } else {
               // implicit ELSE body until END [IF]
-              let else_vec = collect_stmts_until(|p| p.check(End))?;
+              let else_vec = collect_stmts_until(|p| p.check(End))?
               Some(Box::new(Stmt::Block(else_vec)))
           }
-      } else { None };
+      } else { None }
       while match(Semicolon) {}
-      self.expect_end_any()?;
-      return Ok(Stmt::If { cond, then_branch: then_s, else_branch: else_s });
+      self.expect_end_any()?
+      return Ok(Stmt::If { cond, then_branch: then_s, else_branch: else_s })
   } else {
       // existing single-statement THEN/ELSE path
   }
@@ -137,9 +137,9 @@ Function collect_stmts_until (utility suggestion, optional)
       while match(Semicolon) {}
       if stop_predicate(self) { break; }
       if check(Eof) { return Err(... unterminated ...); }
-      let line = peek_line();
-      let s = parse_stmt()?;
-      out.push(Stmt::Line(line)); out.push(s);
+      let line = peek_line()
+      let s = parse_stmt()?
+      out.push(Stmt::Line(line)); out.push(s)
   }
 
 Backward compatibility

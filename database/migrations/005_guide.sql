@@ -8,7 +8,7 @@ CREATE TABLE guide_sections
     description TEXT         NULL,
     sort_order  INT UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
 
 CREATE TABLE guide_pages
 (
@@ -34,4 +34,4 @@ CREATE TABLE guide_pages
         FOREIGN KEY (parent_id) REFERENCES guide_pages (id) ON DELETE SET NULL,
     FULLTEXT INDEX ft_guide_text (title, abstract, body_md)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4

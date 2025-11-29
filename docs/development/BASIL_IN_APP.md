@@ -71,9 +71,9 @@ basil-vm = { path = "../path/to/your/basil/vm", optional = true }
 
 ```rust
 // crates/basil_embed/src/lib.rs
-use crossbeam_channel::{unbounded, Receiver, Sender};
-use anyhow::Result;
-use std::thread;
+use crossbeam_channel::{unbounded, Receiver, Sender}
+use anyhow::Result
+use std::thread
 
 pub struct Io {
     pub to_vm: Sender<String>,      // user input lines → VM
@@ -81,19 +81,19 @@ pub struct Io {
 }
 
 pub trait HostApi: Send + Sync + 'static {
-    fn open_file(&self) -> Option<String>;
-    fn start_anim(&self);
-    fn stop_anim(&self);
-    fn alert(&self, msg: &str);
+    fn open_file(&self) -> Option<String>
+    fn start_anim(&self)
+    fn stop_anim(&self)
+    fn alert(&self, msg: &str)
 }
 
 pub trait BasilEngine: Send + 'static {
     /// Feed a single line (REPL-style).
-    fn feed_line(&mut self, line: &str) -> Result<()>;
+    fn feed_line(&mut self, line: &str) -> Result<()>
     /// Called periodically (or on lines) to drain output, returning zero or more lines.
-    fn drain_output(&mut self) -> Vec<String>;
+    fn drain_output(&mut self) -> Vec<String>
     /// Graceful shutdown.
-    fn shutdown(&mut self);
+    fn shutdown(&mut self)
 }
 
 /// Replace this stub with your real VM adapter.
@@ -109,14 +109,14 @@ impl StubBasil {
 
 impl BasilEngine for StubBasil {
     fn feed_line(&mut self, line: &str) -> Result<()> {
-        let l = line.trim();
+        let l = line.trim()
         match l {
             "help" => self.buf.push("Commands: help, open, alert, start, stop, exit".into()),
             "open" => {
                 if let Some(p) = self.host.open_file() {
-                    self.buf.push(format!("Selected: {p}"));
+                    self.buf.push(format!("Selected: {p}"))
                 } else {
-                    self.buf.push("Canceled.".into());
+                    self.buf.push("Canceled.".into())
                 }
             }
             "alert" => { self.host.alert("Hello from Basil!"); }
@@ -140,21 +140,21 @@ impl BasilRunner {
     pub fn spawn<E: BasilEngine + 'static>(
         mut engine: E
     ) -> Self {
-        let (tx_in, rx_in) = unbounded::<String>();
-        let (tx_out, rx_out) = unbounded::<String>();
+        let (tx_in, rx_in) = unbounded::<String>()
+        let (tx_out, rx_out) = unbounded::<String>()
 
         let handle = thread::spawn(move || {
-            tx_out.send("Basil REPL ready. Type 'help' or 'exit'.".into()).ok();
+            tx_out.send("Basil REPL ready. Type 'help' or 'exit'.".into()).ok()
             while let Ok(line) = rx_in.recv() {
                 if engine.feed_line(&line).is_ok() {
                     for o in engine.drain_output() {
-                        let exit = o.contains("[[EXIT]]");
-                        tx_out.send(o).ok();
+                        let exit = o.contains("[[EXIT]]")
+                        tx_out.send(o).ok()
                         if exit { return; }
                     }
                 }
             }
-        });
+        })
 
         Self { io: Io { to_vm: tx_in, from_vm: rx_out }, handle: Some(handle) }
     }
@@ -171,8 +171,8 @@ In your real integration, you’ll register host callbacks with the Basil VM (li
 
 ```rust
 // crates/host_api/src/lib.rs
-use std::sync::{Arc};
-use parking_lot::Mutex;
+use std::sync::{Arc}
+use parking_lot::Mutex
 
 #[derive(Default)]
 pub struct AppState {
@@ -180,10 +180,10 @@ pub struct AppState {
 }
 
 pub trait HostBindings {
-    fn open_file(&self) -> Option<String>;
-    fn start_anim(&self);
-    fn stop_anim(&self);
-    fn alert(&self, msg: &str);
+    fn open_file(&self) -> Option<String>
+    fn start_anim(&self)
+    fn stop_anim(&self)
+    fn alert(&self, msg: &str)
 }
 
 pub struct HostBridge {
@@ -213,14 +213,14 @@ Your **Basil VM adapter** will accept an `Arc<dyn HostApi>` (or this `HostBindin
 
 ```rust
 // crates/app/src/main.rs
-use eframe::{egui, NativeOptions};
-use crossbeam_channel::TryRecvError;
-use std::sync::{Arc};
-use host_api::{HostBridge, UiCallbacks, AppState};
-use basil_embed::{BasilRunner, StubBasil, BasilEngine};
+use eframe::{egui, NativeOptions}
+use crossbeam_channel::TryRecvError
+use std::sync::{Arc}
+use host_api::{HostBridge, UiCallbacks, AppState}
+use basil_embed::{BasilRunner, StubBasil, BasilEngine}
 
 fn main() -> eframe::Result<()> {
-    let native_options = NativeOptions::default();
+    let native_options = NativeOptions::default()
     eframe::run_native(
         "Basil GUI Starter",
         native_options,
@@ -246,24 +246,24 @@ struct BasilConsole {
 impl GuiApp {
     fn open_basil_console(&mut self) {
         // Construct host bridge callbacks for this app
-        let app_state = Arc::new(parking_lot::Mutex::new(AppState::default()));
+        let app_state = Arc::new(parking_lot::Mutex::new(AppState::default()))
         let host = Arc::new(HostShim {
             open_dialog: Box::new(|| rfd::FileDialog::new().pick_file().map(|p| p.display().to_string())),
             alert_fn:    Box::new(|_|{}), // replaced below after we have &mut self
             set_anim_fn: Box::new(|_|{}), // replaced below
-        });
+        })
 
         // Spin up a Basil runner with the stub engine (replace with real engine)
-        let engine = StubBasil::new(host.clone());
-        let runner = BasilRunner::spawn(engine);
+        let engine = StubBasil::new(host.clone())
+        let runner = BasilRunner::spawn(engine)
 
-        let idx = self.consoles.len();
+        let idx = self.consoles.len()
         self.consoles.push(BasilConsole {
             title: format!("Basil {}", idx + 1),
             input_buf: String::new(),
             log: vec![],
             io: runner.io,
-        });
+        })
     }
 }
 
@@ -274,47 +274,47 @@ impl eframe::App for GuiApp {
             egui::menu::bar(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("New Basil Window").clicked() {
-                        self.open_basil_console();
-                        ui.close_menu();
+                        self.open_basil_console()
+                        ui.close_menu()
                     }
                     if ui.button("Quit").clicked() {
-                        std::process::exit(0);
+                        std::process::exit(0)
                     }
-                });
+                })
                 ui.menu_button("Help", |ui| {
                     if ui.button("About…").clicked() {
-                        self.alert_text = Some("Basil GUI Starter — demo".into());
-                        ui.close_menu();
+                        self.alert_text = Some("Basil GUI Starter — demo".into())
+                        ui.close_menu()
                     }
-                });
-            });
-        });
+                })
+            })
+        })
 
         // Busy-box demo area
         egui::SidePanel::left("left").show(ctx, |ui| {
-            ui.heading("Busy-box");
+            ui.heading("Busy-box")
             if ui.button("Click me").clicked() { self.clicks += 1; }
-            ui.label(format!("Clicks: {}", self.clicks));
+            ui.label(format!("Clicks: {}", self.clicks))
 
             if ui.button(if self.anim { "Stop anim" } else { "Start anim" }).clicked() {
-                self.anim = !self.anim;
+                self.anim = !self.anim
             }
             if ui.button("Open File…").clicked() {
                 if let Some(p) = rfd::FileDialog::new().pick_file() {
-                    self.alert_text = Some(format!("You chose: {}", p.display()));
+                    self.alert_text = Some(format!("You chose: {}", p.display()))
                 }
             }
-        });
+        })
 
         // Basil consoles as tabs
         egui::CentralPanel::default().show(ctx, |ui| {
-            egui::widgets::global_dark_light_mode_switch(ui);
+            egui::widgets::global_dark_light_mode_switch(ui)
             egui::ScrollArea::both().show(ui, |ui| {
                 egui::collapsing_header::CollapsingState::load_with_default_open(ui.ctx(), ui.id().with("consoles"), true)
                     .show_header(ui, |ui| ui.heading("Basil Consoles"))
                     .body(|ui| {
                         for i in (0..self.consoles.len()).collect::<Vec<_>>() {
-                            let mut close_me = false;
+                            let mut close_me = false
                             egui::Window::new(&self.consoles[i].title)
                                 .open(&mut !close_me)
                                 .show(ctx, |ui| {
@@ -329,32 +329,32 @@ impl eframe::App for GuiApp {
                                     // Log view
                                     egui::ScrollArea::vertical().max_height(200.0).show(ui, |ui| {
                                         for l in &self.consoles[i].log { ui.monospace(l); }
-                                    });
+                                    })
                                     // Input line
                                     let r = egui::TextEdit::singleline(&mut self.consoles[i].input_buf)
                                         .hint_text("type 'help', 'open', 'alert', 'start', 'stop', 'exit'")
                                         .desired_width(f32::INFINITY)
-                                        .show(ui);
+                                        .show(ui)
                                     if r.response.lost_focus() && ui.input(|i| i.key_pressed(egui::Key::Enter)) {
-                                        let line = std::mem::take(&mut self.consoles[i].input_buf);
-                                        let _ = self.consoles[i].io.to_vm.send(line);
+                                        let line = std::mem::take(&mut self.consoles[i].input_buf)
+                                        let _ = self.consoles[i].io.to_vm.send(line)
                                     }
-                                });
+                                })
                             if close_me {
-                                self.consoles.remove(i);
-                                break;
+                                self.consoles.remove(i)
+                                break
                             }
                         }
-                    });
-            });
-        });
+                    })
+            })
+        })
 
         // Simple “About/Alert” popup
         if let Some(msg) = self.alert_text.take() {
             egui::Window::new("Message")
                 .collapsible(false)
                 .resizable(false)
-                .show(ctx, |ui| { ui.label(msg); });
+                .show(ctx, |ui| { ui.label(msg); })
         }
     }
 }

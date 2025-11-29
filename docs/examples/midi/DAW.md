@@ -154,20 +154,20 @@ You already have most via our feature objects; the DAW glue script uses:
 ## engine tick (called each UI loop; RT audio does the heavy lifting)
 
 ```basic
-REM update timing;
+REM update timing
 nowSamples% = AUDIO_NOW_SAMPLES%();  REM provided by obj-daw (or we track)
 pos@ = SAMPLES_TO_BBT@(nowSamples%);  REM {bar%, beat%, tick%}
 
-REM drain MIDI input;
+REM drain MIDI input
 WHILE MIDI_POLL%(midiIn@) > 0 BEGIN
-  ev$[] = MIDI_GET_EVENT$[](midiIn@);
-  QUEUE_MIDI_TO_TRACKS%(project@, ev$[], nowSamples%);
+  ev$[] = MIDI_GET_EVENT$[](midiIn@)
+  QUEUE_MIDI_TO_TRACKS%(project@, ev$[], nowSamples%)
 END
 
-REM schedule events for current block for each MIDI track;
+REM schedule events for current block for each MIDI track
 FOR EACH tr@ IN project@.Tracks BEGIN
   IF tr@.Type$ == "midi" THEN
-    DISPATCH_MIDI_FOR_BLOCK%(tr@, nowSamples%);
+    DISPATCH_MIDI_FOR_BLOCK%(tr@, nowSamples%)
   ENDIF
 END
 ```
@@ -175,11 +175,11 @@ END
 ## drawing a header (obj-term)
 
 ```basic
-CURSOR_HIDE; COLOR("brightwhite","blue"); CLS;
-LOCATE(2,1); PRINT "Project: "; PRINT projName$;
-LOCATE(30,1); PRINT "Pos: "; PRINT bar%; PRINT ":"; PRINT beat%; PRINT ":"; PRINT tick%;
-LOCATE(50,1); PRINT "BPM: "; PRINT tempo%;
-COLOR_RESET; CURSOR_SHOW;
+CURSOR_HIDE; COLOR("brightwhite","blue"); CLS
+LOCATE(2,1); PRINT "Project: "; PRINT projName$
+LOCATE(30,1); PRINT "Pos: "; PRINT bar%; PRINT ":"; PRINT beat%; PRINT ":"; PRINT tick%
+LOCATE(50,1); PRINT "BPM: "; PRINT tempo%
+COLOR_RESET; CURSOR_SHOW
 ```
 
 # constraints & choices
@@ -395,18 +395,18 @@ Here’s what that means in practice for our mini-DAW:
 
 ```basic
 REM inside Eng_PumpAudio%() before pushing block to the ring:
-startTick% = (loopStartSamples% + playheadSamples%) / samplesPerTick%;
-endTick%   = (loopStartSamples% + playheadSamples% + blockFrames%) / samplesPerTick%;
+startTick% = (loopStartSamples% + playheadSamples%) / samplesPerTick%
+endTick%   = (loopStartSamples% + playheadSamples% + blockFrames%) / samplesPerTick%
 
 FOR i% = 0 TO pr_count% - 1 BEGIN
-  noteOnTick%  = pr_start%[](i%);
-  noteOffTick% = noteOnTick% + pr_len%[](i%);
+  noteOnTick%  = pr_start%[](i%)
+  noteOffTick% = noteOnTick% + pr_len%[](i%)
 
   IF TICK_IN_WINDOW%(noteOnTick%, startTick%, endTick%, loopEnabled%) THEN
-    SYNTH_NOTE_ON%(pr_pitch%[](i%), pr_vel%[](i%));
+    SYNTH_NOTE_ON%(pr_pitch%[](i%), pr_vel%[](i%))
   ENDIF
   IF TICK_IN_WINDOW%(noteOffTick%, startTick%, endTick%, loopEnabled%) THEN
-    SYNTH_NOTE_OFF%(pr_pitch%[](i%));
+    SYNTH_NOTE_OFF%(pr_pitch%[](i%))
   ENDIF
 END
 ```

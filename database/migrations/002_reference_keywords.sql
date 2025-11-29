@@ -24,7 +24,7 @@ CREATE TABLE keywords
     INDEX idx_keywords_keyword (keyword),
     FULLTEXT INDEX ft_keywords_text (short_desc, long_desc_md)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
 
 CREATE TABLE keyword_languages
 (
@@ -36,7 +36,7 @@ CREATE TABLE keyword_languages
     CONSTRAINT fk_kw_lang_language
         FOREIGN KEY (language_id) REFERENCES languages (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
 
 CREATE TABLE keyword_categories
 (
@@ -48,4 +48,4 @@ CREATE TABLE keyword_categories
     CONSTRAINT fk_kw_cat_category
         FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE CASCADE
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4

@@ -141,11 +141,11 @@ basil/
 pub struct GearmanConfig { servers: Vec<SocketAddr>, client_id: String, timeout: Duration, retries: u32, keepalive: bool }
 
 pub struct GearmanClientPool { /* connections, metrics, rng */ }
-pub struct JobHandle(String);
+pub struct JobHandle(String)
 pub enum SubmitMode { Foreground, Background, Stream }
 
 pub struct WorkerRuntime { /* function map, tasks, stop signal */ }
-type BasilHandler = Arc<dyn Fn(String) -> BoxFuture<'static, Result<String, BasilError>> + Send + Sync>;
+type BasilHandler = Arc<dyn Fn(String) -> BoxFuture<'static, Result<String, BasilError>> + Send + Sync>
 ```
 
 **Basil FFI surface**

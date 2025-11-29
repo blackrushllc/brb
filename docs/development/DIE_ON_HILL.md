@@ -104,17 +104,17 @@ END IF
 
 ```basic
 FOR i = 1 TO 5
-    PRINTLN i;
-NEXT i;
+    PRINTLN i
+NEXT i
 
 FOR j = 5 TO 1 STEP -1
     BEGIN
-        PRINT j;
+        PRINT j
         FOR i = 1 TO 5
-            PRINTLN i;
-        NEXT i;
+            PRINTLN i
+        NEXT i
     END
-NEXT j;
+NEXT j
 
 ```
 
@@ -122,15 +122,15 @@ NEXT j;
 
 ```basic
 FOR i = 1 TO 5
-    PRINTLN i;
-NEXT i;
+    PRINTLN i
+NEXT i
 
 FOR j = 5 TO 1 STEP -1
-    PRINT j;
+    PRINT j
     FOR i = 1 TO 5
-        PRINTLN i;
-    NEXT i;
-NEXT j;
+        PRINTLN i
+    NEXT i
+NEXT j
 ```
 
 

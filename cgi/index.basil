@@ -1,223 +1,118 @@
 #CGI_NO_HEADER
-
+#include "cgi.inc"
 SUB MAIN()
-  REM Read environment
-  LET pathInfo$ = env$("PATH_INFO");
-  IF LEN(pathInfo$) = 0 THEN pathInfo$ = "/";
-
-  REM Required CGI headers (200 OK by default)
-  PRINTLN "Content-Type: text/html; charset=utf-8";
-  PRINTLN "";  REM blank line after headers
-
-  REM Route and render
-  handle_request(pathInfo$);
-END
+    REM Read environment
+    pathInfo$ = env$("PATH_INFO")
+    IF LEN(pathInfo$) = 0 THEN pathInfo$ = "/"
+    REM Route and render
+    handle_request(pathInfo$)
+END SUB
 
 SUB handle_request(pathInfo$)
-  LET p$ = normalize_path$(pathInfo$);
+  p$ = normalize_path$(pathInfo$)
+
+  send_header_ok_html()
 
   SELECT CASE p$
 
-    CASE p$ = "/"
-        render_home_page();
+    CASE "/"
+        render_home_page()
 
     CASE starts_with%(p$, "/guide")
-        render_guide_placeholder();
+        render_guide_placeholder()
 
-    CASE starts_with%(p$, "/reference")
-        REM We choose to show a simple stub linking to /reference (no redirect for now)
-        render_reference_link();
     CASE ELSE
-        //render_not_found();
-        render_home_page();
+        PRINTLN p$
+        render_not_found()
+        //render_home_page()
     END SELECT
-END
+END SUB
 
 SUB render_home_page()
-  html_head("Basil / Basic / Basic.JS Documentation");
+    html_head("Basil / Basic / Basic.JS Documentation")
 
-  PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\">";
-  PRINTLN "  <div class=\"wrap\"><strong>Basil Docs</strong></div>";
-  PRINTLN "</header>";
+    PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\">"
+    PRINTLN "  <div class=\"wrap\"><strong>Basil Docs</strong></div>"
+    PRINTLN "</header>"
 
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Basil / Basic / Basic.JS Documentation</h1>";
-  PRINTLN "  <p>This is the documentation site for the Basil programming language family.\n";
-  PRINTLN "     It is powered by Basil CGI on the backend and plain HTML/CSS/JS on the frontend.</p>";
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Basil / Basic / Basic.JS Documentation</h1>"
+    PRINTLN "  <p>This is the documentation site for the Basil programming language family.\n"
+    PRINTLN "     It is powered by Basil CGI on the backend and plain HTML/CSS/JS on the frontend.</p>"
 
-  PRINTLN "  <div style=\"margin:1.5rem 0; display:flex; gap:1rem; flex-wrap:wrap;\">";
-  PRINTLN "    <a class=\"btn\" href=\"/guide\" style=\"display:inline-block;padding:.8rem 1.2rem;border:1px solid #888;border-radius:6px;text-decoration:none\">Guide</a>";
-  PRINTLN "    <a class=\"btn\" href=\"/reference\" style=\"display:inline-block;padding:.8rem 1.2rem;border:1px solid #888;border-radius:6px;text-decoration:none\">Reference</a>";
-  PRINTLN "  </div>";
+    PRINTLN "  <div style=\"margin:1.5rem 0; display:flex; gap:1rem; flex-wrap:wrap;\">"
+    PRINTLN "    <a class=\"btn\" href=\"/guide\" style=\"display:inline-block;padding:.8rem 1.2rem;border:1px solid #888;border-radius:6px;text-decoration:none\">Guide</a>"
+    PRINTLN "    <a class=\"btn\" href=\"/reference\" style=\"display:inline-block;padding:.8rem 1.2rem;border:1px solid #888;border-radius:6px;text-decoration:none\">Reference</a>"
+    PRINTLN "  </div>"
 
-  PRINTLN "  <section style=\"margin-top:1.5rem\">";
-  PRINTLN "    <h3>Search</h3>";
-  PRINTLN "    <form method=\"GET\" action=\"/search\">";
-  PRINTLN "      <input type=\"text\" name=\"q\" placeholder=\"Search docs...\" style=\"padding:.5rem;min-width:240px\">";
-  PRINTLN "      <button type=\"submit\">Search</button>";
-  PRINTLN "    </form>";
-  PRINTLN "  </section>";
+    PRINTLN "  <section style=\"margin-top:1.5rem\">"
+    PRINTLN "    <h3>Search</h3>"
+    PRINTLN "    <form method=\"GET\" action=\"/search\">"
+    PRINTLN "      <input type=\"text\" name=\"q\" placeholder=\"Search docs...\" style=\"padding:.5rem;min-width:240px\">"
+    PRINTLN "      <button type=\"submit\">Search</button>"
+    PRINTLN "    </form>"
+    PRINTLN "  </section>"
 
-  PRINTLN "</main>";
+    PRINTLN "</main>"
 
-  html_foot();
-END
+    html_foot()
+END SUB
 
 SUB render_guide_placeholder()
-  html_head("Guide (Coming Soon)");
-  PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\"><div class=\"wrap\"><a href=\"/\">Home</a></div></header>";
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Guide</h1>";
-  PRINTLN "  <p>The Guide will live here. Check back soon.</p>";
-  PRINTLN "  <p><a href=\"/\">Return to Home</a></p>";
-  PRINTLN "</main>";
-  html_foot();
-END
+    html_head("Guide (Coming Soon)")
+    PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\"><div class=\"wrap\"><a href=\"/\">Home</a></div></header>"
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Guide</h1>"
+    PRINTLN "  <p>The Guide will live here. Check back soon.</p>"
+    PRINTLN "  <p><a href=\"/\">Return to Home</a></p>"
+    PRINTLN "</main>"
+    html_foot()
+END SUB
 
 SUB render_reference_link()
-  html_head("Reference");
-  PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\"><div class=\"wrap\"><a href=\"/\">Home</a></div></header>";
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Reference</h1>";
-  PRINTLN "  <p>The Reference lives at <a href=\"/reference\">/reference</a>.</p>";
-  PRINTLN "</main>";
-  html_foot();
-END
+    html_head("Reference")
+    PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\"><div class=\"wrap\"><a href=\"/\">Home</a></div></header>"
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Reference</h1>"
+    PRINTLN "  <p>The Reference lives at <a href=\"/reference\">/reference</a>.</p>"
+    PRINTLN "</main>"
+    html_foot()
+END SUB
 
 SUB render_not_found()
-  REM Optionally, emit a 404 status (sending after content-type is ok for many CGI handlers but
-  REM if needed, move headers to before printing anything). Keeping minimal as per spec.
-  PRINTLN "Status: 404 Not Found";
-  PRINTLN "";
+    REM Optionally, emit a 404 status (sending after content-type is ok for many CGI handlers but
+    REM if needed, move headers to before printing anything). Keeping minimal as per spec.
+    PRINTLN "Status: 404 Not Found"
+    PRINTLN ""
 
-  html_head("Not Found");
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>404 — Not Found</h1>";
-  PRINTLN "  <p>The requested page could not be found.</p>";
-  PRINTLN "  <p><a href=\"/\">Return to Home</a></p>";
-  PRINTLN "</main>";
-  html_foot();
-END
+    html_head("Not Found")
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>404 — Not Found</h1>"
+    PRINTLN "  <p>The requested page could not be found.</p>"
+    PRINTLN "  <p><a href=\"/\">Return to Home</a></p>"
+    PRINTLN "</main>"
+    html_foot()
+END SUB
 
 SUB html_head(title$)
-  PRINTLN "<!doctype html>";
-  PRINTLN "<html lang=\"en\">";
-  PRINTLN "<head>";
-  PRINTLN "  <meta charset=\"utf-8\">";
-  PRINTLN "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-  PRINTLN "  <title>" + html_escape$(title$) + "</title>";
-  PRINTLN "  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0} .wrap{max-width:980px;margin:0 auto;padding:0 1rem}</style>";
-  PRINTLN "</head>";
-  PRINTLN "<body>";
-END
+    PRINTLN "<!doctype html>"
+    PRINTLN "<html lang=\"en\">"
+    PRINTLN "<head>"
+    PRINTLN "  <meta charset=\"utf-8\">"
+    PRINTLN "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINTLN "  <title>" + html_escape$(title$) + "</title>"
+    PRINTLN "  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0} .wrap{max-width:980px;margin:0 auto;padding:0 1rem}</style>"
+    PRINTLN "</head>"
+    PRINTLN "<body>"
+END SUB
 
 SUB html_foot()
-  PRINTLN "<footer style=\"border-top:1px solid #eee;margin-top:2rem\">";
-  PRINTLN "  <div class=\"wrap\" style=\"padding:1rem;\"><small>Basil Docs • <a href=\"/\">Home</a> • <a href=\"/guide\">Guide</a> • <a href=\"/reference\">Reference</a></small></div>";
-  PRINTLN "</footer>";
-  PRINTLN "</body></html>";
-END
+    PRINTLN "<footer style=\"border-top:1px solid #eee;margin-top:2rem\">"
+    PRINTLN "  <div class=\"wrap\" style=\"padding:1rem;\"><small>Basil Docs • <a href=\"/\">Home</a> • <a href=\"/guide\">Guide</a> • <a href=\"/reference\">Reference</a></small></div>"
+    PRINTLN "</footer>"
+    PRINTLN "</body></html>"
+END SUB
 
-FUNCTION env$(name$)
-  LET v$ = ENV$(name$);
-  IF LEN(v$) = 0 THEN RETURN "";
-  RETURN v$;
-END
-
-FUNCTION normalize_path$(path$)
-  IF LEN(path$) = 0 THEN RETURN "/";
-  LET p$ = path$;
-  IF RIGHT$(p$, 1) = "/" AND LEN(p$) > 1 THEN BEGIN
-    LET p$ = LEFT$(p$, LEN(p$) - 1);
-  END
-  RETURN p$;
-END
-
-FUNCTION starts_with%(s$, prefix$)
-  IF LEN(prefix$) = 0 THEN RETURN -1;
-  IF LEN(s$) < LEN(prefix$) THEN RETURN 0;
-  IF LEFT$(s$, LEN(prefix$)) = prefix$ THEN RETURN -1;
-  RETURN 0;
-END
-
-FUNCTION html_escape$(s$)
-  LET out$ = "";
-  FOR i% = 1 TO LEN(s$)
-    LET ch$ = MID$(s$, i%, 1);
-    SELECT CASE ch$
-        CASE "&"
-            out$ = out$ + "&amp;";
-        CASE "<"
-            out$ = out$ + "&lt;";
-        CASE ">"
-            out$ = out$ + "&gt;";
-        CASE "\""
-            out$ = out$ + "&quot;";
-        CASE ELSE
-            out$ = out$ + ch$;
-    END SELECT
-
-  NEXT i%
-  RETURN out$;
-END FUNCTION
-
-REM Minimal URL decoding for '+' and %XX (hex)
-FUNCTION url_decode$(s$)
-  LET out$ = "";
-  LET i% = 1;
-  WHILE i% <= LEN(s$) BEGIN
-    LET ch$ = MID$(s$, i%, 1);
-    SELECT CASE ch$
-        CASE "+"
-            out$ = out$ + " ";
-            i% = i% + 1;
-        CASE "%" AND i% + 2 <= LEN(s$)
-            h1$ = MID$(s$, i%+1, 1);
-            h2$ = MID$(s$, i%+2, 1);
-            n% = hex2int%(h1$, h2$);
-            IF n% >= 0 THEN BEGIN
-                out$ = out$ + CHR$(n%);
-            ELSE
-                out$ = out$ + ch$;
-            END
-            i% = i% + 3;
-        CASE ELSE
-           out$ = out$ + ch$;
-           i% = i% + 1;
-    END SELECT
-  END WHILE
-  RETURN out$;
-END
-
-FUNCTION hex2int%(a$, b$)
-  LET v1% = hex1%(a$);
-  LET v2% = hex1%(b$);
-  IF v1% < 0 OR v2% < 0 THEN RETURN -1;
-  RETURN v1% * 16 + v2%;
-END
-
-FUNCTION hex1%(c$)
-  LET u$ = UCASE$(c$);
-  IF u$ >= "0" AND u$ <= "9" THEN RETURN ASC(u$) - ASC("0");
-  IF u$ >= "A" AND u$ <= "F" THEN RETURN 10 + (ASC(u$) - ASC("A"));
-  RETURN -1;
-END
-
-
-FUNCTION param$(name$) BEGIN
-    FOR EACH kv$ IN REQUEST$()
-        BEGIN
-            LET eq% = INSTR(kv$, "=");
-            IF eq% > 0 THEN BEGIN
-                LET k$ = LEFT$(kv$, eq%);
-                LET v$ = MID$(kv$, eq%+2);
-                IF k$ == name$ THEN RETURN v$;
-            END
-        END
-    NEXT
-    RETURN "";
-END FUNCTION
 
 REM run
-
 MAIN()

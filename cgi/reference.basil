@@ -1,512 +1,505 @@
 #CGI_NO_HEADER
+#include "cgi.inc"
 
 REM Reference section CGI for Basil / Basic / Basic.JS docs
 
 SUB MAIN()
-  LET pathInfo$ = env$("PATH_INFO");
-  IF LEN(pathInfo$) = 0 THEN pathInfo$ = "/"; END
+    pathInfo$ = env$("PATH_INFO")
+    IF LEN(pathInfo$) = 0 THEN pathInfo$ = "/"
 
-  PRINTLN "Content-Type: text/html; charset=utf-8";
-  PRINTLN "";
+    PRINT "Status: 200 OK\r\n"
+    PRINT "Content-Type: text/html; charset=utf-8\r\n"
+    PRINT "Cache-Control: no-store\r\n\r\n"
 
-  handle_reference_request(pathInfo$);
-END
+    handle_reference_request(pathInfo$)
+
+END SUB
+
+
+
 
 SUB handle_reference_request(pathInfo$)
-  REM Normalize path and route
-  LET p$ = normalize_path$(pathInfo$);
+    REM Normalize path and route
+    p$ = normalize_path$(pathInfo$)
+REM    PRINTLN "Path: " + p$ <-- /reference
+    IF p$ = "/reference" THEN
+        render_reference_index()
+        RETURN
+    END IF
 
-  IF p$ = "/" THEN
-    render_reference_index();
-    RETURN;
-  END
+    segments$() = split_path_segments(p$)
+    n% = ARRAY_ROWS%(segments$)
+    IF n% >= 2 THEN
+        first$ = segments$(0)
 
-  LET segments$() = split_path_segments$[](p$);
-  LET n% = ARRAY_ROWS%(segments$);
-  IF n% >= 2 THEN
-    LET first$ = segments$(0);
+        IF first$ = "alpha" THEN
+            IF n% >= 3 THEN
+                render_alpha_listing(segments$(1))
+            ELSE
+                render_reference_not_found()
+            END IF
+            RETURN
+        END IF
 
-    IF first$ = "alpha" THEN
-      IF n% >= 3 THEN
-        render_alpha_listing(segments$(1));
-      ELSE
-        render_reference_not_found();
-      END
-      RETURN;
-    END
+        IF first$ = "category" THEN
+            IF n% >= 3 THEN
+                render_category_listing(segments$(1))
+            ELSE
+                render_reference_not_found()
+            END IF
+            RETURN
+        END IF
 
-    IF first$ = "category" THEN
-      IF n% >= 3 THEN
-        render_category_listing(segments$(1));
-      ELSE
-        render_reference_not_found();
-      END
-      RETURN;
-    END
+        IF first$ = "keyword" THEN
+            IF n% >= 3 THEN
+                render_keyword_detail(segments$(1))
+            ELSE
+                render_reference_not_found()
+            END IF
+            RETURN
+        END IF
+    END IF
 
-    IF first$ = "keyword" THEN
-      IF n% >= 3 THEN
-        render_keyword_detail(segments$(1));
-      ELSE
-        render_reference_not_found();
-      END
-      RETURN;
-    END
-  END
+    render_reference_not_found()
 
-  render_reference_not_found();
-END
+END SUB
 
 REM ---------- Renderers ----------
 
 SUB render_reference_index()
-  html_head("Language Reference");
-  reference_header_nav();
+    html_head("Language Reference")
+    reference_header_nav()
 
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Language Reference</h1>";
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Language Reference</h1>"
 
-  REM Alpha block
-  PRINTLN "  <section style=\"margin:1rem 0\">";
-  PRINTLN "    <h3>Alphabetical Index</h3>";
-  LET letters$() = get_alpha_letters$[]();
-  PRINTLN "    <p>";
-  FOR i% = 0 TO ARRAY_ROWS%(letters$) - 1
-    LET L$ = letters$(i%);
-    PRINT "      <a href=\"/reference/alpha/" + html_escape$(L$) + "\" style=\"margin-right:.5rem\">" + html_escape$(L$) + "</a>";
-  NEXT i%
-  PRINTLN "    </p>";
-  PRINTLN "  </section>";
+    REM Alpha block
+    PRINTLN "  <section style=\"margin:1rem 0\">"
+    PRINTLN "    <h3>Alphabetical Index</h3>"
+    letters() = get_alpha_letters()
+    PRINTLN "    <p>"
+    FOR i% = 0 TO ARRAY_ROWS%(letters$) - 1
+        L$ = letters(i%)
+        PRINT "      <a href=\"/reference/alpha/" + html_escape$(L$) + "\" style=\"margin-right:.5rem\">" + html_escape$(L$) + "</a>"
+    NEXT i%
+    PRINTLN "    </p>"
+    PRINTLN "  </section>"
 
-  REM Category block
-  PRINTLN "  <section style=\"margin:1rem 0\">";
-  PRINTLN "    <h3>Categories</h3>";
-  LET cats$() = get_all_categories$[][]();
-  LET rc% = ARRAY_ROWS%(cats$);
-  FOR i% = 0 TO rc% - 1
-    LET slug$ = cats$(i%, 0);
-    LET name$ = cats$(i%, 1);
-    PRINTLN "    <div><a href=\"/reference/category/" + html_escape$(slug$) + "\">" + html_escape$(name$) + "</a></div>";
-  NEXT i%
-  PRINTLN "  </section>";
+    REM Category block
+    PRINTLN "  <section style=\"margin:1rem 0\">"
+    PRINTLN "    <h3>Categories</h3>"
+    cats$() = get_all_categories()
+    rc% = ARRAY_ROWS%(cats$)
+    FOR i% = 0 TO rc% - 1
+        slug$ = cats$(i%, 0)
+        name$ = cats$(i%, 1)
+        PRINTLN "    <div><a href=\"/reference/category/" + html_escape$(slug$) + "\">" + html_escape$(name$) + "</a></div>"
+    NEXT i%
+    PRINTLN "  </section>"
 
-  PRINTLN "</main>";
-  html_foot();
-END
+    PRINTLN "</main>"
+    html_foot()
+END SUB
 
 SUB render_alpha_listing(letter$)
-  LET L$ = UCASE$(LEFT$(letter$, 1));
-  html_head("Keywords starting with " + L$);
-  reference_header_nav();
+    L$ = UCASE$(LEFT$(letter$, 1))
+    html_head("Keywords starting with " + L$)
+    reference_header_nav()
 
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Keywords starting with " + html_escape$(L$) + "</h1>";
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Keywords starting with " + html_escape$(L$) + "</h1>"
 
-  LET rows$() = get_keywords_for_letter$[][](L$);
-  LET rc% = ARRAY_ROWS%(rows$);
-  IF rc% = 0 THEN
-    PRINTLN "  <p>No keywords found for this letter.</p>";
-  ELSE
-    PRINTLN "  <ul>";
-    FOR i% = 0 TO rc% - 1
-      LET slug$ = rows$(i%, 0);
-      LET kw$ = rows$(i%, 1);
-      LET sd$ = rows$(i%, 2);
-      PRINTLN "    <li><a href=\"/reference/keyword/" + html_escape$(slug$) + "\">" + html_escape$(kw$) + "</a> – " + html_escape$(sd$) + "</li>";
-    NEXT i%
-    PRINTLN "  </ul>";
-  END
+    rows$() = get_keywords_for_letter(L$)
+    rc% = ARRAY_ROWS%(rows$)
+    IF rc% = 0 THEN
+        PRINTLN "  <p>No keywords found for this letter.</p>"
+    ELSE
+        PRINTLN "  <ul>"
+        FOR i% = 0 TO rc% - 1
+          slug$ = rows$(i%, 0)
+          kw$ = rows$(i%, 1)
+          sd$ = rows$(i%, 2)
+          PRINTLN "    <li><a href=\"/reference/keyword/" + html_escape$(slug$) + "\">" + html_escape$(kw$) + "</a> – " + html_escape$(sd$) + "</li>"
+        NEXT i%
+        PRINTLN "  </ul>"
+    END IF
 
-  PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>";
-  PRINTLN "</main>";
-  html_foot();
-END
+    PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>"
+    PRINTLN "</main>"
+    html_foot()
+END SUB
 
 SUB render_category_listing(categorySlug$)
-  LET slug$ = LOWER$(categorySlug$);
-  LET name$ = get_category_display_name$(slug$);
+    slug$ = LOWER$(categorySlug$)
+    name$ = get_category_display_name$(slug$)
 
-  html_head("Category: " + name$);
-  reference_header_nav();
+    html_head("Category: " + name$)
+    reference_header_nav()
 
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Category: " + html_escape$(name$) + "</h1>";
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Category: " + html_escape$(name$) + "</h1>"
 
-  LET rows$() = get_keywords_for_category$[][](slug$);
-  LET rc% = ARRAY_ROWS%(rows$);
-  IF rc% = 0 THEN
-    PRINTLN "  <p>No keywords found in this category.</p>";
-  ELSE
-    PRINTLN "  <ul>";
-    FOR i% = 0 TO rc% - 1
-      LET slug2$ = rows$(i%, 0);
-      LET kw$ = rows$(i%, 1);
-      LET sd$ = rows$(i%, 2);
-      PRINTLN "    <li><a href=\"/reference/keyword/" + html_escape$(slug2$) + "\">" + html_escape$(kw$) + "</a> – " + html_escape$(sd$) + "</li>";
-    NEXT i%
-    PRINTLN "  </ul>";
-  END
+    rows$() = get_keywords_for_category(slug$)
+    rc% = ARRAY_ROWS%(rows$)
+    IF rc% = 0 THEN
+        PRINTLN "  <p>No keywords found in this category.</p>"
+    ELSE
+        PRINTLN "  <ul>"
+        FOR i% = 0 TO rc% - 1
+            slug2$ = rows$(i%, 0)
+            kw$ = rows$(i%, 1)
+            sd$ = rows$(i%, 2)
+            PRINTLN "    <li><a href=\"/reference/keyword/" + html_escape$(slug2$) + "\">" + html_escape$(kw$) + "</a> – " + html_escape$(sd$) + "</li>"
+        NEXT i%
+        PRINTLN "  </ul>"
+    END IF
 
-  PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>";
-  PRINTLN "</main>";
-  html_foot();
-END
+    PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>"
+    PRINTLN "</main>"
+    html_foot()
+
+END SUB
+
+
+
 
 SUB render_keyword_detail(keywordSlug$)
-  LET slug$ = LOWER$(keywordSlug$);
+    slug$ = LOWER$(keywordSlug$)
 
-  REM Load detail from stub provider
-  LET detail$() = get_keyword_detail$[][](slug$);
-  IF ARRAY_ROWS%(detail$) = 0 THEN
-    render_reference_not_found();
-    RETURN;
-  END
+    REM Load detail from stub provider
+    detail$() = get_keyword_detail(slug$)
+    IF ARRAY_ROWS%(detail$) = 0 THEN
+        render_reference_not_found()
+        RETURN
+    END IF
 
-  LET kw$ = detail$(0, 0);
-  LET short$ = detail$(0, 1);
-  LET longMd$ = detail$(0, 2);
-  LET feature$ = detail$(0, 3);
+    kw$ = detail$(0, 0)
+    short$ = detail$(0, 1)
+    longMd$ = detail$(0, 2)
+    feature$ = detail$(0, 3)
 
-  REM parallel list blobs
-  LET langsCsv$ = detail$(0, 4);
-  LET catsCsv$ = detail$(0, 5);
-  LET seeCsv$ = detail$(0, 6);
+    REM parallel list blobs
+    langsCsv$ = detail$(0, 4)
+    catsCsv$ = detail$(0, 5)
+    seeCsv$ = detail$(0, 6)
 
-  html_head(kw$ + " — Reference");
-  reference_header_nav();
+    html_head(kw$ + " — Reference")
+    reference_header_nav()
 
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>" + html_escape$(kw$) + "</h1>";
-  PRINTLN "  <p>" + html_escape$(short$) + "</p>";
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>" + html_escape$(kw$) + "</h1>"
+    PRINTLN "  <p>" + html_escape$(short$) + "</p>"
 
-  REM badges
-  PRINTLN "  <p>";
-  IF LEN(langsCsv$) > 0 THEN
-    PRINTLN "    <strong>Languages:</strong> " + html_escape$(langsCsv$) + "<br>";
-  END
-  IF LEN(feature$) > 0 THEN
-    PRINTLN "    <strong>Feature library:</strong> " + html_escape$(feature$) + "<br>";
-  END
-  IF LEN(catsCsv$) > 0 THEN
-    PRINTLN "    <strong>Categories:</strong> " + html_escape$(catsCsv$) + "";
-  END
-  PRINTLN "  </p>";
+    REM badges
+    PRINTLN "  <p>"
+    IF LEN(langsCsv$) > 0 THEN
+        PRINTLN "    <strong>Languages:</strong> " + html_escape$(langsCsv$) + "<br>"
+    END IF
+    IF LEN(feature$) > 0 THEN
+        PRINTLN "    <strong>Feature library:</strong> " + html_escape$(feature$) + "<br>"
+    END IF
+    IF LEN(catsCsv$) > 0 THEN
+        PRINTLN "    <strong>Categories:</strong> " + html_escape$(catsCsv$) + ""
+    END IF
+    PRINTLN "  </p>"
 
-  REM Long description as preformatted text for now (TODO: Markdown renderer later)
-  PRINTLN "  <section>";
-  PRINTLN "    <h3>Description</h3>";
-  PRINTLN "    <pre style=\"white-space:pre-wrap\">" + html_escape$(longMd$) + "</pre>";
-  PRINTLN "  </section>";
+    REM Long description as preformatted text for now (TODO: Markdown renderer later)
+    PRINTLN "  <section>"
+    PRINTLN "    <h3>Description</h3>"
+    PRINTLN "    <pre style=\"white-space:pre-wrap\">" + html_escape$(longMd$) + "</pre>"
+    PRINTLN "  </section>"
 
-  REM Examples (two styles)
-  LET ex$() = get_keyword_examples$[][](slug$);
-  LET exn% = ARRAY_ROWS%(ex$);
-  IF exn% > 0 THEN
-    PRINTLN "  <section>";
-    PRINTLN "    <h3>Examples</h3>";
-    FOR i% = 0 TO exn% - 1
-      LET label$ = ex$(i%, 0);
-      LET code$ = ex$(i%, 1);
-      LET exid$ = "ex" + (i% + 1);
-      PRINTLN "    <div style=\"margin:.75rem 0\">";
-      PRINTLN "      <div style=\"display:flex;align-items:center;gap:.5rem\"><strong>" + html_escape$(label$) + "</strong> <button onclick=\"copyCode('" + exid$ + "')\">Copy</button></div>";
-      PRINTLN "      <pre><code id=\"" + exid$ + "\">" + html_escape$(code$) + "</code></pre>";
-      PRINTLN "    </div>";
-    NEXT i%
-    PRINTLN "  </section>";
-  END
+    REM Examples (two styles)
+    ex$() = get_keyword_examples(slug$)
+    exn% = ARRAY_ROWS%(ex$)
+    IF exn% > 0 THEN
+        PRINTLN "  <section>"
+        PRINTLN "    <h3>Examples</h3>"
+        FOR i% = 0 TO exn% - 1
+            label$ = ex$(i%, 0)
+            code$ = ex$(i%, 1)
+            exid$ = "ex" + (i% + 1)
+            PRINTLN "    <div style=\"margin:.75rem 0\">"
+            PRINTLN "      <div style=\"display:flex;align-items:center;gap:.5rem\"><strong>" + html_escape$(label$) + "</strong> <button onclick=\"copyCode('" + exid$ + "')\">Copy</button></div>"
+            PRINTLN "      <pre><code id=\"" + exid$ + "\">" + html_escape$(code$) + "</code></pre>"
+            PRINTLN "    </div>"
+        NEXT i%
+        PRINTLN "  </section>"
+    END IF
 
-  REM See also
-  IF LEN(seeCsv$) > 0 THEN
-    PRINTLN "  <section>";
-    PRINTLN "    <h3>See Also</h3>";
-    PRINTLN "    <ul>";
-    LET li$() = split_csv$[](seeCsv$);
+    REM See also
+    IF LEN(seeCsv$) > 0 THEN
+    PRINTLN "  <section>"
+    PRINTLN "    <h3>See Also</h3>"
+    PRINTLN "    <ul>"
+    li$() = split_csv(seeCsv$)
     FOR i% = 0 TO ARRAY_ROWS%(li$) - 1
-      LET name$ = TRIM$(li$(i%));
-      LET slug2$ = to_slug$(name$);
-      PRINTLN "      <li><a href=\"/reference/keyword/" + html_escape$(slug2$) + "\">" + html_escape$(name$) + "</a></li>";
+      name$ = TRIM$(li$(i%))
+      slug2$ = to_slug$(name$)
+      PRINTLN "      <li><a href=\"/reference/keyword/" + html_escape$(slug2$) + "\">" + html_escape$(name$) + "</a></li>"
     NEXT i%
-    PRINTLN "    </ul>";
-    PRINTLN "  </section>";
-  END
+    PRINTLN "    </ul>"
+    PRINTLN "  </section>"
+    END
 
-  PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>";
-  PRINTLN "</main>";
+    PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>"
+    PRINTLN "</main>"
 
-  PRINTLN "<script>function copyCode(id){var t=document.getElementById(id).innerText;navigator.clipboard&&navigator.clipboard.writeText?t&&navigator.clipboard.writeText(t):null}</script>";
-  html_foot();
-END
+    PRINTLN "<script>function copyCode(id){var t=document.getElementById(id).innerText;navigator.clipboard&&navigator.clipboard.writeText?t&&navigator.clipboard.writeText(t):null}</script>"
+    html_foot()
+END SUB
 
 SUB render_reference_not_found()
-  PRINTLN "Status: 404 Not Found";
-  PRINTLN "";
-  html_head("Reference — Not Found");
-  reference_header_nav();
-  PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">";
-  PRINTLN "  <h1>Not Found</h1>";
-  PRINTLN "  <p>The requested reference page could not be found.</p>";
-  PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>";
-  PRINTLN "</main>";
-  html_foot();
-END
+    PRINTLN "Status: 404 Not Found"
+    PRINTLN ""
+    html_head("Reference — Not Found")
+    reference_header_nav()
+    PRINTLN "<main class=\"wrap\" style=\"padding:1rem;\">"
+    PRINTLN "  <h1>Not Found</h1>"
+    PRINTLN "  <p>The requested reference page could not be found.</p>"
+    PRINTLN "  <p><a href=\"/reference\">Back to Reference Index</a></p>"
+    PRINTLN "</main>"
+    html_foot()
+END SUB
 
 SUB reference_header_nav()
-  PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\">";
-  PRINTLN "  <div class=\"wrap\">";
-  PRINTLN "    <nav><a href=\"/\">Home</a> • <a href=\"/guide\">Guide</a> • <a href=\"/reference\">Reference</a></nav>";
-  PRINTLN "  </div>";
-  PRINTLN "</header>";
-END
+    PRINTLN "<header style=\"padding:1rem 0;border-bottom:1px solid #eee;\">"
+    PRINTLN "  <div class=\"wrap\">"
+    PRINTLN "    <nav><a href=\"/\">Home</a> • <a href=\"/guide\">Guide</a> • <a href=\"/reference\">Reference</a></nav>"
+    PRINTLN "  </div>"
+    PRINTLN "</header>"
+END SUB
 
 SUB html_head(title$)
-  PRINTLN "<!doctype html>";
-  PRINTLN "<html lang=\"en\">";
-  PRINTLN "<head>";
-  PRINTLN "  <meta charset=\"utf-8\">";
-  PRINTLN "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
-  PRINTLN "  <title>" + html_escape$(title$) + "</title>";
-  PRINTLN "  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0} .wrap{max-width:980px;margin:0 auto;padding:0 1rem}</style>";
-  PRINTLN "</head>";
-  PRINTLN "<body>";
-END
+    PRINTLN "<!doctype html>"
+    PRINTLN "<html lang=\"en\">"
+    PRINTLN "<head>"
+    PRINTLN "  <meta charset=\"utf-8\">"
+    PRINTLN "  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINTLN "  <title>" + html_escape$(title$) + "</title>"
+    PRINTLN "  <style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0} .wrap{max-width:980px;margin:0 auto;padding:0 1rem}</style>"
+    PRINTLN "</head>"
+    PRINTLN "<body>"
+END SUB
 
 SUB html_foot()
-  PRINTLN "<footer style=\"border-top:1px solid #eee;margin-top:2rem\">";
-  PRINTLN "  <div class=\"wrap\" style=\"padding:1rem;\"><small>Basil Docs • <a href=\"/\">Home</a> • <a href=\"/guide\">Guide</a> • <a href=\"/reference\">Reference</a></small></div>";
-  PRINTLN "</footer>";
-  PRINTLN "</body></html>";
-END
+    PRINTLN "<footer style=\"border-top:1px solid #eee;margin-top:2rem\">"
+    PRINTLN "  <div class=\"wrap\" style=\"padding:1rem;\"><small>Basil Docs • <a href=\"/\">Home</a> • <a href=\"/guide\">Guide</a> • <a href=\"/reference\">Reference</a></small></div>"
+    PRINTLN "</footer>"
+    PRINTLN "</body></html>"
+END SUB
 
-REM ---------- Helpers ----------
+REM Note to Self:
+REM Functions can return any data type, including arrays. For our convention, we will use functions with no type suffix
+REM to indicate that they probably return arrays.
 
-FUNCTION env$(name$)
-  LET v$ = ENV$(name$);
-  IF LEN(v$) = 0 THEN RETURN "";
-  RETURN v$;
-END
-
-FUNCTION html_escape$(s$)
-  LET out$ = "";
-  FOR i% = 1 TO LEN(s$)
-    LET ch$ = MID$(s$, i%, 1);
-    IF ch$ = "&" THEN out$ = out$ + "&amp;";
-    ELSEIF ch$ = "<" THEN out$ = out$ + "&lt;";
-    ELSEIF ch$ = ">" THEN out$ = out$ + "&gt;";
-    ELSEIF ch$ = '"' THEN out$ = out$ + "&quot;";
-    ELSE out$ = out$ + ch$;
-    END
-  NEXT i%
-  RETURN out$;
-END
-
-FUNCTION starts_with%(s$, prefix$)
-  IF LEN(prefix$) = 0 THEN RETURN -1;
-  IF LEN(s$) < LEN(prefix$) THEN RETURN 0;
-  IF LEFT$(s$, LEN(prefix$)) = prefix$ THEN RETURN -1;
-  RETURN 0;
-END
-
-FUNCTION normalize_path$(path$)
-  IF LEN(path$) = 0 THEN RETURN "/";
-  LET p$ = path$;
-  IF RIGHT$(p$, 1) = "/" AND LEN(p$) > 1 THEN
-    LET p$ = LEFT$(p$, LEN(p$) - 1);
-  END
-  RETURN p$;
-END
-
-FUNCTION split_path_segments$[](path$)
-  REM path like "/alpha/A" -> ["alpha","A"]
-  LET p$ = path$;
-  IF LEFT$(p$, 1) = "/" THEN p$ = MID$(p$, 2); END
-  REM count segments
-  IF LEN(p$) = 0 THEN
-    DIM empty$(0);
-    RETURN empty$();
-  END
-  LET count% = 1;
-  LET pos% = 1;
-  WHILE TRUE BEGIN
-    LET slash% = INSTR(p$, "/", pos%);
-    IF slash% = 0 THEN EXIT WHILE; END
-    LET count% = count% + 1;
-    LET pos% = slash% + 1;
-  END
-  DIM segs$[count%];
-  LET i% = 0;
-  LET start% = 1;
-  WHILE start% <= LEN(p$) AND i% < count% BEGIN
-    LET slash% = INSTR(p$, "/", start%);
-    IF slash% = 0 THEN LET slash% = LEN(p$) + 1; END
-    LET segs$(i%) = MID$(p$, start%, slash% - start%);
-    LET i% = i% + 1;
-    LET start% = slash% + 1;
-  END
-  RETURN segs$();
-END
+FUNCTION split_path_segments(path$)
+    REM path like "/alpha/A" -> ["alpha","A"]
+    p$ = path$
+    IF LEFT$(p$, 1) = "/" THEN p$ = MID$(p$, 2)
+    REM count segments
+    IF LEN(p$) = 0 THEN
+        DIM empty$(0)
+        RETURN empty$()
+    END IF
+    count% = 1
+    pos% = 1
+    WHILE TRUE
+        slash% = INSTR(p$, "/", pos%)
+        IF slash% = 0 THEN BREAK
+        count% = count% + 1
+        pos% = slash% + 1
+    END WHILE
+    DIM segs$(count%)
+    i% = 0
+    start% = 1
+    WHILE start% <= LEN(p$) AND i% < count%
+        slash% = INSTR(p$, "/", start%)
+        IF slash% = 0 THEN slash% = LEN(p$) + 1
+        segs$(i%) = MID$(p$, start%, slash% - start%)
+        i% = i% + 1
+        start% = slash% + 1
+    END WHILE
+    RETURN segs$()
+END FUNCTION
 
 FUNCTION to_slug$(name$)
-  REM very simple: lowercase and replace non-alnum/space/underscore with underscore; spaces -> underscore
-  LET s$ = name$;
-  LET out$ = "";
-  FOR i% = 1 TO LEN(s$)
-    LET ch$ = MID$(s$, i%, 1);
-    IF ch$ >= "A" AND ch$ <= "Z" THEN out$ = out$ + LOWER$(ch$);
-    ELSEIF ch$ >= "a" AND ch$ <= "z" THEN out$ = out$ + ch$;
-    ELSEIF ch$ >= "0" AND ch$ <= "9" THEN out$ = out$ + ch$;
-    ELSEIF ch$ = " " OR ch$ = "-" THEN out$ = out$ + "_";
-    ELSEIF ch$ = "_" THEN out$ = out$ + ch$;
-    ELSE out$ = out$ + "_";
-    END
-  NEXT i%
-  RETURN out$;
-END
+    REM very simple: lowercase and replace non-alnum/space/underscore with underscore; spaces -> underscore
+    s$ = name$
+    out$ = ""
+    FOR i% = 1 TO LEN(s$)
+        ch$ = MID$(s$, i%, 1)
+        SELECT CASE ch$
+            CASE ch$ >= "A" AND ch$ <= "Z"
+                out$ = out$ + LOWER$(ch$)
+            CASE ch$ >= "a" AND ch$ <= "z"
+                out$ = out$ + ch$
+            CASE ch$ >= "0" AND ch$ <= "9"
+                out$ = out$ + ch$
+            CASE ch$ = " " OR ch$ = "-"
+                out$ = out$ + "_"
+            CASE ch$ = "_"
+                out$ = out$ + ch$
+            CASE ELSE
+                out$ = out$ + "_"
+        END SELECT
+    NEXT i%
+    RETURN out$
+END FUNCTION
 
-FUNCTION split_csv$[](csv$)
-  IF LEN(csv$) = 0 THEN
-    DIM empty$(0);
-    RETURN empty$();
-  END
-  LET s$ = csv$;
-  LET count% = 1;
-  LET pos% = 1;
-  WHILE TRUE BEGIN
-    LET comma% = INSTR(s$, ",", pos%);
-    IF comma% = 0 THEN EXIT WHILE; END
-    LET count% = count% + 1;
-    LET pos% = comma% + 1;
-  END
-  DIM arr$[count%];
-  LET i% = 0;
-  LET start% = 1;
-  WHILE start% <= LEN(s$) AND i% < count% BEGIN
-    LET comma% = INSTR(s$, ",", start%);
-    IF comma% = 0 THEN LET comma% = LEN(s$) + 1; END
-    LET arr$(i%) = MID$(s$, start%, comma% - start%);
-    LET i% = i% + 1;
-    LET start% = comma% + 1;
-  END
-  RETURN arr$();
-END
+FUNCTION split_csv(csv$)
+    IF LEN(csv$) = 0 THEN
+        DIM empty$(0)
+        RETURN empty$()
+    END IF
+    s$ = csv$
+    count% = 1
+    pos% = 1
+    WHILE TRUE
+        comma% = INSTR(s$, ",", pos%)
+        IF comma% = 0 THEN BREAK
+
+        count% = count% + 1
+        pos% = comma% + 1
+
+        DIM arr$(count%)
+        i% = 0
+        start% = 1
+        WHILE start% <= LEN(s$) AND i% < count%
+            comma% = INSTR(s$, ",", start%)
+            IF comma% = 0 THEN
+                comma% = LEN(s$) + 1
+                BREAK
+            END IF
+            arr$(i%) = MID$(s$, start%, comma% - start%)
+            i% = i% + 1
+            start% = comma% + 1
+        END WHILE
+    END WHILE
+    RETURN arr$()
+END FUNCTION
 
 REM ---------- Stub data providers (to be replaced with MySQL/ORM) ----------
 
-FUNCTION get_alpha_letters$[]()
-  REM TODO: Replace with SELECT DISTINCT UPPER(LEFT(keyword,1)) FROM keywords ORDER BY 1;
-  DIM letters$[5];
-  letters$(0) = "A";
-  letters$(1) = "B";
-  letters$(2) = "C";
-  letters$(3) = "D";
-  letters$(4) = "E";
-  RETURN letters$();
-END
+FUNCTION get_alpha_letters()
+    REM TODO: Replace with SELECT DISTINCT UPPER(LEFT(keyword,1)) FROM keywords ORDER BY 1
+    DIM letters$(5)
+    letters$(0) = "A"
+    letters$(1) = "B"
+    letters$(2) = "C"
+    letters$(3) = "D"
+    letters$(4) = "E"
+    RETURN letters$()
+END FUNCTION
 
-FUNCTION get_all_categories$[][]()
-  REM TODO: Replace with SELECT slug, name FROM categories ORDER BY name;
-  DIM cats$[3, 2];
-  cats$(0, 0) = "audio"; cats$(0, 1) = "Audio";
-  cats$(1, 0) = "midi";  cats$(1, 1) = "MIDI";
-  cats$(2, 0) = "media"; cats$(2, 1) = "Media";
-  RETURN cats$();
-END
+FUNCTION get_all_categories()
+    REM TODO: Replace with SELECT slug, name FROM categories ORDER BY name
+    DIM cats$(3, 2)
+    cats$(0, 0) = "audio"; cats$(0, 1) = "Audio"
+    cats$(1, 0) = "midi";  cats$(1, 1) = "MIDI"
+    cats$(2, 0) = "media"; cats$(2, 1) = "Media"
+    RETURN cats$()
+END FUNCTION
 
 FUNCTION get_category_display_name$(slug$)
-  REM TODO: Replace with SELECT name FROM categories WHERE slug = ?;
-  LET s$ = LOWER$(slug$);
-  IF s$ = "audio" THEN RETURN "Audio";
-  IF s$ = "midi" THEN RETURN "MIDI";
-  IF s$ = "media" THEN RETURN "Media";
-  RETURN slug$;
-END
+    REM TODO: Replace with SELECT name FROM categories WHERE slug = ?
+    s$ = LOWER$(slug$)
+    IF s$ = "audio" THEN RETURN "Audio"
+    IF s$ = "midi" THEN RETURN "MIDI"
+    IF s$ = "media" THEN RETURN "Media"
+    RETURN slug$
+END FUNCTION
 
-FUNCTION get_keywords_for_letter$[][](letter$)
-  REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords WHERE UPPER(keyword) LIKE 'A%' ORDER BY keyword;
-  LET L$ = UCASE$(LEFT$(letter$,1));
-  IF L$ <> "A" THEN
-    DIM empty$(0,0);
-    RETURN empty$();
-  END
-  DIM rows$[3, 3];
-  rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names.";
-  rows$(1,0) = "audio_outputs";  rows$(1,1) = "AUDIO_OUTPUTS$";    rows$(1,2) = "Returns an array of audio output device names.";
-  rows$(2,0) = "audio_default";  rows$(2,1) = "AUDIO_DEFAULT_RATE%"; rows$(2,2) = "Default audio sample rate (Hz).";
-  RETURN rows$();
-END
+FUNCTION get_keywords_for_letter(letter$)
+    REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords WHERE UPPER(keyword) LIKE 'A%' ORDER BY keyword
+    L$ = UCASE$(LEFT$(letter$,1))
+    IF L$ <> "A" THEN
+        DIM empty$(0,0)
+        RETURN empty$()
+    END IF
+    DIM rows$(3, 3)
+    rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names."
+    rows$(1,0) = "audio_outputs";  rows$(1,1) = "AUDIO_OUTPUTS$";    rows$(1,2) = "Returns an array of audio output device names."
+    rows$(2,0) = "audio_default";  rows$(2,1) = "AUDIO_DEFAULT_RATE%"; rows$(2,2) = "Default audio sample rate (Hz)."
+    RETURN rows$()
+END FUNCTION
 
-FUNCTION get_keywords_for_category$[][](slug$)
-  REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords k JOIN keyword_categories kc ON kc.keyword_id=k.id JOIN categories c ON kc.category_id=c.id WHERE c.slug=? ORDER BY keyword;
-  LET s$ = LOWER$(slug$);
-  IF s$ = "audio" THEN
-    DIM rows$[3, 3];
-    rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names.";
-    rows$(1,0) = "audio_outputs";  rows$(1,1) = "AUDIO_OUTPUTS$";    rows$(1,2) = "Returns an array of audio output device names.";
-    rows$(2,0) = "audio_default";  rows$(2,1) = "AUDIO_DEFAULT_RATE%"; rows$(2,2) = "Default audio sample rate (Hz).";
-    RETURN rows$();
-  END
-  IF s$ = "midi" THEN
-    DIM rows2$[1,3];
-    rows2$(0,0) = "midi_list"; rows2$(0,1) = "MIDI_DEVICES$"; rows2$(0,2) = "List available MIDI devices.";
-    RETURN rows2$();
-  END
-  IF s$ = "media" THEN
-    DIM rows3$[1,3];
-    rows3$(0,0) = "media_open"; rows3$(0,1) = "MEDIA_OPEN@"; rows3$(0,2) = "Open a media file.";
-    RETURN rows3$();
-  END
-  DIM empty$(0,0);
-  RETURN empty$();
-END
+FUNCTION get_keywords_for_category(slug$)
+    REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords k JOIN keyword_categories kc ON kc.keyword_id=k.id JOIN categories c ON kc.category_id=c.id WHERE c.slug=? ORDER BY keyword
+    s$ = LOWER$(slug$)
+    IF s$ = "audio" THEN
+        DIM rows$(3, 3)
+        rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names."
+        rows$(1,0) = "audio_outputs";  rows$(1,1) = "AUDIO_OUTPUTS$";    rows$(1,2) = "Returns an array of audio output device names."
+        rows$(2,0) = "audio_default";  rows$(2,1) = "AUDIO_DEFAULT_RATE%"; rows$(2,2) = "Default audio sample rate (Hz)."
+        RETURN rows$()
+    END IF
 
-FUNCTION get_keyword_detail$[][](slug$)
-  REM TODO: Replace with SELECT ... FROM keywords WHERE slug = ?;
-  LET s$ = LOWER$(slug$);
-  IF s$ = "audio_inputs" THEN
-    DIM row$[1, 7];
-    row$(0, 0) = "AUDIO_INPUTS$";
-    row$(0, 1) = "Returns an array of audio input device names.";
-    row$(0, 2) = "Returns a list of available audio input device names on the system.\n\nUse this to present a device picker or to choose a default input device.";
-    row$(0, 3) = "obj-audio";  REM feature library
-    row$(0, 4) = "Basil";      REM languages CSV
-    row$(0, 5) = "Audio, MIDI, Media"; REM categories CSV
-    row$(0, 6) = "AUDIO_OUTPUTS$, AUDIO_DEFAULT_RATE%, AUDIO_DEFAULT_CHANS%"; REM see also CSV
-    RETURN row$();
-  END
+    IF s$ = "midi" THEN
+        DIM rows2$(1,3)
+        rows2$(0,0) = "midi_list"; rows2$(0,1) = "MIDI_DEVICES$"; rows2$(0,2) = "List available MIDI devices."
+        RETURN rows2$()
+    END IF
 
-  IF s$ = "audio_outputs" THEN
-    DIM row2$[1, 7];
-    row2$(0, 0) = "AUDIO_OUTPUTS$";
-    row2$(0, 1) = "Returns an array of audio output device names.";
-    row2$(0, 2) = "Enumerates audio output (playback) devices on the system.";
-    row2$(0, 3) = "obj-audio";
-    row2$(0, 4) = "Basil";
-    row2$(0, 5) = "Audio";
-    row2$(0, 6) = "AUDIO_INPUTS$, AUDIO_DEFAULT_RATE%";
-    RETURN row2$();
-  END
+    IF s$ = "media" THEN
+        DIM rows3$(1,3)
+        rows3$(0,0) = "media_open"; rows3$(0,1) = "MEDIA_OPEN@"; rows3$(0,2) = "Open a media file."
+        RETURN rows3$()
+    END IF
+    DIM empty$(0,0)
+    RETURN empty$()
+END FUNCTION
 
-  DIM none$(0,0);
-  RETURN none$();
-END
+FUNCTION get_keyword_detail(slug$)
+    REM TODO: Replace with SELECT ... FROM keywords WHERE slug = ?
+    s$ = LOWER$(slug$)
+    IF s$ = "audio_inputs" THEN
+        DIM row$(1, 7)
+        row$(0, 0) = "AUDIO_INPUTS$"
+        row$(0, 1) = "Returns an array of audio input device names."
+        row$(0, 2) = "Returns a list of available audio input device names on the system.\n\nUse this to present a device picker or to choose a default input device."
+        row$(0, 3) = "obj-audio";  REM feature library
+        row$(0, 4) = "Basil";      REM languages CSV
+        row$(0, 5) = "Audio, MIDI, Media"; REM categories CSV
+        row$(0, 6) = "AUDIO_OUTPUTS$, AUDIO_DEFAULT_RATE%, AUDIO_DEFAULT_CHANS%"; REM see also CSV
+        RETURN row$()
+    END IF
 
-FUNCTION get_keyword_examples$[][](slug$)
-  REM TODO: Replace with SELECT lang_style, code FROM examples WHERE keyword_slug = ? ORDER BY sort;
-  LET s$ = LOWER$(slug$);
-  IF s$ = "audio_inputs" THEN
-    DIM ex$[2, 2];
-    ex$(0, 0) = "Blocky BASIC";
-    ex$(0, 1) = "DIM ins$[0]\nLET ins$() = AUDIO_INPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(ins$) - 1 BEGIN\n  PRINTLN ins$(i%)\nEND";
-    ex$(1, 0) = "Curly";
-    ex$(1, 1) = "let ins$ = AUDIO_INPUTS$();\nfor (let i% = 0; i% < ins$.length; i% += 1) {\n  println(ins$[i%]);\n}";
-    RETURN ex$();
-  END
-  IF s$ = "audio_outputs" THEN
-    DIM ex2$[1, 2];
-    ex2$(0, 0) = "Blocky BASIC";
-    ex2$(0, 1) = "DIM outs$[0]\nLET outs$() = AUDIO_OUTPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(outs$) - 1 BEGIN\n  PRINTLN outs$(i%)\nEND";
-    RETURN ex2$();
-  END
-  DIM none$[0,0];
-  RETURN none$();
-END
+    IF s$ = "audio_outputs" THEN
+        DIM row2$(1, 7)
+        row2$(0, 0) = "AUDIO_OUTPUTS$"
+        row2$(0, 1) = "Returns an array of audio output device names."
+        row2$(0, 2) = "Enumerates audio output (playback) devices on the system."
+        row2$(0, 3) = "obj-audio"
+        row2$(0, 4) = "Basil"
+        row2$(0, 5) = "Audio"
+        row2$(0, 6) = "AUDIO_INPUTS$, AUDIO_DEFAULT_RATE%"
+        RETURN row2$()
+    END IF
+
+    DIM none$(0,0)
+    RETURN none$()
+END FUNCTION
+
+FUNCTION get_keyword_examples(slug$)
+    REM TODO: Replace with SELECT lang_style, code FROM examples WHERE keyword_slug = ? ORDER BY sort
+    s$ = LOWER$(slug$)
+    IF s$ = "audio_inputs" THEN
+        DIM ex$(2, 2)
+        ex$(0, 0) = "Blocky BASIC"
+        ex$(0, 1) = "DIM ins$(0)\nins$() = AUDIO_INPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(ins$) - 1\n  PRINTLN ins$(i%)\nNEXT i%"
+        ex$(1, 0) = "Curly"
+        ex$(1, 1) = "ins$ = AUDIO_INPUTS$();\nfor (i% = 0; i% < ins$.length; i% += 1) {\n  println(ins$(i%));\n}"
+        RETURN ex$()
+    END IF
+    IF s$ = "audio_outputs" THEN
+        DIM ex2$(1, 2)
+        ex2$(0, 0) = "Blocky BASIC"
+        ex2$(0, 1) = "DIM outs$(0)\nouts$() = AUDIO_OUTPUTS$()\nFOR i% = 0 TO ARRAY_ROWS%(outs$) - 1\n  PRINTLN outs$(i%)\nNEXT i%"
+        RETURN ex2$()
+    END IF
+    DIM none$(0,0)
+    RETURN none$()
+END FUNCTION
+
+MAIN()

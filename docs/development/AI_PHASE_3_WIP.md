@@ -174,7 +174,7 @@ Then a tool-aware ask:
 
 ```basic
 PRINT AI.CHAT$("Create a 4-bar lofi drum ClipSpec and insert it at bar 1 on 'Drums'.", _
-               "{ allow_tools:true, max_tool_calls:2 }");
+               "{ allow_tools:true, max_tool_calls:2 }")
 ```
 
 ---

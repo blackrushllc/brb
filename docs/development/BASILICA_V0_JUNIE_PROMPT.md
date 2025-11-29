@@ -140,11 +140,11 @@ E) Webview (wry)
     window.BASIL = {
       send: (obj) => window.ipc.postMessage(obj),
       receive: (payload) => { /* handle Rust→JS messages; payload is JSON */ }
-    };
+    }
     document.addEventListener('click', (e) => {
-      const id = e.target?.id;
-      if (id) BASIL.send({ event: 'click', id });
-    });
+      const id = e.target?.id
+      if (id) BASIL.send({ event: 'click', id })
+    })
   </script>
   ```
 * Rust→JS: `webview.evaluate_script(&format!("BASIL.receive({});", json))?`

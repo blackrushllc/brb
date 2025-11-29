@@ -43,9 +43,9 @@ FOPEN(path$, mode$) -> fh%
 
 Example:
 ```basil
-LET fh% = FOPEN("notes.txt", "w");
-FWRITELN fh%, "Hello, Basil!";
-FCLOSE fh%;
+LET fh% = FOPEN("notes.txt", "w")
+FWRITELN fh%, "Hello, Basil!"
+FCLOSE fh%
 ```
 
 FCLOSE fh%
@@ -81,22 +81,22 @@ FSEEK fh%, offset&, whence%
 
 Example: reading lines
 ```basil
-LET fh% = FOPEN("notes.txt", "r");
+LET fh% = FOPEN("notes.txt", "r")
 WHILE NOT FEOF(fh%) BEGIN
-  LET line$ = FREADLINE$(fh%);
-  PRINTLN line$;
+  LET line$ = FREADLINE$(fh%)
+  PRINTLN line$
 END
-FCLOSE fh%;
+FCLOSE fh%
 ```
 
 Example: seek and tell
 ```basil
-LET fh% = FOPEN("data.bin", "rb");
-LET pos& = FTELL&(fh%);
-PRINTLN "pos before = ", pos&;
+LET fh% = FOPEN("data.bin", "rb")
+LET pos& = FTELL&(fh%)
+PRINTLN "pos before = ", pos&
 FSEEK fh%, 10, 0;   ' move to absolute 10
-PRINTLN "pos now = ", FTELL&(fh%);
-FCLOSE fh%;
+PRINTLN "pos now = ", FTELL&(fh%)
+FCLOSE fh%
 ```
 
 ## 3. Whole-file helpers (no explicit open/close)
@@ -112,9 +112,9 @@ APPENDFILE path$, data$
 
 Example:
 ```basil
-WRITEFILE "out.txt", "Alpha\nBeta\n";
-APPENDFILE "out.txt", "Gamma\n";
-PRINT READFILE$("out.txt");
+WRITEFILE "out.txt", "Alpha\nBeta\n"
+APPENDFILE "out.txt", "Gamma\n"
+PRINT READFILE$("out.txt")
 ```
 
 ## 4. File management statements
@@ -140,9 +140,9 @@ DIR$(pattern$) -> STRING[]
 
 Example:
 ```basil
-LET files$@ = DIR$("*.basil");
+LET files$@ = DIR$("*.basil")
 FOR i% = 0 TO UBOUND(files$@)
-  PRINTLN files$@(i%);
+  PRINTLN files$@(i%)
 NEXT
 ```
 

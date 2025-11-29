@@ -118,8 +118,8 @@ pub mod ast;      // ergonomic typed wrappers
 pub mod parse;    // parser producing CST (+errors with ranges)
 
 // crates/basil_tools/src/lib.rs
-pub mod format;
-pub mod lint;
+pub mod format
+pub mod lint
 pub mod lsp;      // optional
 pub mod ai_advice; // optional; behind "ai" feature
 

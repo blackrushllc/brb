@@ -35,7 +35,7 @@ Below are the precise changes to make and what you need to publish or ship.
 
   Example in code (inside `bcc` before spawning Cargo):
   ```rust
-  cmd.env("CARGO_TARGET_DIR", emitted.root.join("target"));
+  cmd.env("CARGO_TARGET_DIR", emitted.root.join("target"))
   cmd.arg("--locked"); // reproducible, uses Cargo.lock if present
   ```
 

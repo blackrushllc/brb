@@ -75,10 +75,10 @@ lib-runner = ["basil_compiler", "basil_vm"]
 **crates/basil_web/src/engine.rs** (new)
 
 ```rust
-use std::path::{Path, PathBuf};
-use std::time::Duration;
-use std::collections::HashMap;
-use anyhow::Result;
+use std::path::{Path, PathBuf}
+use std::time::Duration
+use std::collections::HashMap
+use anyhow::Result
 
 #[derive(Clone, Debug)]
 pub struct CompileOutcome {
@@ -101,15 +101,15 @@ pub struct VmIo {
 }
 
 pub trait CompileService: Send + Sync + 'static {
-    fn compile_to_bytecode(&self, source: &Path, bytecode: &Path) -> Result<CompileOutcome>;
+    fn compile_to_bytecode(&self, source: &Path, bytecode: &Path) -> Result<CompileOutcome>
 }
 
 pub trait RunService: Send + Sync + 'static {
-    fn run_bytecode(&self, bytecode: &Path, env: &Env) -> Result<VmIo>;
+    fn run_bytecode(&self, bytecode: &Path, env: &Env) -> Result<VmIo>
     /// Optional for template blocks (in-memory source)
     fn run_source_block(&self, source_snippet: &str, env: &Env) -> Result<VmIo> {
-        let _ = (source_snippet, env);
-        anyhow::bail!("run_source_block not supported in this backend");
+        let _ = (source_snippet, env)
+        anyhow::bail!("run_source_block not supported in this backend")
     }
 }
 ```
@@ -169,7 +169,7 @@ impl RunService for LibRunner {
         unimplemented!()
     }
     fn run_source_block(&self, source_snippet: &str, env: &Env) -> Result<VmIo> {
-        // compile + run snippet entirely in-memory if VM supports it;
+        // compile + run snippet entirely in-memory if VM supports it
         // fallback: compile to temp bytecode in a cache and run.
         unimplemented!()
     }
@@ -184,14 +184,14 @@ impl RunService for LibRunner {
 
 ```rust
 #[cfg(feature = "process-runner")]
-pub type DefaultCompiler = crate::engine_process::ProcCompiler;
+pub type DefaultCompiler = crate::engine_process::ProcCompiler
 #[cfg(feature = "process-runner")]
-pub type DefaultRunner   = crate::engine_process::ProcRunner;
+pub type DefaultRunner   = crate::engine_process::ProcRunner
 
 #[cfg(all(not(feature = "process-runner")), feature = "lib-runner"))]
-pub type DefaultCompiler = crate::engine_lib::LibCompiler;
+pub type DefaultCompiler = crate::engine_lib::LibCompiler
 #[cfg(all(not(feature = "process-runner")), feature = "lib-runner"))]
-pub type DefaultRunner   = crate::engine_lib::LibRunner;
+pub type DefaultRunner   = crate::engine_lib::LibRunner
 ```
 
 * Expose `make_services(cfg: &Config) -> (impl CompileService, impl RunService)`
@@ -208,7 +208,7 @@ pub async fn compile_if_stale<C: CompileService>(
     source: &Path,
     bytecode: &Path
 ) -> Result<CompileOutcome> {
-    let stale = /* mtime compare or hash compare */;
+    let stale = /* mtime compare or hash compare */
     if stale { compiler.compile_to_bytecode(source, bytecode) } else {
         Ok(CompileOutcome{ changed:false, version:None, stderr_tail:None, bytecode_path: bytecode.to_path_buf() })
     }

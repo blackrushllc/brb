@@ -48,47 +48,47 @@
 ### 1) One-liners for students
 
 ```basic
-PRINT AI.CHAT$("Explain bubble sort in 3 bullet points");
+PRINT AI.CHAT$("Explain bubble sort in 3 bullet points")
 ```
 
 ```basic
 PRINT AI.CHAT$("Write Basil code that prints the first 10 primes", _
-               "{ model:'mini', max_tokens:256 }");
+               "{ model:'mini', max_tokens:256 }")
 ```
 
 ### 2) Streaming (cool for CLI demos)
 
 ```basic
-PRINT "AI says: ";
-DIM full$ = AI.STREAM("Tell me a one-liner joke about BASIC");
-PRINT "\n\n[Done]\n";
+PRINT "AI says: "
+DIM full$ = AI.STREAM("Tell me a one-liner joke about BASIC")
+PRINT "\n\n[Done]\n"
 ```
 
 ### 3) System prompt & temperature
 
 ```basic
-DIM opts$ = "{ system:'You are a calm Basil tutor.', temperature:0.2 }";
-PRINT AI.CHAT$("Why does this loop never end? " + PROGRAM.TEXT$(1, 120), opts$);
+DIM opts$ = "{ system:'You are a calm Basil tutor.', temperature:0.2 }"
+PRINT AI.CHAT$("Why does this loop never end? " + PROGRAM.TEXT$(1, 120), opts$)
 ```
 
 ### 4) Embeddings + local search (Phase 2)
 
 ```basic
-DIM q$ = "How do I open a file in Basil?";
-DIM qv[] = AI.EMBED(q$);
+DIM q$ = "How do I open a file in Basil?"
+DIM qv[] = AI.EMBED(q$)
 
 REM Suppose docs[] and vecs[][] were precomputed at startup
-DIM best_i% = COSINE.MAX_SIMILARITY_INDEX(qv[], vecs[][]);
-PRINT "Closest doc: " + docs[best_i%];
+DIM best_i% = COSINE.MAX_SIMILARITY_INDEX(qv[], vecs[][])
+PRINT "Closest doc: " + docs[best_i%]
 ```
 
 ### 5) Moderation gate (Phase 2)
 
 ```basic
 IF AI.MODERATE%("Generate a phishing email") = 0 THEN
-  PRINT AI.CHAT$("Write a polite business email asking for a meeting");
+  PRINT AI.CHAT$("Write a polite business email asking for a meeting")
 ELSE
-  PRINT "Request blocked by moderation.";
+  PRINT "Request blocked by moderation."
 END IF
 ```
 
@@ -97,18 +97,18 @@ END IF
 Expose Basil functions to the AI via a registry:
 
 ```basic
-AI.TOOL.REGISTER "get_time", "Returns the current time", "{}", "string";
+AI.TOOL.REGISTER "get_time", "Returns the current time", "{}", "string"
 
 FUNCTION get_time$()
-  RETURN TIME$();
+  RETURN TIME$()
 END FUNCTION
 ```
 
 Then:
 
 ```basic
-DIM opts$ = "{ tools:[ 'get_time' ], allow_tools:true }";
-PRINT AI.CHAT$("What's the time? Use tools if helpful.", opts$);
+DIM opts$ = "{ tools:[ 'get_time' ], allow_tools:true }"
+PRINT AI.CHAT$("What's the time? Use tools if helpful.", opts$)
 ```
 
 Runtime loop:
@@ -183,25 +183,25 @@ Internally this is just a thin wrapper over `AI.SESSION` (optional stateful chat
 
 ```basic
 DIM spec$ = "Make a numbers guessing game in Basil. " + _
-            "Keep it under 40 lines, validate input, and replay on win.";
+            "Keep it under 40 lines, validate input, and replay on win."
 
 DIM code$ = AI.CHAT$("Generate only code, no commentary:\n" + spec$, _
-                     "{ system:'You write Basil code only.', temperature:0.4 }");
+                     "{ system:'You write Basil code only.', temperature:0.4 }")
 
 IF LEN(code$) = 0 THEN
-  PRINT "AI error: " + AI.LAST_ERROR$;
+  PRINT "AI error: " + AI.LAST_ERROR$
 ELSE
-  FILE.WRITE$("numbers_game.basil", code$);
-  PRINT "Wrote numbers_game.basil";
+  FILE.WRITE$("numbers_game.basil", code$)
+  PRINT "Wrote numbers_game.basil"
 END IF
 ```
 
 # Example: Explain an error
 
 ```basic
-DIM src$ = FILE.READ$("main.basil");
-DIM ask$ = "Explain the bug briefly and show a small fix.\n\n" + src$;
-PRINT AI.CHAT$(ask$, "{ system:'You are a Basil linter.', temperature:0 }");
+DIM src$ = FILE.READ$("main.basil")
+DIM ask$ = "Explain the bug briefly and show a small fix.\n\n" + src$
+PRINT AI.CHAT$(ask$, "{ system:'You are a Basil linter.', temperature:0 }")
 ```
 
 # Minimal `.basil-ai.toml`
@@ -281,8 +281,8 @@ Natural-language ⇄ MIDI. You tell Basil/DAWG what you want (“give me a four-
 
 ```basic
 DIM ask$ = "4 bars, 85 BPM, lo-fi hip hop. Drums only. \
-            swing 54%. Kicks sparse, snares 2 & 4, ghost hats.";
-DIM spec$ = AI.MUSIC.GENERATE$(ask$, "{ model:'mini', temperature:0.3 }");
+            swing 54%. Kicks sparse, snares 2 & 4, ghost hats."
+DIM spec$ = AI.MUSIC.GENERATE$(ask$, "{ model:'mini', temperature:0.3 }")
 
 IF LEN(spec$) = 0 THEN
   PRINT "AI error: "; PRINT AI.LAST_ERROR$; STOP
@@ -298,13 +298,13 @@ TRANSPORT.PLAY
 
 ```basic
 DIM chords$ = AI.MUSIC.GENERATE$("4 bars, key Am, 90 BPM, \
-  i–VI–III–VII pad chords, legato, soft.", "{}");
+  i–VI–III–VII pad chords, legato, soft.", "{}")
 
 DIM chords_id% = MIDI.CLIP.FROM_SPEC(chords$)
 MIDI.CLIP.INSERT chords_id%, TRACK.ID("Pads"), 1
 
 DIM bass$ = AI.MUSIC.VARIATION$(chords$, "Generate bass line that \
-  follows roots with occasional passing tones; 8ths; mellow.");
+  follows roots with occasional passing tones; 8ths; mellow.")
 
 DIM bass_id% = MIDI.CLIP.FROM_SPEC(bass$)
 MIDI.CLIP.INSERT bass_id%, TRACK.ID("Bass"), 1
@@ -578,42 +578,42 @@ Create a crate/module `obj-ai` behind feature flag `obj-ai`:
 1. `01_hello_ai.basil`
 
    ```basic
-   PRINT AI.CHAT$("Explain bubble sort in 3 bullets");
+   PRINT AI.CHAT$("Explain bubble sort in 3 bullets")
    ```
 2. `02_stream_joke.basil`
 
    ```basic
-   PRINT "AI says: ";
-   DIM full$ = AI.STREAM("Tell a one-liner about BASIC", "{ temperature:0.2 }");
-   PRINT "\n---\n"; PRINT full$;
+   PRINT "AI says: "
+   DIM full$ = AI.STREAM("Tell a one-liner about BASIC", "{ temperature:0.2 }")
+   PRINT "\n---\n"; PRINT full$
    ```
 3. `03_explain_file.basil`
 
    ```basic
-   DIM src$ = FILE.READ$("examples/hello.basil");
+   DIM src$ = FILE.READ$("examples/hello.basil")
    PRINT AI.CHAT$("Explain briefly what this code does:\n\n" + src$, _
-                  "{ system:'You are a calm Basil tutor.', max_tokens:300 }");
+                  "{ system:'You are a calm Basil tutor.', max_tokens:300 }")
    ```
 4. `04_embeddings_search.basil` (toy local semantic search)
 
    ```basic
-   DIM docs$[] = ["open a file", "write a file", "arrays", "loops"];
+   DIM docs$[] = ["open a file", "write a file", "arrays", "loops"]
    DIM vecs[][]  ' compute vectors
    FOR i%=0 TO UBOUND(docs$[])
-     vecs[i%][] = AI.EMBED(docs$[i%]);
+     vecs[i%][] = AI.EMBED(docs$[i%])
    NEXT
-   DIM q$ = "how do I write to a file?";
-   DIM qv[] = AI.EMBED(q$);
-   DIM best% = COSINE.MAX_SIMILARITY_INDEX(qv[], vecs[][]);
-   PRINT "Closest doc: "; PRINT docs$[best%];
+   DIM q$ = "how do I write to a file?"
+   DIM qv[] = AI.EMBED(q$)
+   DIM best% = COSINE.MAX_SIMILARITY_INDEX(qv[], vecs[][])
+   PRINT "Closest doc: "; PRINT docs$[best%]
    ```
 5. `05_moderation_gate.basil`
 
    ```basic
    IF AI.MODERATE%("Generate a polite meeting request email") = 0 THEN
-     PRINT AI.CHAT$("Write a polite 3-sentence meeting request.");
+     PRINT AI.CHAT$("Write a polite 3-sentence meeting request.")
    ELSE
-     PRINT "Request blocked by moderation.";
+     PRINT "Request blocked by moderation."
    END IF
    ```
 
@@ -719,11 +719,11 @@ REM ------------------------------------------------------------
 
 FUNCTION Assert%(cond%, msg$)
   IF cond% THEN
-    PRINT "✅ "; PRINT msg$;
+    PRINT "✅ "; PRINT msg$
     PRINT
     RETURN 1
   ELSE
-    PRINT "❌ FAIL: "; PRINT msg$;
+    PRINT "❌ FAIL: "; PRINT msg$
     PRINT
     STOP
   END IF
@@ -736,7 +736,7 @@ Assert%(LEFT$(reply$, 8) = "[[TEST]]", "AI.CHAT$ produced deterministic test pre
 Assert%(LEN(AI.LAST_ERROR$) = 0, "AI.LAST_ERROR$ empty after CHAT")
 
 REM 2) STREAM
-PRINT "Streaming: ";
+PRINT "Streaming: "
 DIM full$ = AI.STREAM("Stream a tiny line", "{ temperature:0.0 }")
 PRINT
 Assert%(LEN(full$) > 0, "AI.STREAM returned text")
@@ -1034,8 +1034,8 @@ Unknown keys ignored.
 1. `01_make_lofi_drums.basil`
 
 ```basic
-DIM ask$ = "4 bars, 85 BPM, lofi hip hop drums, swing 54%, sparse kicks, ghost hats.";
-DIM spec$ = AI.MUSIC.GENERATE$(ask$, "{ grid:16 }");
+DIM ask$ = "4 bars, 85 BPM, lofi hip hop drums, swing 54%, sparse kicks, ghost hats."
+DIM spec$ = AI.MUSIC.GENERATE$(ask$, "{ grid:16 }")
 DIM id% = MIDI.CLIP.FROM_SPEC(spec$)
 MIDI.CLIP.INSERT id%, "Drums", 1
 TRANSPORT.LOOP.SET 1, 5
@@ -1045,7 +1045,7 @@ TRANSPORT.PLAY
 2. `02_chords_and_bass.basil`
 
 ```basic
-DIM chords$ = AI.MUSIC.GENERATE$("4 bars, key Am, i–VI–III–VII, pad, legato, soft.", "{}");
+DIM chords$ = AI.MUSIC.GENERATE$("4 bars, key Am, i–VI–III–VII, pad, legato, soft.", "{}")
 DIM c_id% = MIDI.CLIP.FROM_SPEC(chords$)
 MIDI.CLIP.INSERT c_id%, "Pads", 1
 

@@ -52,7 +52,7 @@ Use **blocky BASIC style** (no line numbers) consistent with the Basil examples,
 
 ```basic
 FOR i% = 0 TO LEN(outs$[]) - 1 BEGIN
-  PRINTLN outs$[](i%);
+  PRINTLN outs$[](i%)
 END
 ```
 
@@ -67,7 +67,7 @@ For both `index.basil` and `reference.basil`, please:
 1. **Print CGI headers** at the very top of `MAIN`:
 
    ```basic
-   PRINTLN "Content-Type: text/html; charset=utf-8";
+   PRINTLN "Content-Type: text/html; charset=utf-8"
    PRINTLN "";  REM blank line after headers
    ```
 
@@ -288,15 +288,15 @@ Please implement the following general structure:
 
   ```basic
   SUB MAIN()
-    LET pathInfo$ = env$("PATH_INFO");
+    LET pathInfo$ = env$("PATH_INFO")
     IF pathInfo$ = "" THEN
-      pathInfo$ = "/";
+      pathInfo$ = "/"
     END
 
-    PRINTLN "Content-Type: text/html; charset=utf-8";
-    PRINTLN "";
+    PRINTLN "Content-Type: text/html; charset=utf-8"
+    PRINTLN ""
 
-    handle_reference_request@(pathInfo$);
+    handle_reference_request@(pathInfo$)
   END
   ```
 
@@ -305,48 +305,48 @@ Please implement the following general structure:
   ```basic
   SUB handle_reference_request@(pathInfo$)
     REM Normalize, strip trailing slashes except root
-    pathInfo$ = normalize_path$(pathInfo$);
+    pathInfo$ = normalize_path$(pathInfo$)
 
     REM If "/", show index
     IF pathInfo$ = "/" THEN
-      render_reference_index@();
-      RETURN;
+      render_reference_index@()
+      RETURN
     END
 
     REM Split on "/" into segments[] (e.g. ["", "alpha", "A"])
-    LET segments$[] = split_path_segments$[](pathInfo$);
+    LET segments$[] = split_path_segments$[](pathInfo$)
 
     IF LEN(segments$[]) >= 2 THEN
       IF segments$ = "alpha" THEN
         REM Expect /alpha/{letter}
         IF LEN(segments$[]) >= 3 THEN
-          render_alpha_listing@(segments$);
+          render_alpha_listing@(segments$)
         ELSE
-          render_reference_not_found@();
+          render_reference_not_found@()
         END
-        RETURN;
+        RETURN
       END
 
       IF segments$ = "category" THEN
         IF LEN(segments$[]) >= 3 THEN
-          render_category_listing@(segments$);
+          render_category_listing@(segments$)
         ELSE
-          render_reference_not_found@();
+          render_reference_not_found@()
         END
-        RETURN;
+        RETURN
       END
 
       IF segments$ = "keyword" THEN
         IF LEN(segments$[]) >= 3 THEN
-          render_keyword_detail@(segments$);
+          render_keyword_detail@(segments$)
         ELSE
-          render_reference_not_found@();
+          render_reference_not_found@()
         END
-        RETURN;
+        RETURN
       END
     END
 
-    render_reference_not_found@();
+    render_reference_not_found@()
   END
   ```
 
@@ -394,20 +394,20 @@ When writing the data stub functions, please:
 * Use **clear TODO comments** where queries will go, e.g.:
 
   ```basic
-  REM TODO: Replace with SELECT DISTINCT UPPER(LEFT(keyword,1)) FROM keywords ORDER BY 1;
+  REM TODO: Replace with SELECT DISTINCT UPPER(LEFT(keyword,1)) FROM keywords ORDER BY 1
   ```
 
 * For now, return small fixed arrays like:
 
   ```basic
   FUNCTION get_alpha_letters$[]()
-    DIM letters$[5];
-    letters$[0] = "A";
-    letters$[1] = "B";
-    letters$[2] = "C";
-    letters$[3] = "D";
-    letters$[4] = "E";
-    RETURN letters$[];
+    DIM letters$[5]
+    letters$[0] = "A"
+    letters$[1] = "B"
+    letters$[2] = "C"
+    letters$[3] = "D"
+    letters$[4] = "E"
+    RETURN letters$[]
   END
   ```
 

@@ -277,9 +277,9 @@ class GenerateCrudAction : AnAction() {
 
 ```php
 <?php
-namespace App\Controllers;
+namespace App\Controllers
 
-use App\Models\__NAME__;
+use App\Models\__NAME__
 
 class __NAME__Controller {
     public function index() {
@@ -292,7 +292,7 @@ class __NAME__Controller {
 
 ```php
 <?php
-namespace App\Models;
+namespace App\Models
 
 class __NAME__ {
     // TODO: properties and ORM mapping

@@ -121,9 +121,9 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn run_program(&mut self, path: &str) -> Result<(), Diags>;
-    pub fn eval_stmtlist(&mut self, src: &str) -> Result<ExecOutcome, Diags>;
-    pub fn eval_expr(&mut self, src: &str) -> Result<Value, Diags>;
+    pub fn run_program(&mut self, path: &str) -> Result<(), Diags>
+    pub fn eval_stmtlist(&mut self, src: &str) -> Result<ExecOutcome, Diags>
+    pub fn eval_expr(&mut self, src: &str) -> Result<Value, Diags>
 }
 ```
 
@@ -183,7 +183,7 @@ If this direction feels right, I can draft the Junie prompt that asks her to:
 You are helping build **Basil**, a modern BASIC interpreter written in Rust. Basil compiles `.basil` sources to `.basilx` bytecode on first execution or code change. Programs can load **class files** (regular Basil files whose main body serves as a constructor and whose LETs are public properties, with FUNC methods). Classes are instantiated like:
 
 ```
-DIM user@ AS CLASS("my_class.basil");
+DIM user@ AS CLASS("my_class.basil")
 ```
 
 Basil supports running in different modes (e.g., `run`, `test`, `lex`). We want a new **`cli`** mode that behaves like an **Immediate Mode REPL** (think GW-BASIC/BASICA) but over the **already loaded** environment of a program (similar to Laravel Tinker): we first run a program (optional), then drop into a REPL that can evaluate further statements/expressions against the same live VM, globals, classes, and linked objects.
@@ -290,18 +290,18 @@ pub struct Session {
 }
 
 impl Session {
-    pub fn new(settings: SessionSettings) -> Self;
-    pub fn run_program(&mut self, path: &str) -> Result<(), Diags>;
+    pub fn new(settings: SessionSettings) -> Self
+    pub fn run_program(&mut self, path: &str) -> Result<(), Diags>
 
     /// Compile/eval a snippet that may be a stmt-list or a single expression.
     /// If expression-only and expr_eval==true, print/return its value.
-    pub fn eval_snippet(&mut self, src: &str) -> Result<EvalOutcome, Diags>;
+    pub fn eval_snippet(&mut self, src: &str) -> Result<EvalOutcome, Diags>
 
     /// Utility for meta commands:
-    pub fn list_globals(&self, filter: Option<&str>) -> Vec<GlobalEntry>;
-    pub fn type_of(&self, name: &str) -> Option<TypeInfo>;
-    pub fn methods_of(&self, var: &str) -> Option<Vec<MethodSig>>;
-    pub fn disasm(&self, symbol: &str) -> Result<String, Diags>;
+    pub fn list_globals(&self, filter: Option<&str>) -> Vec<GlobalEntry>
+    pub fn type_of(&self, name: &str) -> Option<TypeInfo>
+    pub fn methods_of(&self, var: &str) -> Option<Vec<MethodSig>>
+    pub fn disasm(&self, symbol: &str) -> Result<String, Diags>
 }
 ```
 
@@ -403,7 +403,7 @@ Behavior:
    Input:
 
    ```
-   1 + 2 * 3 ;;
+   1 + 2 * 3 ;
    ```
 
    Output contains `7`.
@@ -411,7 +411,7 @@ Behavior:
 2. **Stmt list**
 
    ```
-   LET A% = 10; LET B% = 5; PRINT A% + B% ;;
+   LET A% = 10; LET B% = 5; PRINT A% + B% ;
    ```
 
    Output contains `15`.
@@ -420,7 +420,7 @@ Behavior:
 
    ```
    LET S$ = "Hello"
-   PRINT S$ + ", World" ;;
+   PRINT S$ + ", World" ;
    ```
 
    Output contains `Hello, World`.
@@ -430,7 +430,7 @@ Behavior:
     * If `main.basil` sets `LET GREET$ = "Hi"`, then:
 
    ```
-   PRINT GREET$ + " from REPL" ;;
+   PRINT GREET$ + " from REPL" ;
    ```
 
    Output contains `Hi from REPL`.
@@ -438,7 +438,7 @@ Behavior:
 5. **Class instance**
 
    ```
-   DIM u@ AS CLASS("classes/my_class.basil"); CALL u@.Init("Erik"); PRINT u@.Greeting$(); ;;
+   DIM u@ AS CLASS("classes/my_class.basil"); CALL u@.Init("Erik"); PRINT u@.Greeting$(); ;
    ```
 
    Output contains greeting with “Erik”.

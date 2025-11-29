@@ -28,7 +28,7 @@ Paths
 - Use backslashes on Windows in examples: "examples\\hello.basil".
 
 Program structure example
-PRINTLN "Hello";
+PRINTLN "Hello"
 FOR I% = 1 TO 3 BEGIN PRINTLN "i=", I%; END NEXT
 
 User input

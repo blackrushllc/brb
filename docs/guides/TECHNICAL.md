@@ -124,7 +124,7 @@ The compiler lowers AST → bytecode in a single pass with environment tracking.
     - Flags (u32 LE): includes templating and "short tag" switches from the precompiler
     - Source size (u64 LE) and source mtime in nanoseconds (u64 LE)
     - Followed by the serialize_program byte stream (chunk + globals)
-- On run, basilc attempts to validate and reuse the cache if header fields match (format/ABI/flags/size/mtime);
+- On run, basilc attempts to validate and reuse the cache if header fields match (format/ABI/flags/size/mtime)
   otherwise re-parses and re-compiles, then rewrites the cache atomically.
 
 ## 4. Virtual Machine (basilcore/vm)
@@ -240,20 +240,20 @@ The VM is a deterministic, single-threaded, stack-based interpreter.
 ### 9.1 Hello, world
 
 ```basil
-PRINT "Hello, Basil!";
+PRINT "Hello, Basil!"
 ```
 
 ### 9.2 Fibonacci function
 
 ```basil
 FUNC fib(n)
-  IF n < 2 THEN RETURN n;
-  RETURN fib(n - 1) + fib(n - 2);
+  IF n < 2 THEN RETURN n
+  RETURN fib(n - 1) + fib(n - 2)
 END
 
 FOR i = 0 TO 10
-  PRINT fib(i);
-  PRINT " ";
+  PRINT fib(i)
+  PRINT " "
 NEXT
 PRINTLN;  ' newline
 ```
@@ -262,16 +262,16 @@ PRINTLN;  ' newline
 
 ```basil
 DIM a(4) AS INTEGER;   ' indices 0..4 (inclusive upper bound)
-LET i = 0;
+LET i = 0
 WHILE i <= 4 BEGIN
-  LET a(i) = i * i;
-  LET i = i + 1;
+  LET a(i) = i * i
+  LET i = i + 1
 END
 
 FOR EACH v IN a
-  PRINT v; PRINT " ";
+  PRINT v; PRINT " "
 NEXT
-PRINTLN;
+PRINTLN
 ```
 
 ### 9.4 Strings and builtins
@@ -293,8 +293,8 @@ PRINT ASC%("A");              ' 65
 #CGI_NO_HEADER
 <?basil
   ' Manual header mode
-  PRINT "Status: 200 OK\r\n";
-  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n";
+  PRINT "Status: 200 OK\r\n"
+  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n"
 ?>
 <!doctype html>
 <html lang="en">
@@ -306,7 +306,7 @@ PRINT ASC%("A");              ' 65
 <ul>
     <?basil
     FOR EACH p$ IN REQUEST$()
-      PRINT "<li>" + HTML$(p$) + "</li>\n";
+      PRINT "<li>" + HTML$(p$) + "</li>\n"
     NEXT
     ?>
 </ul>

@@ -36,9 +36,9 @@ Disables automatic CGI headers; your program must print full headers followed by
 ```basil
 #CGI_NO_HEADER
 <?basil
-  PRINT "Status: 200 OK\r\n";
-  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n";
-  PRINT "Hello";
+  PRINT "Status: 200 OK\r\n"
+  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n"
+  PRINT "Hello"
 ?>
 ```
 
@@ -55,7 +55,7 @@ Enables short template code tags <?bas ... ?> in CGI templates (in addition to <
 Declares opt-in modules/types for the program or template; used by tools/front-ends and ignored by the core lexer.
 ```basil
 #USE BMX_RIDER, BMX_TEAM
-PRINTLN "Modules hinted.";
+PRINTLN "Modules hinted."
 ```
 
 ## AI.CHAT$
@@ -63,7 +63,7 @@ PRINTLN "Modules hinted.";
 *Feature:* obj-ai  
 Sends a synchronous chat request to the configured AI model and returns the response text. In test mode, returns a deterministic string like "[[TEST]] abcd1234".
 ```basil
-PRINT AI.CHAT$("Explain bubble sort in 3 bullets");
+PRINT AI.CHAT$("Explain bubble sort in 3 bullets")
 ```
 
 ## AI.EMBED
@@ -80,8 +80,8 @@ LET vec = AI.EMBED("hello world");  ' vec is a numeric array of floats
 *Feature:* obj-ai  
 Returns the last error message from an AI operation (or "" if none). Cleared at the start of each AI call.
 ```basil
-LET reply$ = AI.CHAT$("Hi", "{ max_tokens: 30 }");
-IF reply$ = "" THEN PRINTLN AI.LAST_ERROR$();
+LET reply$ = AI.CHAT$("Hi", "{ max_tokens: 30 }")
+IF reply$ = "" THEN PRINTLN AI.LAST_ERROR$()
 ```
 
 ## AI.MODERATE%
@@ -90,9 +90,9 @@ IF reply$ = "" THEN PRINTLN AI.LAST_ERROR$();
 Runs a simple moderation check on the input. Returns 0 if OK, 1 if flagged. In test mode, inputs containing "FLAG_ME" are flagged.
 ```basil
 IF AI.MODERATE%("Write a polite meeting request") = 0 THEN
-  PRINTLN AI.CHAT$("Write a 3-sentence meeting request.");
+  PRINTLN AI.CHAT$("Write a 3-sentence meeting request.")
 ELSE
-  PRINTLN "Request blocked by moderation.";
+  PRINTLN "Request blocked by moderation."
 END IF
 ```
 
@@ -101,23 +101,23 @@ END IF
 *Feature:* obj-ai  
 Streams tokens to the console as they arrive and returns the full text at the end. In test mode, prints the deterministic reply in 3 chunks.
 ```basil
-PRINT "AI says: ";
-DIM full$ = AI.STREAM("Tell a one-liner about BASIC", "{ temperature:0.2 }");
-PRINT "\n---\n"; PRINT full$;
+PRINT "AI says: "
+DIM full$ = AI.STREAM("Tell a one-liner about BASIC", "{ temperature:0.2 }")
+PRINT "\n---\n"; PRINT full$
 ```
 
 ## AND
 *Type:* Logical Operator  
 Boolean conjunction with short-circuit evaluation.
 ```basil
-IF A > 0 AND B > 0 THEN PRINTLN "both positive";
+IF A > 0 AND B > 0 THEN PRINTLN "both positive"
 ```
 
 ## APPENDFILE
 *Type:* Statement  
 Appends string data to an existing file or creates a new one.
 ```basil
-APPENDFILE "out.txt", "Gamma\n";
+APPENDFILE "out.txt", "Gamma\n"
 ```
 
 ## AS
@@ -132,7 +132,7 @@ DIM r1@ AS BMX_RIDER
 *Feature:* obj-term  
 Leaves the terminal's alternate screen buffer and returns to the main screen buffer. Safe to call multiple times.
 ```basil
-TERM.INIT; ALTSCREEN_ON; PRINTLN "Alt screen"; ALTSCREEN_OFF; TERM.END;
+TERM.INIT; ALTSCREEN_ON; PRINTLN "Alt screen"; ALTSCREEN_OFF; TERM.END
 ```
 
 ## ALTSCREEN_ON
@@ -140,14 +140,14 @@ TERM.INIT; ALTSCREEN_ON; PRINTLN "Alt screen"; ALTSCREEN_OFF; TERM.END;
 *Feature:* obj-term  
 Enters the terminal's alternate screen buffer (typically a blank screen separate from the main buffer).
 ```basil
-TERM.INIT; ALTSCREEN_ON; PRINTLN "Hello (alt)"; TERM.FLUSH;
+TERM.INIT; ALTSCREEN_ON; PRINTLN "Hello (alt)"; TERM.FLUSH
 ```
 
 ## ASC%
 *Type:* Function (returns Integer)  
 Returns the ASCII/Unicode code point of the first character of a string, or 0 if empty.
 ```basil
-LET code% = ASC%("A");
+LET code% = ASC%("A")
 ```
 
 ## ATTR
@@ -155,7 +155,7 @@ LET code% = ASC%("A");
 *Feature:* obj-term  
 Sets text attributes: bold%, underline%, reverse% (each 0=OFF, 1=ON). Use ATTR_RESET to clear.
 ```basil
-ATTR(1,0,0); PRINTLN "Bold"; ATTR_RESET;
+ATTR(1,0,0); PRINTLN "Bold"; ATTR_RESET
 ```
 
 ## ATTR_RESET
@@ -163,14 +163,14 @@ ATTR(1,0,0); PRINTLN "Bold"; ATTR_RESET;
 *Feature:* obj-term  
 Clears all text attributes (bold, underline, reverse) to defaults.
 ```basil
-ATTR_RESET;
+ATTR_RESET
 ```
 
 ## AUTHOR
 *Type:* Function (returns String)  
 Constant function-like keyword that yields the Basil author name; accepts optional empty parentheses.
 ```basil
-PRINTLN AUTHOR;
+PRINTLN AUTHOR
 ```
 
 ## AUDIO_MONITOR%
@@ -205,8 +205,8 @@ IF rc% <> 0 THEN PRINT "Error: ", DAW_ERR$()
 Begins a block of statements to be terminated by END.
 ```basil
 BEGIN
-  PRINTLN 1;
-  PRINTLN 2;
+  PRINTLN 1
+  PRINTLN 2
 END
 ```
 
@@ -221,14 +221,14 @@ FOR I = 1 TO 10 BEGIN IF I = 5 THEN BREAK; END NEXT
 *Type:* Function (returns String)  
 Returns a one-character string for the given numeric code point (out of range yields "").
 ```basil
-PRINTLN CHR$(65);
+PRINTLN CHR$(65)
 ```
 
 ## CLASS
 *Type:* Function (returns Object)  
 Constructs a class instance from a filename that defines a class.
 ```basil
-LET x@ = CLASS("my_widget.cls");
+LET x@ = CLASS("my_widget.cls")
 ```
 
 ## CLEAR
@@ -236,7 +236,7 @@ LET x@ = CLASS("my_widget.cls");
 *Feature:* obj-term  
 Clears the screen and moves the cursor to the home position (0,0). Alias of CLS and HOME.
 ```basil
-CLEAR;
+CLEAR
 ```
 
 ## CLS
@@ -244,7 +244,7 @@ CLEAR;
 *Feature:* obj-term  
 Clears the screen and moves the cursor to the home position (0,0). Alias of CLEAR and HOME.
 ```basil
-CLS;
+CLS
 ```
 
 ## COLOR
@@ -252,7 +252,7 @@ CLS;
 *Feature:* obj-term  
 Sets foreground and/or background colors. Accepts numeric codes 0..15, -1 to keep unchanged, or color names like "yellow".
 ```basil
-COLOR("yellow", -1);
+COLOR("yellow", -1)
 ```
 
 ## COLOR_RESET
@@ -260,14 +260,14 @@ COLOR("yellow", -1);
 *Feature:* obj-term  
 Resets the terminal colors to defaults.
 ```basil
-COLOR_RESET;
+COLOR_RESET
 ```
 
 ## COPY
 *Type:* Statement  
 Copies a file from src$ to dst$; raises a runtime error on failure.
 ```basil
-COPY "a.txt", "b.txt";
+COPY "a.txt", "b.txt"
 ```
 
 ## CONTINUE
@@ -282,7 +282,7 @@ FOR I = 1 TO 5 BEGIN IF I = 3 THEN CONTINUE; PRINT I; END NEXT
 *Feature:* obj-term  
 Hides the text cursor.
 ```basil
-CURSOR_HIDE;
+CURSOR_HIDE
 ```
 
 ## CURSOR_RESTORE
@@ -290,7 +290,7 @@ CURSOR_HIDE;
 *Feature:* obj-term  
 Restores the most recently saved cursor position; no-op if none saved.
 ```basil
-CURSOR_RESTORE;
+CURSOR_RESTORE
 ```
 
 ## CURSOR_SAVE
@@ -298,7 +298,7 @@ CURSOR_RESTORE;
 *Feature:* obj-term  
 Saves the current cursor position (a small stack of positions is kept).
 ```basil
-CURSOR_SAVE;
+CURSOR_SAVE
 ```
 
 ## CURSOR_SHOW
@@ -306,7 +306,7 @@ CURSOR_SAVE;
 *Feature:* obj-term  
 Shows the text cursor.
 ```basil
-CURSOR_SHOW;
+CURSOR_SHOW
 ```
 
 ## DAW_ERR$
@@ -342,37 +342,37 @@ DAW_STOP
 *Type:* Statement  
 Prints a formatted description of an object instance or an array value.
 ```basil
-DESCRIBE r1@;
+DESCRIBE r1@
 ```
 
 ## DESCRIBE$
 *Type:* Function (returns String)  
 Returns a formatted description string of an object instance or array value.
 ```basil
-PRINTLN DESCRIBE$(r1@);
+PRINTLN DESCRIBE$(r1@)
 ```
 
 ## DELETE
 *Type:* Statement  
 Deletes a file; raises a runtime error on failure.
 ```basil
-DELETE "temp.bin";
+DELETE "temp.bin"
 ```
 
 ## DIR$
 *Type:* Function (returns String Array)  
 Returns file names (no paths) that match a glob pattern in a directory.
 ```basil
-LET names$@ = DIR$("examples/*.basil");
+LET names$@ = DIR$("examples/*.basil")
 ```
 
 ## DIM
 *Type:* Statement  
 Declares a numeric array, object array, or object variable (with AS and optional constructor args).
 ```basil
-DIM A(10, 20);
-DIM riders@(10) AS BMX_RIDER;
-DIM team@ AS BMX_TEAM("Rockets");
+DIM A(10, 20)
+DIM riders@(10) AS BMX_RIDER
+DIM team@ AS BMX_TEAM("Rockets")
 ```
 
 ## DO
@@ -393,7 +393,7 @@ FOR EACH p$ IN REQUEST$() PRINTLN p$; NEXT
 *Type:* Flow Control  
 Introduces the alternative branch of an IF statement.
 ```basil
-IF X > 0 THEN PRINTLN "pos"; ELSE PRINTLN "non-pos";
+IF X > 0 THEN PRINTLN "pos"; ELSE PRINTLN "non-pos"
 ```
 
 ## ENDFOR
@@ -407,14 +407,14 @@ REM Reserved: FOREACH x IN arr ... ENDFOR
 *Type:* Function (returns String)  
 Returns the value of an environment variable named by its string argument, or an empty string if it does not exist.
 ```basil
-PRINTLN "PATH=", ENV$("PATH");
+PRINTLN "PATH=", ENV$("PATH")
 ```
 
 ## EXEPATH$
 *Type:* Function (returns String)
 Returns the absolute directory path of the currently running Basil executable. Returns an empty string on failure.
 ```basil
-PRINTLN "EXEPATH = ", EXEPATH$();
+PRINTLN "EXEPATH = ", EXEPATH$()
 ```
 
 ## LOADENV%
@@ -426,11 +426,11 @@ Loads environment variables from a text file containing newline-separated `name=
 - Notes: Surrounding single or double quotes around values are removed when present.
 ```basil
 ' Load from default .env
-IF LOADENV%() THEN PRINTLN "Loaded .env"; ELSE PRINTLN "No .env";
+IF LOADENV%() THEN PRINTLN "Loaded .env"; ELSE PRINTLN "No .env"
 
 ' Load from a specific file
-IF LOADENV%("config.env") THEN PRINTLN "Loaded config.env";
-PRINTLN "API_KEY=", ENV$("API_KEY");
+IF LOADENV%("config.env") THEN PRINTLN "Loaded config.env"
+PRINTLN "API_KEY=", ENV$("API_KEY")
 ```
 
 ## NET_DOWNLOAD_FILE%
@@ -446,10 +446,10 @@ Downloads a file from an HTTP/HTTPS URL to a destination path on disk. Returns 0
   - `99` unexpected internal error
 
 ```basil
-LET url$ = "https://example.com/index.html";
-LET dest$ = EXEPATH$() + "/example.html";
-LET rc% = NET_DOWNLOAD_FILE%(url$, dest$);
-PRINTLN "Download RC = ", rc%;
+LET url$ = "https://example.com/index.html"
+LET dest$ = EXEPATH$() + "/example.html"
+LET rc% = NET_DOWNLOAD_FILE%(url$, dest$)
+PRINTLN "Download RC = ", rc%
 ```
 
 ## ESCAPE$
@@ -463,56 +463,56 @@ PRINTLN ESCAPE$("O'Reilly");  ' prints: O''Reilly
 *Type:* Statement  
 Exits the interpreter with an optional numeric exit code (defaults to 0).
 ```basil
-EXIT 0;
+EXIT 0
 ```
 
 ## EXPORTENV
 *Type:* Statement  
 Sets an environment variable like SETENV and also attempts to export/persist it for future processes when supported (Windows via SETX). Always sets the process-local value.
 ```basil
-EXPORTENV DEMO_EXPORT = "HELLO WORLD";
+EXPORTENV DEMO_EXPORT = "HELLO WORLD"
 ```
 
 ## FALSE
 *Type:* Data Type  
 Boolean literal representing false.
 ```basil
-IF FALSE THEN PRINTLN "won't print";
+IF FALSE THEN PRINTLN "won't print"
 ```
 
 ## FEOF
 *Type:* Function (returns Bool)  
 Returns TRUE if the file handle is at end-of-file.
 ```basil
-IF FEOF(fh%) THEN PRINTLN "eof";
+IF FEOF(fh%) THEN PRINTLN "eof"
 ```
 
 ## FFLUSH
 *Type:* Function (returns Bool)  
 Flushes buffered data to disk for the given file handle.
 ```basil
-FFLUSH fh%;
+FFLUSH fh%
 ```
 
 ## FOPEN
 *Type:* Function (returns Integer handle)  
 Opens a file and returns a handle (>=1) or raises on error. Modes: r, w, a, rb, wb, ab, r+, w+, a+, rb+, wb+, ab+.
 ```basil
-LET fh% = FOPEN("notes.txt", "w");
+LET fh% = FOPEN("notes.txt", "w")
 ```
 
 ## FREAD$
 *Type:* Function (returns String)  
 Reads up to N bytes/characters from a file.
 ```basil
-LET s$ = FREAD$(fh%, 16);
+LET s$ = FREAD$(fh%, 16)
 ```
 
 ## FREADLINE$
 *Type:* Function (returns String)  
 Reads a single line (without trailing newline) from a file.
 ```basil
-LET line$ = FREADLINE$(fh%);
+LET line$ = FREADLINE$(fh%)
 ```
 
 ## FSEEK
@@ -526,21 +526,21 @@ FSEEK fh%, 0, 0;  ' rewind
 *Type:* Function (returns Long)  
 Returns the current byte offset for the file handle.
 ```basil
-LET pos& = FTELL&(fh%);
+LET pos& = FTELL&(fh%)
 ```
 
 ## FWRITE
 *Type:* Function (returns Bool)  
 Writes a string to a file without a newline.
 ```basil
-FWRITE fh%, "Hello";
+FWRITE fh%, "Hello"
 ```
 
 ## FWRITELN
 *Type:* Function (returns Bool)  
 Writes a string followed by a newline to a file.
 ```basil
-FWRITELN fh%, "Hello";
+FWRITELN fh%, "Hello"
 ```
 
 ## FOR
@@ -563,7 +563,7 @@ Declares a function with an optional BEGIN…END block or implicit block termina
 ```basil
 FUNC Add(a, b)
 BEGIN
-  RETURN a + b;
+  RETURN a + b
 END
 ```
 
@@ -571,7 +571,7 @@ END
 *Type:* Function (returns String Array)  
 Returns an array of GET query parameters (as strings) in CGI mode.
 ```basil
-LET params$@ = GET$();
+LET params$@ = GET$()
 ```
 
 ## GOSUB
@@ -580,9 +580,9 @@ LET params$@ = GET$();
 Transfers control to a subroutine at a LABEL and returns when a matching GOSUB return is executed. Nestable; uses a dedicated GOSUB return stack.
 
 Syntax:
-- GOSUB <label>;
-- RETURN;
-- RETURN TO <label>;
+- GOSUB <label>
+- RETURN
+- RETURN TO <label>
 
 Notes:
 - Labels can be written either as `LabelName:` or `LABEL LabelName` on their own line.
@@ -592,33 +592,33 @@ Notes:
 
 Example:
 ```basil
-PRINTLN "Start";
-GOSUB Work;
-PRINTLN "Back";
-GOTO Done;
+PRINTLN "Start"
+GOSUB Work
+PRINTLN "Back"
+GOTO Done
 
 Work:
-  PRINTLN "In Work";
-  RETURN;
+  PRINTLN "In Work"
+  RETURN
 
 Done:
-PRINTLN "End";
+PRINTLN "End"
 ```
 
 Return-then-continue example:
 ```basil
 Outer:
-  GOSUB Inner;
-  PRINTLN "This will be skipped";
-  RETURN;
+  GOSUB Inner
+  PRINTLN "This will be skipped"
+  RETURN
 
 Inner:
-  PRINTLN "Inner...";
-  RETURN TO After;
+  PRINTLN "Inner..."
+  RETURN TO After
 
 After:
-  PRINTLN "After label reached via RETURN TO";
-  RETURN;
+  PRINTLN "After label reached via RETURN TO"
+  RETURN
 ```
 
 ## GOTO
@@ -627,23 +627,23 @@ After:
 Transfers control unconditionally to a LABEL (labels can be written as `Name:` or `LABEL Name`).
 ```basil
 GOTO After
-PRINTLN "skipped";
+PRINTLN "skipped"
 After:
-PRINTLN "continued";
+PRINTLN "continued"
 ```
 
 ## HTML
 *Type:* Function (returns String)  
 Escapes special HTML characters of its argument; alias of HTML$.
 ```basil
-PRINTLN HTML("<b>& ok</b>");
+PRINTLN HTML("<b>& ok</b>")
 ```
 
 ## HTML$
 *Type:* Function (returns String)  
 Escapes special HTML characters of its argument.
 ```basil
-PRINTLN HTML$("<b>& ok</b>");
+PRINTLN HTML$("<b>& ok</b>")
 ```
 
 ## HOME
@@ -651,7 +651,7 @@ PRINTLN HTML$("<b>& ok</b>");
 *Feature:* obj-term  
 Clears the screen and moves the cursor to the home position (0,0). Alias of CLEAR and CLS.
 ```basil
-HOME;
+HOME
 ```
 
 ## IF
@@ -672,42 +672,42 @@ FOR EACH p$ IN REQUEST$() PRINTLN p$; NEXT
 *Type:* Function (returns Integer)  
 Non-blocking key read; returns key code (0 if no key available).
 ```basil
-LET k% = INKEY%();
+LET k% = INKEY%()
 ```
 
 ## INKEY$
 *Type:* Function (returns String)  
 Non-blocking key read; returns one-character string ("" if no key available).
 ```basil
-LET k$ = INKEY$();
+LET k$ = INKEY$()
 ```
 
 ## INPUT
 *Type:* Function (returns String)  
 Alias of INPUT$; reads a line from standard input without trailing CR/LF.
 ```basil
-LET name$ = INPUT("Enter your name: ");
+LET name$ = INPUT("Enter your name: ")
 ```
 
 ## INPUT$
 *Type:* Function (returns String)  
 Reads a line from standard input without trailing CR/LF (optionally prints a prompt first).
 ```basil
-LET name$ = INPUT$("Enter your name: ");
+LET name$ = INPUT$("Enter your name: ")
 ```
 
 ## INPUTC$
 *Type:* Function (returns String)  
 Reads a single ASCII character (echoed once) from input; returns "" for non-ASCII or Enter.
 ```basil
-LET ch$ = INPUTC$("Press a key: ");
+LET ch$ = INPUTC$("Press a key: ")
 ```
 
 ## INSTR
 *Type:* Function (returns Integer)  
 Finds the position (0-based) of a substring within a string starting at an optional index (0 if not found).
 ```basil
-LET p% = INSTR("banana", "na", 2);
+LET p% = INSTR("banana", "na", 2)
 ```
 
 ## LABEL
@@ -715,7 +715,7 @@ LET p% = INSTR("banana", "na", 2);
 Declares a jump target that can be used with GOTO or GOSUB.
 ```basil
 LABEL again
-PRINTLN "hi";
+PRINTLN "hi"
 GOTO again
 ```
 
@@ -723,14 +723,14 @@ GOTO again
 *Type:* Function (returns String)  
 Returns the lowercase version of a string.
 ```basil
-PRINTLN LCASE$("MiXeD");
+PRINTLN LCASE$("MiXeD")
 ```
 
 ## LEFT$
 *Type:* Function (returns String)  
 Returns the leftmost N characters of a string.
 ```basil
-PRINTLN LEFT$("basil", 2);
+PRINTLN LEFT$("basil", 2)
 ```
 
 ## LOCATE
@@ -738,28 +738,28 @@ PRINTLN LEFT$("basil", 2);
 *Feature:* obj-term  
 Moves the cursor to column x% and row y% (1-based), clamped to the terminal size.
 ```basil
-LOCATE(1, 1);
+LOCATE(1, 1)
 ```
 
 ## LEN
 *Type:* Function (returns Integer)  
 Returns string character length or total element count of an array; other values are converted to strings.
 ```basil
-PRINTLN LEN("hello");
+PRINTLN LEN("hello")
 ```
 
 ## LET
 *Type:* Statement  
 Assigns a value to a variable, array element, or object property (property assignment may also omit LET).
 ```basil
-LET A = 42;  LET arr(1,2) = 7;  obj.Prop = 10;
+LET A = 42;  LET arr(1,2) = 7;  obj.Prop = 10
 ```
 
 ## MID$
 *Type:* Function (returns String)  
 Returns a substring starting at 1-based index, with optional length.
 ```basil
-PRINTLN MID$("banana", 2, 3);
+PRINTLN MID$("banana", 2, 3)
 ```
 
 ## MIDI_CAPTURE%
@@ -775,14 +775,14 @@ IF rc% <> 0 THEN PRINT "Error: ", DAW_ERR$()
 *Type:* Statement  
 Moves/renames a file to a new path (can cross directories).
 ```basil
-MOVE "from.txt", "to_dir/to.txt";
+MOVE "from.txt", "to_dir/to.txt"
 ```
 
 ## NEW
 *Type:* Function (returns Object)  
 Constructs a new object instance of a registered type with constructor arguments.
 ```basil
-LET r@ = NEW BMX_RIDER("Alex", 12, 5);
+LET r@ = NEW BMX_RIDER("Alex", 12, 5)
 ```
 
 ## NEXT
@@ -796,56 +796,56 @@ FOR I = 1 TO 2 PRINT I; NEXT
 *Type:* Logical Operator  
 Boolean negation with truthiness semantics.
 ```basil
-IF NOT (A = B) THEN PRINTLN "different";
+IF NOT (A = B) THEN PRINTLN "different"
 ```
 
 ## NULL
 *Type:* Data Type  
 Null literal representing “no value”.
 ```basil
-LET x = NULL;
+LET x = NULL
 ```
 
 ## OR
 *Type:* Logical Operator  
 Boolean disjunction with short-circuit evaluation.
 ```basil
-IF A = 0 OR B = 0 THEN PRINTLN "has zero";
+IF A = 0 OR B = 0 THEN PRINTLN "has zero"
 ```
 
 ## POST$
 *Type:* Function (returns String Array)  
 Returns an array of POST body parameters (as strings) in CGI mode.
 ```basil
-LET form$@ = POST$();
+LET form$@ = POST$()
 ```
 
 ## PRINT
 *Type:* Statement  
 Prints an expression (or expressions separated by commas, which insert TABs) without a trailing newline.
 ```basil
-PRINT "Hello, "; PRINT "world!";
+PRINT "Hello, "; PRINT "world!"
 ```
 
 ## PRINTLN
 *Type:* Statement  
 Prints an expression followed by a newline.
 ```basil
-PRINTLN "Hello";
+PRINTLN "Hello"
 ```
 
 ## READFILE$
 *Type:* Function (returns String)  
 Reads an entire file into a string.
 ```basil
-PRINT READFILE$("out.txt");
+PRINT READFILE$("out.txt")
 ```
 
 ## RENAME
 *Type:* Statement  
 Renames a file within its directory.
 ```basil
-RENAME "data.csv", "data_old.csv";
+RENAME "data.csv", "data_old.csv"
 ```
 
 ## REQUEST$
@@ -866,44 +866,44 @@ Examples:
 ```basil
 FUNC Add(a, b)
 BEGIN
-  RETURN a + b;
+  RETURN a + b
 END
 ```
 
 ```basil
-GOSUB Work;
-PRINTLN "Back";
+GOSUB Work
+PRINTLN "Back"
 Work:
-  RETURN;
+  RETURN
 ```
 
 ```basil
-GOSUB A;
+GOSUB A
 A:
-  RETURN TO Done;
+  RETURN TO Done
 Done:
-PRINTLN "after RETURN TO";
+PRINTLN "after RETURN TO"
 ```
 
 ## RIGHT$
 *Type:* Function (returns String)  
 Returns the rightmost N characters of a string.
 ```basil
-PRINTLN RIGHT$("basil", 3);
+PRINTLN RIGHT$("basil", 3)
 ```
 
 ## SETENV
 *Type:* Statement  
 Sets an environment variable for the current Basil process. Syntax: SETENV NAME = value; the value may be a quoted string, number, or any scalar variable.
 ```basil
-SETENV DEMO_VAR = "42";
+SETENV DEMO_VAR = "42"
 ```
 
 ## SHELL
 *Type:* Statement  
 Executes a command in the parent command environment and waits for it to complete.
 ```basil
-SHELL "cmd /C dir > temp.txt";
+SHELL "cmd /C dir > temp.txt"
 ```
 
 ## STEP
@@ -917,7 +917,7 @@ FOR I = 10 TO 0 STEP -2 PRINT I; NEXT
 *Type:* Flow Control  
 Separates the IF condition from its consequent statement or BEGIN block.
 ```basil
-IF X > 0 THEN PRINTLN "positive";
+IF X > 0 THEN PRINTLN "positive"
 ```
 
 ## TO
@@ -931,7 +931,7 @@ FOR I = 1 TO 5 PRINT I; NEXT
 *Type:* Function (returns String)  
 Returns the input string with leading and trailing whitespace removed.
 ```basil
-PRINTLN TRIM$("  hi  ");
+PRINTLN TRIM$("  hi  ")
 ```
 
 ## TERM.COLs%
@@ -941,7 +941,7 @@ PRINTLN TRIM$("  hi  ");
 *Feature:* obj-term  
 Returns the current terminal width (columns).
 ```basil
-PRINTLN TERM_COLS%();
+PRINTLN TERM_COLS%()
 ```
 
 ## TERM.END
@@ -949,7 +949,7 @@ PRINTLN TERM_COLS%();
 *Feature:* obj-term  
 Restores the console to a sane state (show cursor, disable raw mode, leave alt-screen). Safe to call multiple times.
 ```basil
-TERM.END;
+TERM.END
 ```
 
 ## TERM_ERR$
@@ -957,7 +957,7 @@ TERM.END;
 *Feature:* obj-term  
 Returns and clears the last terminal-error message (or "" if none).
 ```basil
-LET err$ = TERM_ERR$(); IF err$ <> "" THEN PRINTLN err$;
+LET err$ = TERM_ERR$(); IF err$ <> "" THEN PRINTLN err$
 ```
 
 ## TERM.FLUSH
@@ -965,7 +965,7 @@ LET err$ = TERM_ERR$(); IF err$ <> "" THEN PRINTLN err$;
 *Feature:* obj-term  
 Flushes any buffered terminal output to reduce flicker during redraws.
 ```basil
-PRINT "Ready"; TERM.FLUSH;
+PRINT "Ready"; TERM.FLUSH
 ```
 
 ## TERM.INIT
@@ -973,7 +973,7 @@ PRINT "Ready"; TERM.FLUSH;
 *Feature:* obj-term  
 Initializes terminal session state; idempotent and safe to call more than once.
 ```basil
-TERM.INIT;
+TERM.INIT
 ```
 
 ## TERM.POLLKEY$
@@ -981,7 +981,7 @@ TERM.INIT;
 *Feature:* obj-term  
 Non-blocking key read. Returns "" if no key is available; otherwise returns normalized names like "Enter", "Esc", or "Char:a".
 ```basil
-LET k$ = TERM.POLLKEY$(); IF k$ <> "" THEN PRINTLN k$;
+LET k$ = TERM.POLLKEY$(); IF k$ <> "" THEN PRINTLN k$
 ```
 
 ## TERM.RAW
@@ -989,7 +989,7 @@ LET k$ = TERM.POLLKEY$(); IF k$ <> "" THEN PRINTLN k$;
 *Feature:* obj-term  
 Enables or disables raw mode (no line buffering). Accepts TRUE/FALSE, 1/0, or "ON"/"OFF".
 ```basil
-TERM.RAW(TRUE);  ' later…  TERM.RAW(FALSE);
+TERM.RAW(TRUE);  ' later…  TERM.RAW(FALSE)
 ```
 
 ## TERM_ROWS%
@@ -997,28 +997,28 @@ TERM.RAW(TRUE);  ' later…  TERM.RAW(FALSE);
 *Feature:* obj-term  
 Returns the current terminal height (rows).
 ```basil
-PRINTLN TERM_ROWS%();
+PRINTLN TERM_ROWS%()
 ```
 
 ## TRUE
 *Type:* Data Type  
 Boolean literal representing true.
 ```basil
-IF TRUE THEN PRINTLN "ok";
+IF TRUE THEN PRINTLN "ok"
 ```
 
 ## TYPE$
 *Type:* Function (returns String)  
 Returns a string that names the Basil type of its argument (e.g., "String", "Int", "Array", "Object").
 ```basil
-PRINTLN TYPE$(42);
+PRINTLN TYPE$(42)
 ```
 
 ## UCASE$
 *Type:* Function (returns String)  
 Returns the uppercase version of a string.
 ```basil
-PRINTLN UCASE$("basil");
+PRINTLN UCASE$("basil")
 ```
 
 ## UNESCAPE$
@@ -1047,15 +1047,15 @@ PRINTLN URLENCODE$("Bob Smith & Co");  ' prints: Bob+Smith+%26+Co
 Begins a while loop; body must be a BEGIN … END block.
 ```basil
 WHILE I < 3 BEGIN
-  PRINTLN I;
-  LET I = I + 1;
+  PRINTLN I
+  LET I = I + 1
 END
 ```
 ## WRITEFILE
 *Type:* Statement  
 Overwrites/creates a file with the given string data.
 ```basil
-WRITEFILE "out.txt", "Alpha\n";
+WRITEFILE "out.txt", "Alpha\n"
 ```
 
 

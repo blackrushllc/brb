@@ -118,10 +118,10 @@ Timeout 30
 This wraps your existing Basil interpreter entry point. Replace the `run_basil_file` stub with the call into your VM.
 
 ```rust
-use std::env;
-use std::fs;
-use std::io::{self, Read, Write};
-use std::path::Path;
+use std::env
+use std::fs
+use std::io::{self, Read, Write}
+use std::path::Path
 
 fn run_basil_file(path: &str, query: &str, method: &str, body: &[u8]) -> Result<String, String> {
     // TODO: Call into your Basil VM here, injecting env/query/body as needed.
@@ -138,43 +138,43 @@ fn main() {
     let script_path = env::var("SCRIPT_FILENAME")
         .or_else(|_| env::var("PATH_TRANSLATED"))
         .or_else(|_| env::var("PATH_INFO").map(|p| format!("/var/www{}", p)))
-        .unwrap_or_else(|_| "/var/www/html/index.basil".to_string());
+        .unwrap_or_else(|_| "/var/www/html/index.basil".to_string())
 
     if !Path::new(&script_path).exists() {
         // CGI error response
-        println!("Status: 404 Not Found");
-        println!("Content-Type: text/plain");
-        println!();
-        println!("Basil file not found: {}", script_path);
-        return;
+        println!("Status: 404 Not Found")
+        println!("Content-Type: text/plain")
+        println!()
+        println!("Basil file not found: {}", script_path)
+        return
     }
 
     // 2) Collect request info
-    let method = env::var("REQUEST_METHOD").unwrap_or_else(|_| "GET".into());
-    let query = env::var("QUERY_STRING").unwrap_or_default();
+    let method = env::var("REQUEST_METHOD").unwrap_or_else(|_| "GET".into())
+    let query = env::var("QUERY_STRING").unwrap_or_default()
     let content_len: usize = env::var("CONTENT_LENGTH").ok()
-        .and_then(|s| s.parse().ok()).unwrap_or(0);
+        .and_then(|s| s.parse().ok()).unwrap_or(0)
 
-    let mut body = Vec::with_capacity(content_len);
+    let mut body = Vec::with_capacity(content_len)
     if content_len > 0 {
-        let mut stdin = io::stdin();
-        stdin.take(content_len as u64).read_to_end(&mut body).ok();
+        let mut stdin = io::stdin()
+        stdin.take(content_len as u64).read_to_end(&mut body).ok()
     }
 
     // 3) Run Basil
     match run_basil_file(&script_path, &query, &method, &body) {
         Ok(html) => {
             // You can set cookies/headers as needed:
-            println!("Status: 200 OK");
-            println!("Content-Type: text/html; charset=utf-8");
-            println!();
-            print!("{}", html);
+            println!("Status: 200 OK")
+            println!("Content-Type: text/html; charset=utf-8")
+            println!()
+            print!("{}", html)
         }
         Err(e) => {
-            println!("Status: 500 Internal Server Error");
-            println!("Content-Type: text/plain; charset=utf-8");
-            println!();
-            println!("Basil runtime error:\n{}", e);
+            println!("Status: 500 Internal Server Error")
+            println!("Content-Type: text/plain; charset=utf-8")
+            println!()
+            println!("Basil runtime error:\n{}", e)
         }
     }
 }

@@ -113,8 +113,8 @@ Key takeaway: **AI accelerates**, but **human guidance and testing** shape quali
 #CGI_NO_HEADER
 <?basil
   // Manual header mode: send headers explicitly, then a blank line
-  PRINT "Status: 200 OK\r\n";
-  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n";
+  PRINT "Status: 200 OK\r\n"
+  PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n"
 ?>
 <!doctype html>
 <html lang="en">
@@ -131,7 +131,7 @@ Key takeaway: **AI accelerates**, but **human guidance and testing** shape quali
   <ul>
   <?basil
     FOR EACH p$ IN REQUEST$()
-      PRINT "<li>" + HTML$(p$) + "</li>\n";
+      PRINT "<li>" + HTML$(p$) + "</li>\n"
     NEXT
   ?>
   </ul>
