@@ -100,6 +100,7 @@ FUNCTION html_escape$(s$)
 END FUNCTION
 
 REM Minimal URL decoding for '+' and %XX (hex)
+REM but we already have a builtin URLDECODE$()
 FUNCTION url_decode$(s$)
     url_out$ = ""
     url_d% = 1

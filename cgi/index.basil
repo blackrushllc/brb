@@ -1,5 +1,6 @@
 #CGI_NO_HEADER
 #include "cgi.inc"
+#include "db.inc"
 SUB MAIN()
     REM Read environment
     pathInfo$ = env$("PATH_INFO")
@@ -12,7 +13,8 @@ SUB handle_request(pathInfo$)
   p$ = normalize_path$(pathInfo$)
 
   send_header_ok_html()
-    REM PRINT p$ // cgi/index.basil
+  REM PRINTLN p$ // cgi/index.basil
+
   SELECT CASE p$
 
     CASE "/"
