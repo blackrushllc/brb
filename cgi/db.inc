@@ -36,6 +36,7 @@ FUNCTION DbGetMysql@()
   RETURN db@
 END
 
+
 REM DIM A$(12)
 
 REM  Create a model

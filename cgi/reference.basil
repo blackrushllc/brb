@@ -90,7 +90,7 @@ SUB render_reference_index()
     PRINTLN "    <h3>Categories</h3>"
     LET cats$ = get_all_categories()
     rc% = ARRAY_ROWS%(cats$)
-
+    REM orm@.Table("keywords").Select$("UPPER(LEFT(keyword,1)) AS initial").Get()
     FOR ii% = 0 TO rc% - 1
         slug$ = cats$(ii%, 0)
         name$ = cats$(ii%, 1)
