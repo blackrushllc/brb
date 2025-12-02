@@ -1,5 +1,7 @@
 REM Basil/Basic CGI Library Include File
 
+
+
 FUNC send_header_ok_html()
     PRINT "Status: 200 OK\r\n"
     PRINT "Content-Type: text/html; charset=utf-8\r\n"
@@ -128,6 +130,8 @@ FUNCTION url_decode$(s$)
     RETURN url_out$
 END FUNCTION
 
+
+
 FUNCTION hex2int%(a$, b$)
     hex_v1% = hex1%(a$)
     hex_v2% = hex1%(b$)
@@ -135,10 +139,11 @@ FUNCTION hex2int%(a$, b$)
     RETURN hex_v1% * 16 + hex_v2%
 END FUNCTION
 
+
+
 FUNCTION hex1%(c$)
     hex_u$ = UCASE$(c$)
     IF hex_u$ >= "0" AND hex_u$ <= "9" THEN RETURN ASC(hex_u$) - ASC("0")
     IF hex_u$ >= "A" AND hex_u$ <= "F" THEN RETURN 10 + (ASC(hex_u$) - ASC("A"))
     RETURN -1
 END FUNCTION
-

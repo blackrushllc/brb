@@ -1,5 +1,6 @@
 #CGI_NO_HEADER
 #include "cgi.inc"
+#include "db.inc"
 
 REM Reference section CGI for Basil / Basic / Basic.JS docs
 
@@ -78,7 +79,7 @@ SUB render_reference_index()
 
     LET letters$ = get_alpha_letters()
 
-    PRINTLN "    <p>", letters$
+    PRINTLN "    <p>"
     FOR EACH L$ IN letters$
         PRINT "      <a href=\"/reference/alpha/" + html_escape$(L$) + "\" style=\"margin-right:.5rem\">" + html_escape$(L$) + "</a>"
     NEXT i%
@@ -384,13 +385,23 @@ REM ---------- Stub data providers (to be replaced with MySQL/ORM) ----------
 
 FUNCTION get_alpha_letters()
     REM TODO: Replace with SELECT DISTINCT UPPER(LEFT(keyword,1)) FROM keywords ORDER BY 1
-    DIM letters$(5)
-    letters$(0) = "A"
-    letters$(1) = "B"
-    letters$(2) = "C"
-    letters$(3) = "D"
-    letters$(4) = "E"
-    RETURN letters$
+
+    DIM galA$(0)
+    galA$(0) = "UPPER(LEFT(keyword,1)) AS initial"
+
+    REM TODO: Select$() should be able to accept a string or a list of strings, not just a string array
+
+    ltter2$ = orm@.Table("keywords").Select$(galA$).Unique().Pluck("initial")
+
+    RETURN ltter2$
+REM    DIM letters$(5)
+REM    letters$(0) = "A"
+REM    letters$(1) = "B"
+REM    letters$(2) = "C"
+REM    letters$(3) = "D"
+REM    letters$(4) = "E"
+REM    RETURN letters$
+    REM DIM B$ = ["A", "B", "C", "D", "E"] // This no work because LET keys@ = [ "first", "last", "born" ] .. This is a LIST not an array
 END FUNCTION
 
 FUNCTION get_all_categories()
@@ -415,7 +426,7 @@ FUNCTION get_category_display_name$(slug$)
 END FUNCTION
 
 FUNCTION get_keywords_for_letter(letter$)
-    REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords WHERE UPPER(keyword) LIKE 'A%' ORDER BY keyword
+    REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords WHERE UPPER(keyword) LIKE "A%" ORDER BY keyword
     L$ = UCASE$(LEFT$(letter$,1))
     IF L$ <> "A" THEN
         DIM empty$(0,0)

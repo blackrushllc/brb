@@ -28,6 +28,8 @@ REM  PRINTLN db@.Query$("SELECT id, name FROM test2 WHERE name LIKE ?", "A%")
  orm@.ModelFromTable$("guide_pages")
  orm@.ModelFromTable$("admin_users")
 
+
+
 FUNCTION DbGetOrm@()
   RETURN orm@
 END
@@ -70,6 +72,26 @@ REM u@.Save()
 REM  Query the database
 REM PRINTLN orm@.Table("keywords").Where$("name$","LIKE","B%").OrderBy$("id%","ASC").ToJson$()
 REM PRINTLN orm@.Table("keywords").Where$("id%",">","1").OrderBy$("id%","ASC").ToJson$()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 FUNCTION get_user_by_id%(user_id%)
