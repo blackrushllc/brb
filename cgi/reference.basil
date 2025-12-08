@@ -29,8 +29,8 @@ REM    PRINTLN "Path: " + p$ <-- /reference
 
     n% = LEN(segments$)
 
-    IF n% >= 3 THEN
-        first$ = segments$(1)
+    IF n% >= 4 THEN
+        first$ = segments$(2) // alpha or category or keyword
 
         IF first$ = "alpha" THEN
             IF n% >= 4 THEN
@@ -38,29 +38,31 @@ REM    PRINTLN "Path: " + p$ <-- /reference
             ELSE
                 render_reference_not_found()
             END IF
-            RETURN
         END IF
+
+        REM PRINT pinfo$, n%, first$ // /reference/category/audio 4 /categor
+        REM PRINT "<br>", segments$(1), "<br>", segments$(2), "<br>", segments$(3) // reference .. category ..  audio
 
         IF first$ = "category" THEN
             IF n% >= 4 THEN
-                render_category_listing(segments$(2))
+                render_category_listing(segments$(3))
             ELSE
                 render_reference_not_found()
             END IF
-            RETURN
         END IF
 
         IF first$ = "keyword" THEN
             IF n% >= 4 THEN
-                render_keyword_detail(segments$(2))
+                render_keyword_detail(segments$(3))
             ELSE
                 render_reference_not_found()
             END IF
-            RETURN
         END IF
+    ELSE
+        render_reference_not_found()
     END IF
 
-    render_reference_not_found()
+
 
 END SUB
 
@@ -132,7 +134,7 @@ SUB render_alpha_listing(letter$)
 END SUB
 
 SUB render_category_listing(categorySlug$)
-    slug$ = LOWER$(categorySlug$)
+    slug$ = LCASE$(categorySlug$)
     name$ = get_category_display_name$(slug$)
 
     html_head("Category: " + name$)
@@ -166,7 +168,7 @@ END SUB
 
 
 SUB render_keyword_detail(keywordSlug$)
-    slug$ = LOWER$(keywordSlug$)
+    slug$ = LCASE$(keywordSlug$)
 
     REM Load detail from stub provider
     detail$ = get_keyword_detail(slug$)
@@ -304,25 +306,17 @@ FUNCTION split_path_segments(path$)
         DIM empty$(0)
         RETURN empty$
     END IF
-    count% = 1
-    pos% = 1
-    WHILE TRUE
-        slash% = INSTR(p$, "/", pos%)
-        IF slash% = 0 THEN BREAK
-        count% = count% + 1
-        pos% = slash% + 1
-    END WHILE
-    DIM segs$(count%)
-    iii% = 0
-    start% = 1
-    WHILE start% <= LEN(p$) AND iii% < count%
-        slash% = INSTR(p$, "/", start%)
-        IF slash% = 0 THEN slash% = LEN(p$) + 1
-        segs$(iii%) = MID$(p$, start%, slash% - start%)
-        iii% = iii% + 1
-        start% = slash% + 1
-    END WHILE
-    RETURN segs$
+
+    LET items@ = EXPLODE(path$, "/")
+
+    DIM temp$(LEN(items@)-1)
+
+    FOR i% = 1 TO LEN(items@)
+        temp$(i%-1) = items@[i%]
+    NEXT
+
+    return temp$
+
 END FUNCTION
 
 FUNCTION to_slug$(name$)
@@ -333,7 +327,7 @@ FUNCTION to_slug$(name$)
         ch$ = MID$(s$, i%, 1)
         SELECT CASE ch$
             CASE ch$ >= "A" AND ch$ <= "Z"
-                out$ = out$ + LOWER$(ch$)
+                out$ = out$ + LCASE$(ch$)
             CASE ch$ >= "a" AND ch$ <= "z"
                 out$ = out$ + ch$
             CASE ch$ >= "0" AND ch$ <= "9"
@@ -418,7 +412,7 @@ END FUNCTION
 
 FUNCTION get_category_display_name$(slug$)
     REM TODO: Replace with SELECT name FROM categories WHERE slug = ?
-    s$ = LOWER$(slug$)
+    s$ = LCASE$(slug$)
     IF s$ = "audio" THEN RETURN "Audio"
     IF s$ = "midi" THEN RETURN "MIDI"
     IF s$ = "media" THEN RETURN "Media"
@@ -441,7 +435,7 @@ END FUNCTION
 
 FUNCTION get_keywords_for_category(slug$)
     REM TODO: Replace with SELECT slug, keyword, short_desc FROM keywords k JOIN keyword_categories kc ON kc.keyword_id=k.id JOIN categories c ON kc.category_id=c.id WHERE c.slug=? ORDER BY keyword
-    s$ = LOWER$(slug$)
+    s$ = LCASE$(slug$)
     IF s$ = "audio" THEN
         DIM rows$(3, 3)
         rows$(0,0) = "audio_inputs";   rows$(0,1) = "AUDIO_INPUTS$";     rows$(0,2) = "Returns an array of audio input device names."
@@ -467,7 +461,7 @@ END FUNCTION
 
 FUNCTION get_keyword_detail(slug$)
     REM TODO: Replace with SELECT ... FROM keywords WHERE slug = ?
-    s$ = LOWER$(slug$)
+    s$ = LCASE$(slug$)
     IF s$ = "audio_inputs" THEN
         DIM row$(1, 7)
         row$(0, 0) = "AUDIO_INPUTS$"
@@ -498,7 +492,7 @@ END FUNCTION
 
 FUNCTION get_keyword_examples(slug$)
     REM TODO: Replace with SELECT lang_style, code FROM examples WHERE keyword_slug = ? ORDER BY sort
-    s$ = LOWER$(slug$)
+    s$ = LCASE$(slug$)
     IF s$ = "audio_inputs" THEN
         DIM ex$(2, 2)
         ex$(0, 0) = "Blocky BASIC"
