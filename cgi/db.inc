@@ -29,16 +29,6 @@ REM  PRINTLN db@.Query$("SELECT id, name FROM test2 WHERE name LIKE ?", "A%")
  orm@.ModelFromTable$("admin_users")
 
 
-
-FUNCTION DbGetOrm@()
-  RETURN orm@
-END
-
-FUNCTION DbGetMysql@()
-  RETURN db@
-END
-
-
 REM DIM A$(12)
 
 REM  Create a model
@@ -72,27 +62,6 @@ REM u@.Save()
 REM  Query the database
 REM PRINTLN orm@.Table("keywords").Where$("name$","LIKE","B%").OrderBy$("id%","ASC").ToJson$()
 REM PRINTLN orm@.Table("keywords").Where$("id%",">","1").OrderBy$("id%","ASC").ToJson$()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 FUNCTION get_user_by_id%(user_id%)
     DIM user_rec@ AS RECORD

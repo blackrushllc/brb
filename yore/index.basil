@@ -1,0 +1,90 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "users.inc"
+<?basil
+
+  REM This is a simple CGI skeleton for a website.
+  REM It uses a SQLite database for user accounts.
+  REM Deploy to yore1/basilbasic (note for me)
+
+  SITE_TITLE$ = "Simple Basil Website Skeleton";
+
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n";
+    PRINT "<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>" + HTML$(title$) + "</title>\n";
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n";
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\">\n";
+    PRINT "</head>\n<body>\n<header class=\"top\"><div class=\"wrap\"><h1>" + HTML$(SITE_TITLE$) + "</h1></div></header>\n";
+    PRINT "<main class=\"wrap\">\n";
+    RETURN 0;
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main>\n<footer class=\"foot\"><div class=\"wrap\">\n";
+    PRINT "<small>Example Basil CGI skeleton • <a href=\"index.basil\">Home</a></small>\n";
+    PRINT "</div></footer>\n<script src=\"js/site.js\"></script>\n</body></html>\n";
+    RETURN 0;
+  END FUNC
+
+  user$ = cookie$("user");
+  dummy% =  send_header_ok_html();
+  dummy% = layout_start("Welcome");
+
+  // Render a table of users from the database (function context avoids top-level array quirks)
+  FUNC render_users() BEGIN
+    db% = SQLITE_OPEN%("website.db");
+    IF db% == 0 THEN BEGIN
+      tmp$ = ENV$("TMPDIR");
+      IF LEN(tmp$) == 0 THEN tmp$ = ENV$("TEMP");
+      IF LEN(tmp$) == 0 THEN tmp$ = ENV$("TMP");
+      IF LEN(tmp$) == 0 THEN tmp$ = "/tmp";
+      IF RIGHT$(tmp$, 1) == "/" OR RIGHT$(tmp$, 1) == "\\" THEN BEGIN
+        path$ = tmp$ + "website.db";
+      ELSE
+        path$ = tmp$ + "/" + "website.db";
+      END
+      db% = SQLITE_OPEN%(path$);
+    END
+
+    IF db% == 0 THEN BEGIN
+      PRINT "<p class=\"error\">Could not open database to list users.</p>";
+      RETURN 0;
+    END
+
+    _ = SQLITE_EXEC%(db%, "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)");
+
+    DIM rows$(0,0);
+    rows$() = SQLITE_QUERY2D$(db%, "SELECT username, password FROM users ORDER BY id");
+    rc% = ARRAY_ROWS%(rows$);
+
+    PRINT "<section class=\"card\" style=\"margin-top:1rem\">";
+    PRINT "<h3>Users in DB (" + rc% + ")</h3>";
+    PRINT "<div style=\"overflow:auto\"><table border=\"1\" cellspacing=\"0\" cellpadding=\"6\"><thead><tr><th>#</th><th>Username</th><th>Password</th></tr></thead><tbody>";
+
+    FOR r% = 0 TO rc% - 1
+      PRINT "<tr><td>" + (r%+1) + "</td><td>" + HTML$(rows$(r%, 0)) + "</td><td>" + HTML$(rows$(r%, 1)) + "</td></tr>";
+    NEXT r%
+
+    PRINT "</tbody></table></div></section>";
+    SQLITE_CLOSE(db%);
+    RETURN 0;
+  END
+?>
+<?basil
+
+PRINT READFILE$("views/home.html");
+
+?>
+<?basil
+  // After the view HTML, show current users table from the database
+  __d% = render_users();
+
+  IF LEN(user$) > 0 THEN BEGIN
+    PRINT "<section class=\"notice\">You appear to be logged in as <strong>" + HTML$(user$) + "</strong>.\n";
+    PRINT " Visit your <a href=\"user_home.basil\">dashboard</a>.";
+    PRINT "</section>\n";
+  ELSE
+    PRINT "<p><a class=\"btn\" href=\"login.basil\">Log in</a> or <a class=\"btn secondary\" href=\"register.basil\">Create an account</a></p>\n";
+  END
+  dummy% = layout_end();
+?>

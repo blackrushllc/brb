@@ -1,5 +1,6 @@
 #CGI_NO_HEADER
 #include "cgi.inc"
+#include "db.inc"
 
 title$ = "Basil Docs"
 
@@ -16,18 +17,22 @@ SUB handle_request(pathInfo$)
 
   send_header_ok_html()
 
-  SELECT CASE p$
+  IF p$ = "/guide" THEN
+      GuideRenderIndex()
+      RETURN
+  END IF
 
-    CASE "/guide"
+  LET segments$ = split_path_segments(p$)
+  n% = LEN(segments$)
+  IF n% >= 3 THEN
+      first$ = segments$(1)
+      IF first$ = "guide" THEN
+          GuideRenderPage(segments$(2))
+          RETURN
+      END IF
+  END IF
 
-        render_guide_placeholder()
-
-    CASE ELSE
-
-        PRINTLN p$
-        render_not_found()
-
-    END SELECT
+  GuideRenderNotFound()
 END SUB
 
 SUB render_guide_placeholder()
@@ -94,3 +99,119 @@ END SUB
 
 REM run
 MAIN()
+
+
+REM ---------------- Guide (DB + RENDER$) ----------------
+
+FUNCTION GuideBuildNav()
+    nav@ = []
+    orm@.Table("keywords").Select$("UPPER(LEFT(keyword,1)) AS initial").Get()
+    sections@ = orm@.Table("guide_sections").OrderBy$("sort_order%","ASC").Get()
+    FOR EACH s@ IN sections@
+        sec@ = { "title": s@.Title$, "slug": s@.Slug$, "pages": [] }
+
+        pages@ = orm@.Table("guide_pages").Where$("section_id%","=", s@.Id%).Where$("is_published%","=", 1).OrderBy$("position%","ASC").Get()
+        FOR EACH p@ IN pages@
+            pageItem@ = { "title": p@.Title$, "slug": p@.Slug$ }
+            pi% = LEN(sec@["pages"]) + 1
+            sec@["pages"][pi%] = pageItem@
+        NEXT
+
+        i% = LEN(nav@) + 1
+
+        // TODO - FIX ADDING TO LIST, instead of out of range error!
+
+        nav@[i%] = sec@
+    NEXT
+
+    RETURN nav@
+END FUNCTION
+
+FUNCTION GuideGetBeginnerPages()
+    list@ = []
+    rows@ = orm@.Table("guide_pages").Where$("is_published%","=",1).Where$("difficulty$","=","beginner").OrderBy$("position%","ASC").Get()
+    FOR EACH r@ IN rows@
+        item@ = { "title": r@.Title$, "slug": r@.Slug$ }
+        j% = LEN(list@) + 1
+        list@[j%] = item@
+    NEXT
+    RETURN list@
+END FUNCTION
+
+FUNCTION GuideFindPage(slug$)
+    out@ = { "title": "", "sectionTitle": "", "difficulty": "", "bodyMd": "" }
+    row@ = orm@.Table("guide_pages").Where$("slug$","=", LCASE$(slug$)).Where$("is_published%","=",1).First()
+
+    IF row@ = "NULL" THEN RETURN out@
+
+    sec@ = orm@.Table("guide_sections").Where$("id%","=", row@.Section_id%).First()
+    secTitle$ = ""
+
+    IF sec@ <> "NULL" THEN secTitle$ = sec@.Title$
+
+    out@["title"] = row@.Title$
+    out@["sectionTitle"] = secTitle$
+    out@["difficulty"] = row@.Difficulty$
+    out@["bodyMd"] = row@.Body_md$
+
+    RETURN out@
+END FUNCTION
+
+SUB GuideRenderIndex()
+    nav@ = GuideBuildNav()
+    beginner@ = GuideGetBeginnerPages()
+
+    bodyVars@ = { "beginnerPages": beginner@ }
+    body$ = RENDER$(READFILE$("views/guide/index.html"), bodyVars@)
+
+    vars@ = { "pageTitle": "Guide", "guideNav": nav@, "pageContentHtml": body$ }
+    html$ = RENDER$(READFILE$("views/guide/layout.html"), vars@)
+    PRINT html$
+END SUB
+
+SUB GuideRenderPage(slug$)
+    nav@ = GuideBuildNav()
+    page@ = GuideFindPage(slug$)
+
+    IF LEN(page@) = 0 THEN
+        GuideRenderNotFound()
+        RETURN
+    END IF
+
+    bodyVars@ = {
+        "pageTitle": page@["title"],
+        "sectionTitle": page@["sectionTitle"],
+        "difficulty": page@["difficulty"],
+        "pageBodyMd": page@["bodyMd"]
+    }
+    body$ = RENDER$(READFILE$("views/guide/page.html"), bodyVars@)
+
+    vars@ = { "pageTitle": page@["title"], "guideNav": nav@, "pageContentHtml": body$ }
+    html$ = RENDER$(READFILE$("views/guide/layout.html"), vars@)
+    PRINT html$
+END SUB
+
+SUB GuideRenderNotFound()
+    nav@ = GuideBuildNav()
+    body$ = "<h1>Not Found</h1><p>The requested guide page could not be found.</p>"
+    vars@ = { "pageTitle": "Guide — Not Found", "guideNav": nav@, "pageContentHtml": body$ }
+    html$ = RENDER$(READFILE$("views/guide/layout.html"), vars@)
+    PRINT html$
+END SUB
+
+FUNCTION split_path_segments(path$)
+    p$ = path$
+    IF LEFT$(p$, 1) = "/" THEN p$ = MID$(p$, 2)
+    IF LEN(p$) = 0 THEN
+        DIM empty$(0)
+        RETURN empty$
+    END IF
+
+    LET items@ = EXPLODE(path$, "/")
+
+    DIM temp$(LEN(items@)-1)
+    FOR i% = 1 TO LEN(items@)
+        temp$(i%-1) = items@[i%]
+    NEXT
+    RETURN temp$
+END FUNCTION
