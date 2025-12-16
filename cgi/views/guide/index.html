@@ -1,0 +1,14 @@
+<!-- Guide index content (wrapped by layout.html via pageContentHtml$) -->
+<h1>Welcome to the Guide</h1>
+<p>This Guide introduces Basil, Basic, and Basic.JS. Start with a beginner chapter below.</p>
+
+<section>
+  <h3>Beginner Pages</h3>
+  <ul>
+  @FOREACH(pg@ IN beginnerPages)
+    <li><a href='/guide/@TRIM(pg@["slug"])'>{{ pg@["title"] }}</a></li>
+  @FORELSE
+    <li><em>No beginner pages published yet.</em></li>
+  @ENDFOREACH
+  </ul>
+</section>

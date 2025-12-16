@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ pageTitle$ }}</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0}
+    .wrap{max-width:1100px;margin:0 auto;padding:0 1rem}
+    header.site{padding:1rem 0;border-bottom:1px solid #eee}
+    main{display:grid;grid-template-columns:260px 1fr;gap:1.25rem}
+    aside.nav{border-right:1px solid #f0f0f0;padding:1rem 0}
+    aside.nav h4{margin:.75rem 0 .25rem 0;font-size:1rem}
+    aside.nav ul{list-style:none;padding:0;margin:.25rem 0 1rem}
+    aside.nav li{margin:.2rem 0}
+    aside.nav a{text-decoration:none}
+    section.content{padding:1rem 0}
+  </style>
+</head>
+<body>
+  <header class="site">
+    <div class="wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <strong>Basil / Basic / Basic.JS Documentation</strong>
+        <nav>
+          <a href="/">Home</a> •
+          <a href="/guide">Guide</a> •
+          <a href="/reference">Reference</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <main>
+      <aside class="nav">
+        <!-- Guide side navigation -->
+        @FOREACH(sec@ IN guideNav)
+          <h4>{{ sec@['title'] }}</h4>
+          <ul>
+          @FOREACH (p@ IN sec@['pages'])
+            <li><a href='/guide/@TRIM(p@["slug"])'>{{ p@["title"] }}</a></li>
+          @FORELSE
+            <p><em>No sections yet.</em></p>
+          @ENDFOREACH
+          </ul>
+        @FORELSE
+          <p><em>Guide is empty.</em></p>
+        @ENDFOREACH
+      </aside>
+
+      <section class="content">
+        {{ pageContentHtml$ }}
+      </section>
+    </main>
+  </div>
+
+  <footer style="border-top:1px solid #eee;margin-top:2rem">
+    <div class="wrap" style="padding:1rem;"><small>Basil Docs • <a href="/">Home</a> • <a href="/guide">Guide</a> • <a href="/reference">Reference</a></small></div>
+  </footer>
+</body>
+</html>
