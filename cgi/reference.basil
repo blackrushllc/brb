@@ -8,11 +8,13 @@ SUB MAIN()
     pathInfo$ = env$("PATH_INFO")
     IF LEN(pathInfo$) = 0 THEN pathInfo$ = "/"
 
-    PRINT "Status: 200 OK\r\n"
-    PRINT "Content-Type: text/html; charset=utf-8\r\n"
-    PRINT "Cache-Control: no-store\r\n\r\n"
+    send_header_ok_html()
 
-    handle_reference_request(pathInfo$)
+    TRY
+        handle_reference_request(pathInfo$)
+    CATCH e$
+        cgi_emit_error(e$)
+    END TRY
 
 END SUB
 

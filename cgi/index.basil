@@ -6,7 +6,11 @@ SUB MAIN()
     pathInfo$ = env$("PATH_INFO")
     IF LEN(pathInfo$) = 0 THEN pathInfo$ = "/"
     REM Route and render
-    handle_request(pathInfo$)
+    TRY
+        handle_request(pathInfo$)
+    CATCH e$
+        cgi_emit_error(e$)
+    END TRY
 END SUB
 
 SUB handle_request(pathInfo$)

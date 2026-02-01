@@ -1,16 +1,21 @@
 REM Basil/Basic CGI Library Include File
 
+REM Track whether an HTTP header has already been sent for this CGI response
+g_header_sent% = 0
+
 
 
 FUNC send_header_ok_html()
     PRINT "Status: 200 OK\r\n"
     PRINT "Content-Type: text/html; charset=utf-8\r\n"
     PRINT "Cache-Control: no-store\r\n\r\n"
+    g_header_sent% = 1
     RETURN 0
 END FUNC
 
 FUNC header_flush()
     PRINT "\r\n"
+    g_header_sent% = 1
     RETURN 0
 END FUNC
 
@@ -22,8 +27,44 @@ END
 FUNC send_header_redirect(loc$)
     PRINT "Status: 302 Found\r\n"
     PRINT "Location: " + loc$ + "\r\n\r\n"
+    g_header_sent% = 1
     RETURN 0
 END FUNC
+
+REM Returns -1 (true) if a header has already been sent; otherwise 0 (false)
+FUNCTION cgi_header_sent%()
+    IF g_header_sent% <> 0 THEN RETURN -1
+    RETURN 0
+END FUNCTION
+
+REM Emit an error page to the browser. If no header has been sent yet, send a 500 header.
+REM e$: error message string (will be HTML-escaped)
+SUB cgi_emit_error(e$)
+    IF cgi_header_sent%() = 0 THEN
+        PRINT "Status: 500 Internal Server Error\r\n"
+        PRINT "Content-Type: text/html; charset=utf-8\r\n"
+        PRINT "Cache-Control: no-store\r\n\r\n"
+        g_header_sent% = 1
+    END IF
+
+    err_msg$ = html_escape$(e$)
+    path_info$ = env$("PATH_INFO")
+    method$ = env$("REQUEST_METHOD")
+
+    PRINT "<!doctype html>"
+    PRINT "<html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<title>Server Error</title>"
+    PRINT "<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:2rem;background:#fff;color:#111}"
+    PRINT ".wrap{max-width:960px;margin:0 auto} pre{background:#f7f7f7;padding:1rem;border:1px solid #eee;overflow:auto}"
+    PRINT ".meta{color:#555;font-size:0.9rem;margin-bottom:1rem}</style></head><body><div class=\"wrap\">"
+    PRINT "<h1>Runtime Error</h1>"
+    PRINT "<div class=\"meta\">"
+    PRINT "<div><strong>Request:</strong> " + html_escape$(method$) + " " + html_escape$(path_info$) + "</div>"
+    PRINT "</div>"
+    PRINT "<pre>" + err_msg$ + "</pre>"
+    PRINT "<p style=\"margin-top:2rem;color:#777\"><small>Errors are also logged in the server error log.</small></p>"
+    PRINT "</div></body></html>"
+END SUB
 
 FUNC param$(name$)
     FOR EACH param_kv$ IN REQUEST$()
