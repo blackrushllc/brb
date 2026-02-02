@@ -1,0 +1,90 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "users.inc"
+<?basil
+
+    SITE_TITLE$ = "Simple Basil Website Skeleton"
+
+    FUNC layout_start(title$)
+        PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + "</title>"
+        PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+        PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body><header class=\"top\"><div class=\"wrap\"><h1>" + HTML$(SITE_TITLE$) + "</h1></div></header><main class=\"wrap\">\n"
+        RETURN 0
+    END FUNC
+
+    FUNC layout_end()
+        PRINT "</main><footer class=\"foot\"><div class=\"wrap\"><small><a href=\"index.basil\">Home</a></small></div></footer><script src=\"js/site.js\"></script></body></html>\n"
+        RETURN 0
+    END FUNC
+
+    method$ = ENV$("REQUEST_METHOD")
+
+    IF method$ == "POST" THEN
+
+        err$ = ""
+
+        u$ = param$("username")
+        p$ = param$("password")
+        p2$ = param$("password2")
+
+        db% = db_open%()
+        IF db% == 0 THEN
+            PRINT "Status: 500 Internal Server Error\r\nContent-Type: text/plain; charset=utf-8\r\n\r\nDB open failed"
+            EXIT 0
+        END IF
+
+        ' Validation without ELSE: set err$ on first failure
+        IF LEN(u$) == 0 OR LEN(p$) == 0 THEN
+            err$ = "Please fill in all fields"
+        END
+
+        IF LEN(err$) == 0 THEN
+            IF p$ <> p2$ THEN
+                err$ = "Passwords do not match"
+            END IF
+        END IF
+
+        IF LEN(err$) == 0 THEN
+            IF user_exists%(db%, u$) THEN
+                err$ = "That username is already taken"
+            END IF
+        END IF
+
+        IF LEN(err$) == 0 THEN
+            _id% = create_user%(db%, u$, p$)
+
+            IF id% == 0 THEN
+                err$ = "Could not create user (duplicate username or DB error)."
+            END IF
+            ' ... after you’ve validated input and created the user:
+            IF _id% > 0 THEN
+              ' set the session cookie
+              __d% = set_cookie("user", u$)
+
+              ' close DB if it’s open
+              SQLITE_CLOSE(db%)
+
+              ' IMPORTANT: send an explicit redirect status before Location
+              PRINT "Status: 302 Found\r\n"
+              PRINT "Location: user_home.basil\r\n\r\n"
+              EXIT 0
+            END IF
+        END IF
+        SQLITE_CLOSE(db%)
+    END
+
+    __d% = send_header_ok_html()
+    __d% = layout_start("Register")
+?>
+<?basil PRINT READFILE$("views/register.html"); ?>
+<?basil
+    //err$ = "Hello"
+
+    IF LEN(err$) > 0 THEN 
+        PRINT "<p class=\"error\">" + HTML$(err$) + "</p>\n"
+    END IF    
+
+    PRINT "<p class=\"error\">" + err$ + "</p>\n"
+
+    __d% = layout_end()
+?>
