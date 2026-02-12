@@ -1,0 +1,64 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  _ = send_header_ok_html()
+  _ = layout_start("FAQ")
+
+  PRINT "<div class=\"disclaimer-banner\">"
+  PRINT "<h3>Note: Homeless Helpers is a parody demo site for Basil. Not a real service.</h3>"
+  PRINT "</div>"
+
+  PRINT "<h2>Frequently Asked Questions</h2>"
+  
+  PRINT "<div class=\"faq-item\">"
+  PRINT "<h4>Should I call the police and report this website?</h4>"
+  PRINT "<p>Probably not. Unless you’re bored. In that case, maybe call a friend instead.</p>"
+  PRINT "</div>"
+
+  PRINT "<div class=\"faq-item\">"
+  PRINT "<h4>Is this service safe?</h4>"
+  PRINT "<p>Define \"safe.\"</p>"
+  PRINT "</div>"
+
+  PRINT "<div class=\"faq-item\">"
+  PRINT "<h4>Do you background check helpers?</h4>"
+  PRINT "<p>Absolutely. We confirm that they have a background.</p>"
+  PRINT "</div>"
+
+  PRINT "<div class=\"faq-item\">"
+  PRINT "<h4>Can I pay in food?</h4>"
+  PRINT "<p>Yes. Snacks, leftovers, and questionable casseroles are all acceptable forms of currency.</p>"
+  PRINT "</div>"
+
+  PRINT "<div class=\"faq-item\">"
+  PRINT "<h4>What if my helper tries to move in?</h4>"
+  PRINT "<p>That’s not \"moving in.\" That’s \"community building.\"</p>"
+  PRINT "</div>"
+
+  _ = layout_end()
+?>

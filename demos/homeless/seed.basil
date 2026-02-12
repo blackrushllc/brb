@@ -1,0 +1,38 @@
+REM Hardcoded Seed Script for Homeless Helpers
+#CGI_NO_HEADER
+
+db% = SQLITE_OPEN%("homeless.db")
+IF db% == 0 THEN BEGIN
+    PRINT "Failed to open database.\n"
+    EXIT 0
+END
+
+_ = SQLITE_EXEC%(db%, "DROP TABLE IF EXISTS users")
+_ = SQLITE_EXEC%(db%, "DROP TABLE IF EXISTS profiles")
+_ = SQLITE_EXEC%(db%, "DROP TABLE IF EXISTS posts")
+_ = SQLITE_EXEC%(db%, "DROP TABLE IF EXISTS comments")
+
+_ = SQLITE_EXEC%(db%, "CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT UNIQUE, password TEXT)")
+_ = SQLITE_EXEC%(db%, "CREATE TABLE profiles (user_id INTEGER PRIMARY KEY, display_name TEXT, bio TEXT, avatar_url TEXT)")
+_ = SQLITE_EXEC%(db%, "CREATE TABLE posts (id INTEGER PRIMARY KEY, type TEXT, title TEXT, description TEXT, image_url TEXT, contact_info TEXT, user_id INTEGER, created_at DATETIME, updated_at DATETIME)")
+_ = SQLITE_EXEC%(db%, "CREATE TABLE comments (id INTEGER PRIMARY KEY, post_id INTEGER, user_id INTEGER, body TEXT, created_at DATETIME)")
+
+PRINT "Tables created. Inserting data...\n"
+
+_ = SQLITE_EXEC%(db%, "INSERT INTO users VALUES (1, 'SnackKing42', 'password')")
+_ = SQLITE_EXEC%(db%, "INSERT INTO users VALUES (2, 'WineOClockMom', 'password')")
+_ = SQLITE_EXEC%(db%, "INSERT INTO users VALUES (3, 'FortBuilderDan', 'password')")
+
+_ = SQLITE_EXEC%(db%, "INSERT INTO profiles VALUES (1, 'The Snack King', 'I know where the best goldfish crackers are.', 'uploads/seed_avatar1.png')")
+_ = SQLITE_EXEC%(db%, "INSERT INTO profiles VALUES (2, 'Wine O''Clock Mom', 'Exhausted but still standing. Mostly.', 'uploads/seed_avatar2.png')")
+_ = SQLITE_EXEC%(db%, "INSERT INTO profiles VALUES (3, 'Dan the Builder', 'I can build a fort out of anything.', 'uploads/seed_avatar3.png')")
+
+now$ = "2026-02-01 21:00:00"
+_ = SQLITE_EXEC%(db%, "INSERT INTO posts VALUES (1, 'Available', 'Experienced Snack Negotiator', 'Will babysit for food. Good with toddlers and raccoons.', 'uploads/seed_post.png', 'Text me', 1, '" + now$ + "', '" + now$ + "')")
+_ = SQLITE_EXEC%(db%, "INSERT INTO posts VALUES (2, 'Wanted', 'Date Night Emergency', 'Cheap help wanted no questions asked. Kids asleep by 8pm. Probably.', 'uploads/seed_post.png', 'Call me', 2, '" + now$ + "', '" + now$ + "')")
+
+_ = SQLITE_EXEC%(db%, "INSERT INTO comments VALUES (1, 1, 2, 'Do you work weekends?', '" + now$ + "')")
+_ = SQLITE_EXEC%(db%, "INSERT INTO comments VALUES (2, 1, 1, 'Time is a social construct but yes.', '" + now$ + "')")
+
+PRINT "Seeding complete!\n"
+SQLITE_CLOSE(db%)

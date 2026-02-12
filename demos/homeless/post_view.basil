@@ -1,0 +1,120 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  _ = send_header_ok_html()
+  
+  id$ = param$("id")
+  IF LEN(id$) == 0 THEN BEGIN
+    _ = layout_start("Not Found")
+    PRINT "<h2>Post Not Found</h2>"
+    _ = layout_end()
+    EXIT 0
+  END
+
+  db% = db_open%()
+  IF db% == 0 THEN BEGIN
+    _ = layout_start("Error")
+    PRINT "<p class=\"error\">Database error.</p>"
+    _ = layout_end()
+    EXIT 0
+  END
+
+  DIM post$(0,0)
+  post$() = get_post_by_id@(db%, VAL%(id$))
+  
+  IF ARRAY_ROWS%(post$) == 0 THEN BEGIN
+    _ = layout_start("Not Found")
+    PRINT "<h2>Post Not Found</h2>"
+    _ = layout_end()
+    SQLITE_CLOSE(db%)
+    EXIT 0
+  END
+
+  _ = layout_start(post$(0, 2))
+
+  PRINT "<div class=\"post-detail\">"
+  PRINT "<h2>" + HTML$(post$(0, 2)) + " <span class=\"badge\">" + HTML$(post$(0, 1)) + "</span></h2>"
+  PRINT "<p class=\"meta\">Posted by " + HTML$(post$(0, 9)) + " on " + HTML$(post$(0, 7)) + "</p>"
+  PRINT "<div class=\"post-body\">" + HTML$(post$(0, 3)) + "</div>"
+  PRINT "<div class=\"contact-info card\">"
+  PRINT "<h4>Contact Info:</h4>"
+  PRINT "<p>" + HTML$(post$(0, 5)) + "</p>"
+  PRINT "</div>"
+  PRINT "<div class=\"share-box card\">"
+  PRINT "<h4>Share this listing:</h4>"
+  PRINT "<button onclick=\"copyLink()\" class=\"btn secondary\">Copy Link</button> "
+  PRINT "<a href=\"https://twitter.com/intent/tweet?url=\" class=\"btn secondary\" target=\"_blank\">Share to X</a> "
+  PRINT "<a href=\"https://www.facebook.com/sharer/sharer.php?u=\" class=\"btn secondary\" target=\"_blank\">Facebook</a> "
+  PRINT "<a href=\"mailto:?subject=Check this out&body=\" class=\"btn secondary\">Email</a>"
+  PRINT "</div>"
+  PRINT "</div>"
+  PRINT "<script src=\"js/site.js\"></script>"
+
+  PRINT "<hr>"
+  PRINT "<h3>Comments</h3>"
+  
+  user$ = cookie$("user")
+  IF LEN(user$) > 0 THEN BEGIN
+    method$ = ENV$("REQUEST_METHOD")
+    IF method$ == "POST" AND param$("action") == "add_comment" THEN BEGIN
+        body$ = param$("body")
+        IF LEN(body$) > 0 THEN BEGIN
+            now$ = "2026-02-01 21:00:00"
+            rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE username = '" + user$ + "'")
+            uid% = VAL%(rows$(0, 0))
+            _ = SQLITE_EXEC%(db%, "INSERT INTO comments (post_id, user_id, body, created_at) VALUES (" + VAL%(id$) + ", " + uid% + ", '" + body$ + "', '" + now$ + "')")
+        END
+    END
+    PRINT "<form method=\"POST\" class=\"card\">"
+    PRINT "<input type=\"hidden\" name=\"action\" value=\"add_comment\">"
+    PRINT "<p><textarea name=\"body\" placeholder=\"Be nice. Or at least be entertaining.\" required style=\"width:100%; height:60px;\"></textarea></p>"
+    PRINT "<p><button type=\"submit\" class=\"btn\">Post Comment</button></p>"
+    PRINT "</form>"
+  END ELSE BEGIN
+    PRINT "<p>Please <a href=\"login.basil\">login</a> to post a comment.</p>"
+  END
+  
+  DIM comments$(0,0)
+  comments$() = get_comments_for_post@(db%, VAL%(id$))
+  rc% = ARRAY_ROWS%(comments$)
+  
+  IF rc% == 0 THEN
+    PRINT "<p>No comments yet. Be nice. Or at least be entertaining.</p>"
+  ELSE
+    FOR i% = 0 TO rc% - 1
+        PRINT "<div class=\"comment card\">"
+        PRINT "<strong>" + HTML$(comments$(i%, 5)) + "</strong> <small>" + HTML$(comments$(i%, 4)) + "</small>"
+        PRINT "<p>" + HTML$(comments$(i%, 3)) + "</p>"
+        PRINT "</div>"
+    NEXT i%
+  END IF
+
+  SQLITE_CLOSE(db%)
+  _ = layout_end()
+?>

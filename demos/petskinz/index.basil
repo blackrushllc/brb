@@ -1,0 +1,291 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+<?basil
+// --------------------------------------------------------------------------
+// PETSKINZ "ALIVE AGAIN" - DEMO SITE
+// This demo showcases Basil templating, arrays, loops, and form handling.
+// --------------------------------------------------------------------------
+
+// Gallery Captions - These tell Erik what to AI-generate
+DIM gallery_captions$(10)
+gallery_captions$(0) = "Golden retriever puppy wearing an older golden retriever's exact markings; sunny yard; cinematic."
+gallery_captions$(1) = "Owner hugging a 'same' cat - identical fur pattern; cozy living room; warm film grain."
+gallery_captions$(2) = "Before/After split: 'Mr. Pickles' (then) vs 'Mr. Pickles' (Alive Again); same collar; glossy ad style."
+gallery_captions$(3) = "French bulldog 'Alive Again' reveal party; confetti; everyone smiling a little too hard."
+gallery_captions$(4) = "Close-up: perfectly matched tabby stripes; shallow depth of field; luxury pet shampoo commercial."
+gallery_captions$(5) = "Kid holding 'Alive Again' bunny; soft pastel background; overly wholesome."
+gallery_captions$(6) = "Older couple walking 'Alive Again' dachshund; golden hour; suburban sidewalk; premium brand vibes."
+gallery_captions$(7) = "Veterinarian-looking person giving thumbs-up; 'Alive Again' pet on exam table; suspiciously clean."
+gallery_captions$(8) = "Group photo: three 'Alive Again' pets lined up like a catalog shoot; white seamless backdrop."
+gallery_captions$(9) = "Product shot: 'PetSkinz Care Kit' next to a sleeping 'Alive Again' pet; hyperreal ad style."
+
+// Testimonials - Delighted + Horrified
+DIM testimonials$(14)
+testimonials$(0) = "It's like he never left... except now he's faster. And younger. And stares at me like a stranger. Five stars."
+testimonials$(1) = "The fur is IDENTICAL. My therapist is concerned, but my heart is thrilled."
+testimonials$(2) = "My husband cried, then screamed, then hugged the dog. Incredible customer journey."
+testimonials$(3) = "We asked for 'Alive Again' and they delivered 'Alive Again-ish.' That's honestly enough."
+testimonials$(4) = "Same spots, same ears, same vibe. Different soul. No notes."
+testimonials$(5) = "I feel comforted and mildly haunted. Which is... a comfort I didn't know I needed."
+testimonials$(6) = "Our cat is back. My conscience is not."
+testimonials$(7) = "I can't explain it, but the new hamster feels like it knows what we did."
+testimonials$(8) = "My children think it's magic. I think it's a felony. We are bonding as a family."
+testimonials$(9) = "The coat match is flawless. The moral match is... complicated."
+testimonials$(10) = "I requested 'exactly the same' and they nailed 'uncannily similar.' A+ craftsmanship."
+testimonials$(11) = "It's both closure and a restart button I probably shouldn't have pressed."
+testimonials$(12) = "Customer service was cheerful in a way that made me question reality."
+testimonials$(13) = "I reported the website, then I didn't. Then I did again. Then I didn't. Anyway: great work."
+
+// FAQ Items - Array of strings (Q then A) for simplicity in Basil
+DIM faq$(28)
+faq$(0) = "What is PetSkinz?"
+faq$(1) = "A premium 'continuity service' that helps your heart move forward while your eyes insist nothing changed."
+faq$(2) = "How does 'Alive Again' work?"
+faq$(3) = "We match a young, similar animal and create a 'coat continuity' experience. (This website is parody demo content.)"
+faq$(4) = "Is this ethical?"
+faq$(5) = "Ethics is a spectrum. Our branding is a rectangle."
+faq$(6) = "Will my pet have the same personality?"
+faq$(7) = "Personality is not included in the pelt. Results vary emotionally."
+faq$(8) = "Does my new pet remember me?"
+faq$(9) = "Memory not guaranteed. Attachment, however, is extremely likely."
+faq$(10) = "What pets do you support?"
+faq$(11) = "Common domestic pets: dogs, cats, rabbits. If it has fur, we have... opinions."
+faq$(12) = "Is this safe?"
+faq$(13) = "Physically: this is a parody website. Technically: the contact form works."
+faq$(14) = "Should I report this website to the police?"
+faq$(15) = "If you believe a crime is occurring, contact local authorities. Also: this is satirical demo content."
+faq$(16) = "Do you offer refunds?"
+faq$(17) = "We offer 'emotional store credit' in the form of a sincere thumbs-up."
+faq$(18) = "What do you need for an estimate?"
+faq$(19) = "A photo (alive or otherwise), your pet's name and age, and your best attempt at not thinking too hard about it."
+faq$(20) = "Do you return the original pet?"
+faq$(21) = "This is a parody. Please do not mail anything to anyone."
+faq$(22) = "Can you match rare markings exactly?"
+faq$(23) = "We aim for 'uncannily close' - the premium tier is 'you will gasp.'"
+faq$(24) = "Is this legal where I live?"
+faq$(25) = "We cannot provide legal advice, but we can provide extremely confident typography."
+faq$(26) = "Why does this site exist?"
+faq$(27) = "To demonstrate Basil templating loops and form handling with a memorable (disturbing) concept."
+
+// 3. FORM HANDLING (POST)
+
+success_msg$ = ""
+error_msg$ = ""
+
+method$ = ENV$("REQUEST_METHOD")
+IF method$ == "POST" THEN
+    // Collect fields
+    name$ = param$("full_name")
+    email$ = param$("email")
+    pet_name$ = param$("pet_name")
+    pet_age$ = param$("pet_age")
+    notes$ = param$("notes")
+
+    // Validation
+    IF (LEN(name$) == 0) OR (LEN(email$) == 0) OR (LEN(pet_name$) == 0) OR (LEN(pet_age$) == 0) THEN
+        error_msg$ = "Please fill in all required fields (Name, Email, Pet Name, Pet Age)."
+    ELSE
+        // Handle file upload
+        saved_path$ = "none"
+        IF CGI_HAS_FILE%("pet_photo") THEN
+            fname$ = CGI_FILE_NAME$("pet_photo")
+            IF LEN(fname$) > 0 THEN
+                  // Simple validation: check extension and size
+                  ext$ = LCASE$(RIGHT$(fname$, 4))
+                  fsize% = CGI_FILE_SIZE%("pet_photo")
+                  IF fsize% > 6291456 THEN
+                    error_msg$ = "File is too large. Max size is 6MB."
+                  ELSE
+                        IF (ext$ == ".jpg") OR (ext$ == "jpeg") OR (ext$ == ".png") OR (ext$ == ".webp") THEN
+                              dest$ = "uploads/" + STR$(EPOCH%()) + "_" + fname$
+                              IF CGI_SAVE_FILE%("pet_photo", dest$) THEN
+                                saved_path$ = dest$
+                              ELSE
+                                error_msg$ = "Failed to save the uploaded photo."
+                              END
+                        ELSE
+                            error_msg$ = "Invalid file type. Please upload a JPG, PNG, or WEBP."
+                        END
+                  END
+            END
+        END
+
+        IF LEN(error_msg$) == 0 THEN
+            // SMTP Configuration
+            // How SMTP is configured: We read from environment variables for security.
+            smtp_host$ = ENV$("PETSKINZ_SMTP_HOST")
+            smtp_port% = VAL%(ENV$("PETSKINZ_SMTP_PORT"))
+
+            IF smtp_port% == 0 THEN
+                smtp_port% = 587
+            END
+
+            smtp_user$ = ENV$("PETSKINZ_SMTP_USER")
+            smtp_pass$ = ENV$("PETSKINZ_SMTP_PASS")
+            smtp_from$ = ENV$("PETSKINZ_SMTP_FROM")
+
+            IF LEN(smtp_from$) == 0 THEN
+                smtp_from$ = "PetSkinz <no-reply@petskinz.local>"
+            END
+            contact_to$ = ENV$("PETSKINZ_CONTACT_TO")
+
+            IF LEN(contact_to$) == 0 THEN
+                contact_to$ = "blackrushdrive@gmail.com"
+            END
+
+            IF (LEN(smtp_host$) == 0) OR (LEN(smtp_user$) == 0) OR (LEN(smtp_pass$) == 0) THEN
+                error_msg$ = "SMTP is not configured. Developer, please set: PETSKINZ_SMTP_HOST, PETSKINZ_SMTP_USER, PETSKINZ_SMTP_PASS."
+            ELSE
+                DIM smtp@ AS MAIL_SMTP(smtp_host$, smtp_user$, smtp_pass$, smtp_port%, "starttls")
+                subject$ = "PetSkinz Estimate Request: " + pet_name$ + " (" + pet_age$ + "y)"
+                body$ = "Full Name: " + name$ + "\n"
+                body$ = body$ + "Email: " + email$ + "\n"
+                body$ = body$ + "Pet Name: " + pet_name$ + "\n"
+                body$ = body$ + "Pet Age: " + pet_age$ + "\n"
+                body$ = body$ + "Notes: " + notes$ + "\n"
+                body$ = body$ + "Photo: " + saved_path$ + "\n"
+
+                _ = smtp@.SendEmail(contact_to$, subject$, body$, smtp_from$, 0)
+                success_msg$ = "Estimate request received. We will respond soon (emotionally)."
+            END
+        END
+    END
+
+rem END // a closing END makes an error if followed by a close Basil tag ?> ????
+
+// 4. RENDER PAGE
+  
+PRINT "Status: 200 OK\r\n"
+PRINT "Content-Type: text/html; charset=utf-8\r\n\r\n"
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetSkinz | Alive Again</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header>
+    <div class="wrap">
+        <h1>PetSkinz</h1>
+        <div class="slogan">Alive Again</div>
+    </div>
+</header>
+
+<main>
+    <section class="hero">
+        <div class="wrap">
+            <h2>Because grief deserves a second coat.</h2>
+            <p>Our premium continuity service ensures your home never feels empty, even when it should.</p>
+            <a href="#contact" class="btn">Request an Estimate</a>
+            <p class="disclaimer">This is a parody demo for Basil templating. Please do not mail anything to anyone.</p>
+        </div>
+    </section>
+
+    <section id="gallery">
+        <div class="wrap">
+            <h3>Stunning Results</h3>
+            <div class="gallery">
+                <?basil
+                  FOR i% = 0 TO 9
+                    PRINT "<div class='gallery-item'>"
+                    PRINT "  <div class='photo-placeholder'>[Photo Placeholder #" + STR$(i% + 1) + "]</div>"
+                    PRINT "  <div class='gallery-caption'>" + HTML$(gallery_captions$(i%)) + "</div>"
+                    PRINT "</div>"
+                  NEXT i%
+                ?>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="wrap">
+            <h3>Our Grateful (and Haunted) Clients</h3>
+            <div class="testimonial-grid">
+                <?basil
+                  // Testimonials loop
+                  FOR i% = 0 TO 13
+                    PRINT "<div class='testimonial'>"
+                    PRINT "  <p>\"" + HTML$(testimonials$(i%)) + "\"</p>"
+                    PRINT "</div>"
+                  NEXT i%
+                ?>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq">
+        <div class="wrap">
+            <h3>Frequently Asked Questions</h3>
+            <div class="faq-list">
+                <?basil
+                  // FAQ loop: items are in pairs (Q then A)
+                  FOR i% = 0 TO 27 STEP 2
+                    PRINT "<div class='faq-item'>"
+                    PRINT "  <div class='faq-q'>Q: " + HTML$(faq$(i%)) + "</div>"
+                    PRINT "  <div class='faq-a'>A: " + HTML$(faq$(i% + 1)) + "</div>"
+                    PRINT "</div>"
+                  NEXT i%
+                ?>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="wrap">
+            <h3>Request an Estimate</h3>
+            
+            <?basil
+              IF LEN(success_msg$) > 0 THEN
+                PRINT "<div class='success-msg'>" + HTML$(success_msg$) + "</div>"
+              ELSE
+                IF LEN(error_msg$) > 0 THEN
+                  PRINT "<div class='error-msg'>" + HTML$(error_msg$) + "</div>"
+                END
+              rem END
+            ?>
+
+            <div class="contact-form">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <label for="full_name">Full Name *</label>
+                        <input type="text" id="full_name" name="full_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pet_name">Pet Name *</label>
+                        <input type="text" id="pet_name" name="pet_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="pet_age">Pet Age (years) *</label>
+                        <input type="number" id="pet_age" name="pet_age" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="notes">Notes</label>
+                        <textarea id="notes" name="notes" rows="4" placeholder="Tell us anything we should know... emotionally or medically."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="pet_photo">Attach a photo of your pet (alive or otherwise)</label>
+                        <input type="file" id="pet_photo" name="pet_photo" accept="image/*">
+                    </div>
+                    <button type="submit" class="btn">Submit for Estimate</button>
+                </form>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="wrap">
+        <p>&copy; 2026 PetSkinz - A Basil Templating Demo</p>
+    </div>
+</footer>
+
+</body>
+</html>

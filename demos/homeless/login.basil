@@ -1,0 +1,60 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$)
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end()
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  method$ = ENV$("REQUEST_METHOD")
+  IF method$ == "POST" THEN
+    u$ = param$("username")
+    p$ = param$("password")
+    
+    db% = db_open%()
+    IF db% <> 0 THEN
+      DIM rows$(0,0)
+      rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE username='" + u$ + "' AND password='" + p$ + "' LIMIT 1")
+      IF ARRAY_ROWS%(rows$) > 0 THEN
+        _ = set_cookie("user", u$)
+        PRINT "Status: 302 Found\r\nLocation: user_home.basil\r\n\r\n"
+        SQLITE_CLOSE(db%)
+        EXIT 0
+      END
+      err$ = "Invalid username or password"
+      SQLITE_CLOSE(db%)
+    ELSE
+      err$ = "Database connection failed"
+    END
+  END
+
+  _ = send_header_ok_html()
+  _ = layout_start("Login")
+  
+  IF LEN(err$) > 0 THEN PRINT "<p class=\"error\">" + HTML$(err$) + "</p>"
+  
+  PRINT "<h2>Login</h2>"
+  PRINT "<form method=\"POST\" class=\"card\">"
+  PRINT "<p><label>Username: <input type=\"text\" name=\"username\" required></label></p>"
+  PRINT "<p><label>Password: <input type=\"password\" name=\"password\" required></label></p>"
+  PRINT "<p><button type=\"submit\" class=\"btn\">Login</button></p>"
+  PRINT "</form>"
+  PRINT "<p>Don't have an account? <a href=\"register.basil\">Register here</a>.</p>"
+  
+  _ = layout_end()
+?>

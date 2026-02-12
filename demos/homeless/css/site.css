@@ -1,0 +1,110 @@
+body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background-color: #fffaf0;
+    color: #5d4037;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.wrap {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header.top {
+    background-color: #ffb6c1;
+    border-bottom: 5px dotted #ff69b4;
+    padding: 20px 0;
+    text-align: center;
+}
+
+header.top h1 a {
+    color: white;
+    text-decoration: none;
+    text-shadow: 2px 2px #ff69b4;
+    font-size: 3rem;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+nav a {
+    color: #d81b60;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+}
+
+nav a:hover {
+    background-color: #ffe4e1;
+    border-radius: 10px;
+}
+
+.card {
+    background: white;
+    border: 3px solid #ffc0cb;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 5px 5px 0px #ffb6c1;
+}
+
+.btn {
+    display: inline-block;
+    background-color: #ff69b4;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 25px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: #ff1493;
+}
+
+.btn.secondary {
+    background-color: #fce4ec;
+    color: #ad1457;
+    border: 2px solid #ff69b4;
+}
+
+.btn.secondary:hover {
+    background-color: #f8bbd0;
+}
+
+.badge {
+    background-color: #fce4ec;
+    color: #ad1457;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    vertical-align: middle;
+}
+
+.disclaimer-banner {
+    background-color: #fff3e0;
+    border: 2px dashed #ff9800;
+    padding: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+footer {
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.error {
+    color: #d32f2f;
+    background: #ffcdd2;
+    padding: 10px;
+    border-radius: 5px;
+}

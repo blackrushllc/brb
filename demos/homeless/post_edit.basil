@@ -1,0 +1,107 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  user$ = cookie$("user")
+  IF LEN(user$) == 0 THEN BEGIN
+    PRINT "Status: 302 Found\r\nLocation: login.basil\r\n\r\n"
+    EXIT 0
+  END
+
+  id$ = param$("id")
+  IF LEN(id$) == 0 THEN BEGIN
+    PRINT "Status: 302 Found\r\nLocation: user_home.basil\r\n\r\n"
+    EXIT 0
+  END
+
+  db% = db_open%()
+  IF db% == 0 THEN BEGIN
+    _ = send_header_ok_html()
+    _ = layout_start("Error")
+    PRINT "<p class=\"error\">Database error.</p>"
+    _ = layout_end()
+    EXIT 0
+  END
+
+  // Verify ownership and get data
+  DIM rows$(0,0)
+  rows$() = SQLITE_QUERY2D$(db%, "SELECT id, type, title, description, image_url, contact_info FROM posts WHERE id = " + VAL%(id$) + " AND user_id = (SELECT id FROM users WHERE username = '" + user$ + "')")
+  IF ARRAY_ROWS%(rows$) == 0 THEN BEGIN
+    PRINT "Status: 302 Found\r\nLocation: user_home.basil\r\n\r\n"
+    SQLITE_CLOSE(db%)
+    EXIT 0
+  END
+
+  method$ = ENV$("REQUEST_METHOD")
+  IF method$ == "POST" THEN BEGIN
+    title$ = param$("title")
+    type$ = param$("type")
+    desc$ = param$("description")
+    contact$ = param$("contact_info")
+    
+    img_url$ = rows$(0, 4)
+    IF CGI_HAS_FILE%("image") THEN BEGIN
+        fname$ = CGI_FILE_NAME$("image")
+        IF LEN(fname$) > 0 THEN BEGIN
+            dest$ = "uploads/" + STR$(EPOCH%()) + "_" + fname$
+            IF CGI_SAVE_FILE%("image", dest$) THEN BEGIN
+                img_url$ = dest$
+            END
+        END
+    END
+    
+    now$ = "2026-02-01 21:00:00"
+    _ = SQLITE_EXEC%(db%, "UPDATE posts SET type='" + type$ + "', title='" + title$ + "', description='" + desc$ + "', image_url='" + img_url$ + "', contact_info='" + contact$ + "', updated_at='" + now$ + "' WHERE id=" + VAL%(id$))
+    PRINT "Status: 302 Found\r\nLocation: user_home.basil\r\n\r\n"
+    SQLITE_CLOSE(db%)
+    EXIT 0
+  END
+
+  _ = send_header_ok_html()
+  _ = layout_start("Edit Listing")
+
+  PRINT "<h2>Edit Listing</h2>"
+  PRINT "<form method=\"POST\" enctype=\"multipart/form-data\" class=\"card\">"
+  PRINT "<p><label>Title: <input type=\"text\" name=\"title\" value=\"" + HTML$(rows$(0, 2)) + "\" required></label></p>"
+  PRINT "<p><label>Type: <select name=\"type\">"
+  IF rows$(0, 1) == "Available" THEN
+    PRINT "<option value=\"Available\" selected>Available</option><option value=\"Wanted\">Wanted</option>"
+  ELSE
+    PRINT "<option value=\"Available\">Available</option><option value=\"Wanted\" selected>Wanted</option>"
+  END
+  PRINT "</select></label></p>"
+  PRINT "<p><label>Description: <textarea name=\"description\" required style=\"width:100%; height:100px;\">" + HTML$(rows$(0, 3)) + "</textarea></label></p>"
+  PRINT "<p><label>Contact Info: <input type=\"text\" name=\"contact_info\" value=\"" + HTML$(rows$(0, 5)) + "\" required></label></p>"
+  PRINT "<p><label>Current Image: <img src=\"" + HTML$(rows$(0, 4)) + "\" width=\"100\"></label></p>"
+  PRINT "<p><label>Change Image: <input type=\"file\" name=\"image\" accept=\"image/*\"></label></p>"
+  PRINT "<p><button type=\"submit\" class=\"btn\">Update Listing</button> <a href=\"user_home.basil\" class=\"btn\">Cancel</a></p>"
+  PRINT "</form>"
+
+  SQLITE_CLOSE(db%)
+  _ = layout_end()
+?>

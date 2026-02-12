@@ -1,0 +1,64 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+send_header_ok_html()
+layout_start("Home")
+
+  PRINT "<section class=\"hero card\" style=\"text-align:center; background-image: linear-gradient(to bottom, #fff0f5, #ffffff);\">"
+  PRINT "<h2>Because help is help. Probably.</h2>"
+  PRINT "<p>Connecting those who need food with those who need a babysitter. What's the worst that could happen?</p>"
+  PRINT "<div style=\"margin: 20px 0;\">"
+  PRINT "<a href=\"directory.basil\" class=\"btn\" style=\"font-size: 1.5rem;\">Browse Directory</a> "
+  PRINT "<a href=\"post_new.basil\" class=\"btn secondary\" style=\"font-size: 1.5rem;\">Post a Listing</a>"
+  PRINT "</div>"
+  PRINT "<small style=\"display:block; margin-top: 10px; font-size: 0.7rem;\">Not responsible for emotional damage, property damage, or learning experiences.</small>"
+  PRINT "</section>"
+
+  PRINT "<h3>Disastrously Positive Testimonials</h3>"
+  PRINT "<div class=\"testimonials\">"
+  
+  PRINT "<div class=\"card testimonial\">"
+  PRINT "<strong>Melissa R. ⭐️⭐️⭐️⭐️⭐️</strong>"
+  PRINT "<p>\"My toddler learned three new words I absolutely cannot repeat. Five stars for cultural enrichment!\"</p>"
+  PRINT "</div>"
+
+  PRINT "<div class=\"card testimonial\">"
+  PRINT "<strong>Brandon & Tiff ⭐️⭐️⭐️⭐️⭐️</strong>"
+  PRINT "<p>\"The house smelled like campfire smoke afterward, but honestly? The kids slept GREAT.\"</p>"
+  PRINT "</div>"
+
+  PRINT "<div class=\"card testimonial\">"
+  PRINT "<strong>Karen P. ⭐️⭐️⭐️⭐️⭐️</strong>"
+  PRINT "<p>\"I came home to glitter in places I didn’t know glitter could exist. Memories were made.\"</p>"
+  PRINT "</div>"
+
+  PRINT "</div>"
+
+layout_end()
+?>

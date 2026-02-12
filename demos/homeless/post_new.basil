@@ -1,0 +1,96 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$)
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end()
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  user$ = cookie$("user")
+  IF LEN(user$) == 0 THEN
+    PRINT "Status: 302 Found\r\nLocation: login.basil\r\n\r\n"
+    EXIT 0
+  END
+
+  method$ = ENV$("REQUEST_METHOD")
+  IF method$ == "POST" THEN
+    title$ = param$("title")
+    type$ = param$("type")
+    desc$ = param$("description")
+    contact$ = param$("contact_info")
+    
+    db% = db_open%()
+    IF db% <> 0 THEN
+      // Check limit
+      DIM rows$(0,0)
+      rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE username = '" + user$ + "'")
+      uid% = VAL%(rows$(0, 0))
+      
+      rows$() = SQLITE_QUERY2D$(db%, "SELECT COUNT(*) FROM posts WHERE user_id = " + uid%)
+      count% = VAL%(rows$(0, 0))
+      
+      IF count% >= 10 THEN
+        err$ = "You've reached the 10-post limit. Please delete one or edit an existing post."
+      ELSE
+        img_url$ = "uploads/default.png"
+        // Handle image upload if possible, otherwise use placeholder
+        IF CGI_HAS_FILE%("image") THEN
+            fname$ = CGI_FILE_NAME$("image")
+            IF LEN(fname$) > 0 THEN
+                dest$ = "uploads/" + STR$(EPOCH%()) + "_" + fname$
+                IF CGI_SAVE_FILE%("image", dest$) THEN
+                    img_url$ = dest$
+                END
+            END
+        END
+        
+        now$ = "2026-02-01 21:00:00"
+        _ = SQLITE_EXEC%(db%, "INSERT INTO posts (type, title, description, image_url, contact_info, user_id, created_at, updated_at) VALUES ('" + type$ + "', '" + title$ + "', '" + desc$ + "', '" + img_url$ + "', '" + contact$ + "', " + uid% + ", '" + now$ + "', '" + now$ + "')")
+        PRINT "Status: 302 Found\r\nLocation: user_home.basil\r\n\r\n"
+        SQLITE_CLOSE(db%)
+        EXIT 0
+      END
+      SQLITE_CLOSE(db%)
+    ELSE
+      err$ = "Database error"
+    END
+  END
+
+  _ = send_header_ok_html()
+  _ = layout_start("New Listing")
+  
+  IF LEN(err$) > 0 THEN PRINT "<p class=\"error\">" + HTML$(err$) + "</p>"
+  
+  PRINT "<h2>Create New Listing</h2>"
+  PRINT "<form method=\"POST\" enctype=\"multipart/form-data\" class=\"card\">"
+  PRINT "<p><label>Title: <input type=\"text\" name=\"title\" required></label></p>"
+  PRINT "<p><label>Type: <select name=\"type\"><option value=\"Available\">Available</option><option value=\"Wanted\">Wanted</option></select></label></p>"
+  PRINT "<p><label>Description: <textarea name=\"description\" required style=\"width:100%; height:100px;\"></textarea></label></p>"
+  PRINT "<p><label>Contact Info: <input type=\"text\" name=\"contact_info\" required></label></p>"
+  PRINT "<p><label>Image: <input type=\"file\" name=\"image\" accept=\"image/*\"></label></p>"
+  PRINT "<p><button type=\"submit\" class=\"btn\">Post Listing</button></p>"
+  PRINT "</form>"
+  
+  _ = layout_end()
+?>

@@ -1,0 +1,60 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  _ = send_header_ok_html()
+  _ = layout_start("Directory")
+
+  db% = db_open%()
+  IF db% == 0 THEN
+    PRINT "<p class=\"error\">Database error.</p>"
+  ELSE
+    DIM posts$(0,0)
+    posts$() = get_posts@(db%)
+    rc% = ARRAY_ROWS%(posts$)
+    
+    PRINT "<h2>Help Directory</h2>"
+    PRINT "<p>Browse through our totally trusted listings.</p>"
+    
+    IF rc% == 0 THEN
+        PRINT "<p>No listings found. Be the first to post!</p>"
+    ELSE
+        FOR i% = 0 TO rc% - 1
+            PRINT "<div class=\"card post-card\">"
+            PRINT "<h3>" + HTML$(posts$(i%, 2)) + " <span class=\"badge\">" + HTML$(posts$(i%, 1)) + "</span></h3>"
+            PRINT "<p class=\"meta\">Posted by " + HTML$(posts$(i%, 9)) + " on " + HTML$(posts$(i%, 7)) + "</p>"
+            PRINT "<p>" + HTML$(LEFT$(posts$(i%, 3), 100)) + "...</p>"
+            PRINT "<a href=\"post_view.basil?id=" + posts$(i%, 0) + "\" class=\"btn\">View Details</a>"
+            PRINT "</div>"
+        NEXT i%
+    END IF
+    SQLITE_CLOSE(db%)
+  END
+  
+  _ = layout_end()
+?>

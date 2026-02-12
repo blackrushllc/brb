@@ -1,0 +1,84 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  user$ = cookie$("user")
+  IF LEN(user$) == 0 THEN BEGIN
+    PRINT "Status: 302 Found\r\nLocation: login.basil\r\n\r\n"
+    EXIT 0
+  END
+
+  db% = db_open%()
+  IF db% == 0 THEN BEGIN
+    _ = send_header_ok_html()
+    _ = layout_start("Error")
+    PRINT "<p class=\"error\">Database error.</p>"
+    _ = layout_end()
+    EXIT 0
+  END
+
+  DIM rows$(0,0)
+  rows$() = SQLITE_QUERY2D$(db%, "SELECT display_name, bio, avatar_url FROM profiles WHERE user_id = (SELECT id FROM users WHERE username = '" + user$ + "')")
+  
+  method$ = ENV$("REQUEST_METHOD")
+  IF method$ == "POST" THEN BEGIN
+    display_name$ = param$("display_name")
+    bio$ = param$("bio")
+    
+    avatar_url$ = rows$(0, 2)
+    IF CGI_HAS_FILE%("avatar") THEN BEGIN
+        fname$ = CGI_FILE_NAME$("avatar")
+        IF LEN(fname$) > 0 THEN BEGIN
+            dest$ = "uploads/avatar_" + user$ + "_" + fname$
+            IF CGI_SAVE_FILE%("avatar", dest$) THEN BEGIN
+                avatar_url$ = dest$
+            END
+        END
+    END
+    
+    _ = SQLITE_EXEC%(db%, "UPDATE profiles SET display_name='" + display_name$ + "', bio='" + bio$ + "', avatar_url='" + avatar_url$ + "' WHERE user_id = (SELECT id FROM users WHERE username = '" + user$ + "')")
+    PRINT "Status: 302 Found\r\nLocation: profile.basil\r\n\r\n"
+    SQLITE_CLOSE(db%)
+    EXIT 0
+  END
+
+  _ = send_header_ok_html()
+  _ = layout_start("My Profile")
+
+  PRINT "<h2>My Profile</h2>"
+  PRINT "<form method=\"POST\" enctype=\"multipart/form-data\" class=\"card\">"
+  PRINT "<p><label>Display Name: <input type=\"text\" name=\"display_name\" value=\"" + HTML$(rows$(0, 0)) + "\" required></label></p>"
+  PRINT "<p><label>Bio: <textarea name=\"bio\" style=\"width:100%; height:100px;\">" + HTML$(rows$(0, 1)) + "</textarea></label></p>"
+  PRINT "<p><label>Current Avatar: <br><img src=\"" + HTML$(rows$(0, 2)) + "\" width=\"100\" onerror=\"this.src='https://via.placeholder.com/100'\"></label></p>"
+  PRINT "<p><label>Change Avatar: <input type=\"file\" name=\"avatar\" accept=\"image/*\"></label></p>"
+  PRINT "<p><button type=\"submit\" class=\"btn\">Update Profile</button> <a href=\"user_home.basil\" class=\"btn\">Cancel</a></p>"
+  PRINT "</form>"
+
+  SQLITE_CLOSE(db%)
+  _ = layout_end()
+?>

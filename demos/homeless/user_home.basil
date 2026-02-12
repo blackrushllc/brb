@@ -1,0 +1,75 @@
+#CGI_NO_HEADER
+#include "cgi.inc"
+#include "db.inc"
+<?basil
+  SITE_TITLE$ = "Homeless Helpers"
+  
+  FUNC layout_start(title$) BEGIN
+    PRINT "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\"><title>" + HTML$(title$) + " | " + HTML$(SITE_TITLE$) + "</title>"
+    PRINT "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+    PRINT "<link rel=\"stylesheet\" href=\"css/site.css\"></head><body>"
+    PRINT "<header class=\"top\"><div class=\"wrap\"><h1><a href=\"index.basil\">" + HTML$(SITE_TITLE$) + "</a></h1>"
+    PRINT "<nav><a href=\"index.basil\">Home</a> | <a href=\"directory.basil\">Directory</a> | <a href=\"faq.basil\">FAQ</a>"
+    user$ = cookie$("user")
+    IF LEN(user$) > 0 THEN
+        PRINT " | <a href=\"user_home.basil\">Dashboard</a> | <a href=\"logout.basil\">Logout (" + HTML$(user$) + ")</a>"
+    ELSE
+        PRINT " | <a href=\"login.basil\">Login</a> | <a href=\"register.basil\">Register</a>"
+    END
+    PRINT "</nav></div></header><main class=\"wrap\">\n"
+    RETURN 0
+  END FUNC
+
+  FUNC layout_end() BEGIN
+    PRINT "</main><footer class=\"foot\"><div class=\"wrap\">"
+    PRINT "<p>Live. Laugh. Lawsuit. &copy; 2026 Homeless Helpers Parody.</p>"
+    PRINT "</div></footer></body></html>\n"
+    RETURN 0
+  END FUNC
+
+  user$ = cookie$("user")
+  IF LEN(user$) == 0 THEN BEGIN
+    PRINT "Status: 302 Found\r\nLocation: login.basil\r\n\r\n"
+    EXIT 0
+  END
+
+  _ = send_header_ok_html()
+  _ = layout_start("Dashboard")
+
+  PRINT "<h2>Welcome, " + HTML$(user$) + "!</h2>"
+  PRINT "<div class=\"dashboard-actions\" style=\"margin-bottom: 20px;\">"
+  PRINT "<a href=\"post_new.basil\" class=\"btn\">Create New Listing</a> "
+  PRINT "<a href=\"profile.basil\" class=\"btn secondary\">Edit Profile</a>"
+  PRINT "</div>"
+
+  PRINT "<h3>My Listings</h3>"
+
+  db% = db_open%()
+  IF db% <> 0 THEN BEGIN
+    DIM rows$(0,0)
+    rows$() = SQLITE_QUERY2D$(db%, "SELECT id, title, type, created_at FROM posts WHERE user_id = (SELECT id FROM users WHERE username = '" + user$ + "') ORDER BY created_at DESC")
+    rc% = ARRAY_ROWS%(rows$)
+    
+    IF rc% == 0 THEN
+        PRINT "<p>You haven't posted any listings yet.</p>"
+    ELSE
+        PRINT "<p>You have used " + rc% + "/10 listings.</p>"
+        PRINT "<table border=\"1\" width=\"100%\" cellpadding=\"10\" style=\"border-collapse: collapse; border: 1px solid #ffc0cb;\">"
+        PRINT "<thead><tr style=\"background: #fce4ec;\"><th>Title</th><th>Type</th><th>Date</th><th>Actions</th></tr></thead><tbody>"
+        FOR i% = 0 TO rc% - 1
+            PRINT "<tr>"
+            PRINT "<td>" + HTML$(rows$(i%, 1)) + "</td>"
+            PRINT "<td>" + HTML$(rows$(i%, 2)) + "</td>"
+            PRINT "<td>" + HTML$(rows$(i%, 3)) + "</td>"
+            PRINT "<td><a href=\"post_edit.basil?id=" + rows$(i%, 0) + "\">Edit</a> | <a href=\"post_delete.basil?id=" + rows$(i%, 0) + "\">Delete</a></td>"
+            PRINT "</tr>"
+        NEXT i%
+        PRINT "</tbody></table>"
+    END IF
+    SQLITE_CLOSE(db%)
+  END ELSE BEGIN
+    PRINT "<p class=\"error\">Database error.</p>"
+  END
+
+  _ = layout_end()
+?>
