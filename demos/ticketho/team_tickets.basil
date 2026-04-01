@@ -26,13 +26,11 @@
     END IF
 
     // Get team name
-    DIM trows$(0,0)
-    trows$() = SQLITE_QUERY2D$(db%, "SELECT name FROM teams WHERE id = " + STR$(team_id%))
+    trows$ = SQLITE_QUERY2D$(db%, "SELECT name FROM teams WHERE id = " + STR$(team_id%))
     team_name$ = "Team"
     IF ARRAY_ROWS%(trows$) > 0 THEN team_name$ = trows$(0,0)
 
-    DIM rows$(0,0)
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, u.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN users u ON t.reporter_user_id = u.id WHERE t.team_id = " + STR$(team_id%) + " ORDER BY t.created_at DESC")
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, u.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN users u ON t.reporter_user_id = u.id WHERE t.team_id = " + STR$(team_id%) + " ORDER BY t.created_at DESC")
     
     _ = send_header_ok_html()
     _ = layout_start(team_name$ + " Tickets")

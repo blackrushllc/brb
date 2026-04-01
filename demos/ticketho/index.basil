@@ -2,10 +2,10 @@
 
 <?basil
     db% = db_open%()
-    _ = send_header_ok_html()
-    _ = layout_start("Home")
+    send_header_ok_html()
+    layout_start("Home")
 
-    $page_copy = [
+    page_copy@ = {
         "hero_title": "TICKETHO",
         "hero_subtitle": "Friendly team ticketing with a cleaner front door.",
         "hero_body": "TICKETHO helps teams collect tickets, guide new reporters into the right place, and keep work organized without making the process feel heavy. It is free to use and offered as part of the Syndorela Kingdom educational initiative.",
@@ -25,30 +25,30 @@
         "soon_body": "TICKETHO already covers the essential path into team ticketing, and there is plenty more waiting on the workbench.",
         "final_heading": "Ready to open a better ticket door?",
         "final_body": "Start with a friendlier workflow, invite your team, and let TICKETHO do the guiding."
+    }
+
+    feature_cards@ = [
+        { "title": "Team-Based Tickets", "desc": "Keep incoming work organized by team so requests land where they belong instead of drifting through inbox fog." },
+        { "title": "Public Intake Links", "desc": "Let each team generate its own intake entry point for cleaner routing and fewer misplaced requests." },
+        { "title": "Guided Reporter Onboarding", "desc": "New reporters confirm their email, log in automatically, and land right inside the correct ticket flow." },
+        { "title": "Reporter-Friendly Access", "desc": "Reporters can return later and view their own tickets without wandering through staff-only screens." },
+        { "title": "Custom Status Workflows", "desc": "Start with sensible defaults and expand into team-specific statuses as your process takes shape." },
+        { "title": "Simple Admin Controls", "desc": "Manage members, roles, intake links, and ticket flow from one clean team workspace." },
+        { "title": "Mobile-Friendly Pages", "desc": "Built to stay readable and usable on smaller screens when people are away from their desks." },
+        { "title": "Built for Extension", "desc": "Ready for future comments, attachments, reply-based updates, watchers, and richer integrations." },
+        { "title": "Educational Basil Demo", "desc": "A practical example of how Basil templating and app logic can come together in a real little product." }
     ]
 
-    $feature_cards = [
-        [ "title": "Team-Based Tickets", "desc": "Keep incoming work organized by team so requests land where they belong instead of drifting through inbox fog." ],
-        [ "title": "Public Intake Links", "desc": "Let each team generate its own intake entry point for cleaner routing and fewer misplaced requests." ],
-        [ "title": "Guided Reporter Onboarding", "desc": "New reporters confirm their email, log in automatically, and land right inside the correct ticket flow." ],
-        [ "title": "Reporter-Friendly Access", "desc": "Reporters can return later and view their own tickets without wandering through staff-only screens." ],
-        [ "title": "Custom Status Workflows", "desc": "Start with sensible defaults and expand into team-specific statuses as your process takes shape." ],
-        [ "title": "Simple Admin Controls", "desc": "Manage members, roles, intake links, and ticket flow from one clean team workspace." ],
-        [ "title": "Mobile-Friendly Pages", "desc": "Built to stay readable and usable on smaller screens when people are away from their desks." ],
-        [ "title": "Built for Extension", "desc": "Ready for future comments, attachments, reply-based updates, watchers, and richer integrations." ],
-        [ "title": "Educational Basil Demo", "desc": "A practical example of how Basil templating and app logic can come together in a real little product." ]
+    how_it_works_steps@ = [
+        { "step": "1", "title": "Create a team intake link", "desc": "A team admin generates a public link for their team so new requests can arrive through the right front door." },
+        { "step": "2", "title": "Reporter enters basic details", "desc": "The visitor provides their name, phone number, and email address to begin the process." },
+        { "step": "3", "title": "Confirmation link arrives", "desc": "TICKETHO sends a secure email link that confirms the account and doubles as an instant login." },
+        { "step": "4", "title": "Auto-login to the ticket form", "desc": "Clicking the link drops the reporter directly into the correct ticket form for that team." },
+        { "step": "5", "title": "Ticket lands in the right place", "desc": "The new ticket is created inside the intended team, or in the default team when using the generic intake path." },
+        { "step": "6", "title": "Come back anytime", "desc": "The reporter can log in later and check only their own tickets without any extra maze-solving." }
     ]
 
-    $how_it_works_steps = [
-        [ "step": "1", "title": "Create a team intake link", "desc": "A team admin generates a public link for their team so new requests can arrive through the right front door." ],
-        [ "step": "2", "title": "Reporter enters basic details", "desc": "The visitor provides their name, phone number, and email address to begin the process." ],
-        [ "step": "3", "title": "Confirmation link arrives", "desc": "TICKETHO sends a secure email link that confirms the account and doubles as an instant login." ],
-        [ "step": "4", "title": "Auto-login to the ticket form", "desc": "Clicking the link drops the reporter directly into the correct ticket form for that team." ],
-        [ "step": "5", "title": "Ticket lands in the right place", "desc": "The new ticket is created inside the intended team, or in the default team when using the generic intake path." ],
-        [ "step": "6", "title": "Come back anytime", "desc": "The reporter can log in later and check only their own tickets without any extra maze-solving." ]
-    ]
-
-    $coming_soon_items = [
+    coming_soon_items@ = [
         "Custom intake forms for each team",
         "Ticket comments and discussion threads",
         "File attachments",
@@ -66,17 +66,17 @@
         "Staff notes and internal collaboration tools"
     ]
 
-    $quote_cards = [
-        [ "quote": "It feels like a real ticket system, but somehow less grumpy.", "by": "A pleasantly surprised team admin" ],
-        [ "quote": "Our reporters actually made it to the form without needing a map.", "by": "Someone who has met normal intake pages before" ],
-        [ "quote": "Clean enough for real work, light enough for a demo kingdom.", "by": "An admirer of tidy little systems" ]
+    quote_cards@ = [
+        { "quote": "It feels like a real ticket system, but somehow less grumpy.", "by": "A pleasantly surprised team admin" },
+        { "quote": "Our reporters actually made it to the form without needing a map.", "by": "Someone who has met normal intake pages before" },
+        { "quote": "Clean enough for real work, light enough for a demo kingdom.", "by": "An admirer of tidy little systems" }
     ]
 ?>
 
 <section class="hero">
-    <h1><?= $page_copy["hero_title"] ?></h1>
-    <p class="subtitle"><?= $page_copy["hero_subtitle"] ?></p>
-    <p><?= $page_copy["hero_body"] ?></p>
+    <h1><?= page_copy@["hero_title"] ?></h1>
+    <p class="subtitle"><?= page_copy@["hero_subtitle"] ?></p>
+    <p><?= page_copy@["hero_body"] ?></p>
     <div class="hero-actions">
         <a href="register.basil" class="btn btn-primary">Get Started Free</a>
         <a href="intake.basil" class="btn btn-secondary">Submit a Ticket</a>
@@ -84,66 +84,66 @@
 </section>
 
 <section id="features" class="feature-grid">
-    <h2><?= $page_copy["features_heading"] ?></h2>
-    <p><?= $page_copy["features_body"] ?></p>
+    <h2><?= page_copy@["features_heading"] ?></h2>
+    <p><?= page_copy@["features_body"] ?></p>
     <div class="cards">
-        <?basil foreach ($feature_cards as $card) { ?>
+        <?basil FOR EACH card@ IN feature_cards@ { ?>
             <article class="card">
-                <h3><?= $card["title"] ?></h3>
-                <p><?= $card["desc"] ?></p>
+                <h3><?= card@["title"] ?></h3>
+                <p><?= card@["desc"] ?></p>
             </article>
-        <?basil } ?>
+        <?basil } NEXT ?>
     </div>
 </section>
 
 <section id="how-it-works" class="how-it-works">
-    <h2><?= $page_copy["how_heading"] ?></h2>
-    <p><?= $page_copy["how_body"] ?></p>
+    <h2><?= page_copy@["how_heading"] ?></h2>
+    <p><?= page_copy@["how_body"] ?></p>
     <div class="steps">
-        <?basil foreach ($how_it_works_steps as $step) { ?>
+        <?basil FOR EACH step@ IN how_it_works_steps@ { ?>
             <div class="step">
-                <div class="step-num"><?= $step["step"] ?></div>
-                <h3><?= $step["title"] ?></h3>
-                <p><?= $step["desc"] ?></p>
+                <div class="step-num"><?= step@["step"] ?></div>
+                <h3><?= step@["title"] ?></h3>
+                <p><?= step@["desc"] ?></p>
             </div>
-        <?basil } ?>
+        <?basil } NEXT ?>
     </div>
 </section>
 
 <section class="syndorela-initiative">
-    <h2><?= $page_copy["free_heading"] ?></h2>
-    <p><?= $page_copy["free_body"] ?></p>
+    <h2><?= page_copy@["free_heading"] ?></h2>
+    <p><?= page_copy@["free_body"] ?></p>
     <p><a href="https://syndorela.com" class="btn btn-ghost">Visit Syndorela Kingdom</a></p>
 </section>
 
 <section class="quotes">
     <div class="cards">
-        <?basil foreach ($quote_cards as $quote) { ?>
+        <?basil FOR EACH quote@ IN quote_cards@ { ?>
             <div class="card quote-card">
-                <p class="quote">"<?= HTML$(quote["quote"]) ?>"</p>
-                <p class="by">- <?= HTML$(quote["by"]) ?></p>
+                <p class="quote">"<?= HTML$(quote@["quote"]) ?>"</p>
+                <p class="by">- <?= HTML$(quote@["by"]) ?></p>
             </div>
-        <?basil } ?>
+        <?basil } NEXT ?>
     </div>
 </section>
 
 <section id="coming-soon" class="coming-soon">
-    <h2><?= $page_copy["soon_heading"] ?></h2>
-    <p><?= $page_copy["soon_body"] ?></p>
+    <h2><?= page_copy@["soon_heading"] ?></h2>
+    <p><?= page_copy@["soon_body"] ?></p>
     <ul>
-        <?basil foreach ($coming_soon_items as $item) { ?>
-            <li><?= $item ?></li>
-        <?basil } ?>
+        <?basil FOR EACH item$ IN coming_soon_items@ { ?>
+            <li><?= item$ ?></li>
+        <?basil } NEXT ?>
     </ul>
 </section>
 
 <section class="final-cta">
-    <h2><?= $page_copy["final_heading"] ?></h2>
-    <p><?= $page_copy["final_body"] ?></p>
+    <h2><?= page_copy@["final_heading"] ?></h2>
+    <p><?= page_copy@["final_body"] ?></p>
     <a href="register.basil" class="btn btn-primary">Create Your Account</a>
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

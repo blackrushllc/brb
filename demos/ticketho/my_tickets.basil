@@ -10,8 +10,7 @@
 
     msg$ = param$("msg")
 
-    DIM rows$(0,0)
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.reporter_user_id = " + STR$(user_id%) + " ORDER BY t.created_at DESC")
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.reporter_user_id = " + STR$(user_id%) + " ORDER BY t.created_at DESC")
     
     _ = send_header_ok_html()
     _ = layout_start("My Tickets")

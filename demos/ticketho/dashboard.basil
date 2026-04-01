@@ -9,14 +9,12 @@
     END IF
 
     // Get user details
-    DIM urows$(0,0)
-    urows$() = SQLITE_QUERY2D$(db%, "SELECT name FROM users WHERE id = " + STR$(user_id%))
+    urows$ = SQLITE_QUERY2D$(db%, "SELECT name FROM users WHERE id = " + STR$(user_id%))
     user_name$ = "User"
     IF ARRAY_ROWS%(urows$) > 0 THEN user_name$ = urows$(0,0)
 
     // Get user teams
-    DIM trows$(0,0)
-    trows$() = SQLITE_QUERY2D$(db%, "SELECT t.id, t.name, m.role FROM teams t JOIN team_members m ON t.id = m.team_id WHERE m.user_id = " + STR$(user_id%))
+    trows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.name, m.role FROM teams t JOIN team_members m ON t.id = m.team_id WHERE m.user_id = " + STR$(user_id%))
     
     _ = send_header_ok_html()
     _ = layout_start("Dashboard")

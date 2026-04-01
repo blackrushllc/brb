@@ -34,8 +34,7 @@
             err$ = "Please fill in all required fields."
         ELSE
             // Get default status (Pending)
-            DIM srows$(0,0)
-            srows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM statuses WHERE name = 'Pending' LIMIT 1")
+            srows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM statuses WHERE name = 'Pending' LIMIT 1")
             status_id% = 0
             IF ARRAY_ROWS%(srows$) > 0 THEN status_id% = VAL(srows$(0,0))
             

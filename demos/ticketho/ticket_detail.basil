@@ -14,8 +14,7 @@
         EXIT 0
     END IF
 
-    DIM rows$(0,0)
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, t.description, s.name, t.created_at, t.team_id, t.reporter_user_id, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.id = " + STR$(ticket_id%))
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, t.description, s.name, t.created_at, t.team_id, t.reporter_user_id, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.id = " + STR$(ticket_id%))
     
     IF ARRAY_ROWS%(rows$) == 0 THEN
         _ = send_header_ok_html()

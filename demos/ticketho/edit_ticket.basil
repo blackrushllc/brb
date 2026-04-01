@@ -14,8 +14,7 @@
         EXIT 0
     END IF
 
-    DIM rows$(0,0)
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT team_id, title, status_id FROM tickets WHERE id = " + STR$(ticket_id%))
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT team_id, title, status_id FROM tickets WHERE id = " + STR$(ticket_id%))
     IF ARRAY_ROWS%(rows$) == 0 THEN
         _ = send_header_redirect("dashboard.basil")
         EXIT 0
@@ -46,8 +45,7 @@
     END IF
 
     // Get statuses
-    DIM srows$(0,0)
-    srows$() = SQLITE_QUERY2D$(db%, "SELECT id, name FROM statuses ORDER BY id ASC")
+    srows$ = SQLITE_QUERY2D$(db%, "SELECT id, name FROM statuses ORDER BY id ASC")
     
     _ = send_header_ok_html()
     _ = layout_start("Edit Ticket: " + rows$(0, 1))
@@ -62,7 +60,7 @@
                 <label for="status_id">Update Status</label>
                 <select id="status_id" name="status_id">
                     <?basil FOR i% = 0 TO ARRAY_ROWS%(srows$) - 1 ?>
-                        <option value="<?= srows$(i%, 0) ?>" <?= (VAL(srows$(i%, 0)) == current_status_id% ? "selected" : "") ?>>
+                        <option value="<?= srows$(i%, 0) ?>" <?basil IF VAL(srows$(i%, 0)) == current_status_id% THEN ?>selected<?basil END IF ?>>
                             <?= HTML$(srows$(i%, 1)) ?>
                         </option>
                     <?basil NEXT ?>

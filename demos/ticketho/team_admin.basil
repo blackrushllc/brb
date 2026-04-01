@@ -39,18 +39,15 @@
     END IF
 
     // Get team name
-    DIM trows$(0,0)
-    trows$() = SQLITE_QUERY2D$(db%, "SELECT name FROM teams WHERE id = " + STR$(team_id%))
+    trows$ = SQLITE_QUERY2D$(db%, "SELECT name FROM teams WHERE id = " + STR$(team_id%))
     team_name$ = "Team"
     IF ARRAY_ROWS%(trows$) > 0 THEN team_name$ = trows$(0,0)
 
     // Get intake links
-    DIM lrows$(0,0)
-    lrows$() = SQLITE_QUERY2D$(db%, "SELECT id, token, label, active, created_at FROM public_intake_links WHERE team_id = " + STR$(team_id%) + " ORDER BY created_at DESC")
+    lrows$ = SQLITE_QUERY2D$(db%, "SELECT id, token, label, active, created_at FROM public_intake_links WHERE team_id = " + STR$(team_id%) + " ORDER BY created_at DESC")
     
     // Get members
-    DIM mrows$(0,0)
-    mrows$() = SQLITE_QUERY2D$(db%, "SELECT u.id, u.name, u.email, m.role, m.joined_at FROM users u JOIN team_members m ON u.id = m.user_id WHERE m.team_id = " + STR$(team_id%) + " ORDER BY m.joined_at ASC")
+    mrows$ = SQLITE_QUERY2D$(db%, "SELECT u.id, u.name, u.email, m.role, m.joined_at FROM users u JOIN team_members m ON u.id = m.user_id WHERE m.team_id = " + STR$(team_id%) + " ORDER BY m.joined_at ASC")
 
     _ = send_header_ok_html()
     _ = layout_start("Admin: " + team_name$)
@@ -82,7 +79,7 @@
                         <tr>
                             <td><?= HTML$(lrows$(i%, 2)) ?></td>
                             <td><code>intake.basil?token=<?= lrows$(i%, 1) ?></code></td>
-                            <td><?= (lrows$(i%, 3) == "1" ? "Active" : "Inactive") ?></td>
+                            <td><?basil IF lrows$(i%, 3) == "1" THEN ?>Active<?basil ELSE ?>Inactive<?basil END IF ?></td>
                             <td><?= HTML$(lrows$(i%, 4)) ?></td>
                         </tr>
                     <?basil NEXT ?>

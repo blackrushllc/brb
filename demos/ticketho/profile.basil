@@ -47,8 +47,7 @@
     END IF
 
     // Fetch user info
-    DIM urows$(0,0)
-    urows$() = SQLITE_QUERY2D$(db%, "SELECT name, email, phone, avatar_path FROM users WHERE id = " + STR$(user_id%))
+    urows$ = SQLITE_QUERY2D$(db%, "SELECT name, email, phone, avatar_path FROM users WHERE id = " + STR$(user_id%))
     user_name$ = urows$(0, 0)
     user_email$ = urows$(0, 1)
     user_phone$ = urows$(0, 2)

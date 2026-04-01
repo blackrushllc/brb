@@ -11,14 +11,12 @@
     
     team_id% = 0
     IF LEN(token$) > 0 THEN
-        DIM trows$(0,0)
-        trows$() = SQLITE_QUERY2D$(db%, "SELECT team_id FROM public_intake_links WHERE token = '" + token$ + "' AND active = 1")
+        trows$ = SQLITE_QUERY2D$(db%, "SELECT team_id FROM public_intake_links WHERE token = '" + token$ + "' AND active = 1")
         IF ARRAY_ROWS%(trows$) > 0 THEN
             team_id% = VAL(trows$(0,0))
         END IF
     ELSEIF LEN(slug$) > 0 THEN
-        DIM srows$(0,0)
-        srows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE slug = '" + slug$ + "'")
+        srows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE slug = '" + slug$ + "'")
         IF ARRAY_ROWS%(srows$) > 0 THEN
             team_id% = VAL(srows$(0,0))
         END IF
@@ -37,8 +35,7 @@
             err$ = "Please fill in your name and email."
         ELSE
             // Check if user exists, or create pending user
-            DIM urows$(0,0)
-            urows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "'")
+            urows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "'")
             user_id% = 0
             IF ARRAY_ROWS%(urows$) > 0 THEN
                 user_id% = VAL(urows$(0,0))

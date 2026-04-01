@@ -40,21 +40,20 @@ END FUNC
 
 FUNC seed_defaults%(db%)
     // Seed System User
-    DIM rows$(0,0)
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE id = 1")
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE id = 1")
     IF ARRAY_ROWS%(rows$) == 0 THEN
         _ = SQLITE_EXEC%(db%, "INSERT INTO users (id, name, email, created_at) VALUES (1, 'System', 'system@ticketho.demo', DATETIME('now'))")
     END IF
 
     // Seed Default Team
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE id = 1")
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE id = 1")
     IF ARRAY_ROWS%(rows$) == 0 THEN
         _ = SQLITE_EXEC%(db%, "INSERT INTO teams (id, owner_id, name, slug, created_at) VALUES (1, 1, 'Default Team', 'default', DATETIME('now'))")
         _ = SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (1, 1, 'owner', DATETIME('now'))")
     END IF
 
     // Seed Default Statuses
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM statuses LIMIT 1")
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM statuses LIMIT 1")
     IF ARRAY_ROWS%(rows$) == 0 THEN
         _ = SQLITE_EXEC%(db%, "INSERT INTO statuses (name, color) VALUES ('Pending', '#ffc107')")
         _ = SQLITE_EXEC%(db%, "INSERT INTO statuses (name, color) VALUES ('Approved', '#17a2b8')")
@@ -90,8 +89,7 @@ FUNC get_default_team_id%()
 END FUNC
 
 FUNC get_user_role$(db%, team_id%, user_id%)
-    DIM rows$(0,0)
-    rows$() = SQLITE_QUERY2D$(db%, "SELECT role FROM team_members WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(user_id%))
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT role FROM team_members WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(user_id%))
     IF ARRAY_ROWS%(rows$) > 0 THEN
         RETURN rows$(0,0)
     END IF
