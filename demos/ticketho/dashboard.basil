@@ -1,0 +1,65 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        _ = send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    // Get user details
+    DIM urows$(0,0)
+    urows$() = SQLITE_QUERY2D$(db%, "SELECT name FROM users WHERE id = " + STR$(user_id%))
+    user_name$ = "User"
+    IF ARRAY_ROWS%(urows$) > 0 THEN user_name$ = urows$(0,0)
+
+    // Get user teams
+    DIM trows$(0,0)
+    trows$() = SQLITE_QUERY2D$(db%, "SELECT t.id, t.name, m.role FROM teams t JOIN team_members m ON t.id = m.team_id WHERE m.user_id = " + STR$(user_id%))
+    
+    _ = send_header_ok_html()
+    _ = layout_start("Dashboard")
+?>
+
+<section class="dashboard">
+    <h2>Welcome back, <?= HTML$(user_name$) ?>!</h2>
+    
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>My Teams</h3>
+            <?basil IF ARRAY_ROWS%(trows$) == 0 THEN ?>
+                <p>You are not a member of any teams yet.</p>
+            <?basil ELSE ?>
+                <ul class="team-list">
+                    <?basil FOR i% = 0 TO ARRAY_ROWS%(trows$) - 1 ?>
+                        <li>
+                            <strong><?= HTML$(trows$(i%, 1)) ?></strong> (<?= HTML$(trows$(i%, 2)) ?>)
+                            <div class="team-actions">
+                                <a href="team_tickets.basil?team_id=<?= trows$(i%, 0) ?>" class="btn btn-small">View Tickets</a>
+                                <?basil IF trows$(i%, 2) == "owner" OR trows$(i%, 2) == "admin" THEN ?>
+                                    <a href="team_admin.basil?team_id=<?= trows$(i%, 0) ?>" class="btn btn-small btn-ghost">Admin</a>
+                                <?basil END IF ?>
+                            </div>
+                        </li>
+                    <?basil NEXT ?>
+                </ul>
+            <?basil END IF ?>
+        </div>
+
+        <div class="card">
+            <h3>Quick Actions</h3>
+            <div class="quick-actions">
+                <a href="my_tickets.basil" class="btn btn-primary btn-block">View My Tickets</a>
+                <a href="create_ticket.basil" class="btn btn-secondary btn-block">New Ticket</a>
+                <a href="create_team.basil" class="btn btn-ghost btn-block">Create New Team</a>
+                <a href="profile.basil" class="btn btn-ghost btn-block">Edit Profile</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?basil
+    _ = layout_end()
+    SQLITE_CLOSE(db%)
+?>

@@ -17,6 +17,20 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="BASILSQL on BOB">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="BASRUN on BOB">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="BRB on BOB">
         <serverdata>
           <mappings>
@@ -45,6 +59,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="Collections on Bob">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="DIGITALOCEAN">
         <serverdata>
           <mappings>
@@ -53,6 +74,13 @@
         </serverdata>
       </paths>
       <paths name="Erik/Basic">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="Erik/BreakersDNA">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />
@@ -172,6 +200,41 @@
         </serverdata>
       </paths>
       <paths name="TMV3">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="atomicflix.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="basilbasic.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="cosmonascence.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="dev.atomicflix.com">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="redeemer">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

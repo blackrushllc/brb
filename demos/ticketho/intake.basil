@@ -1,0 +1,114 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    method$ = ENV$("REQUEST_METHOD")
+    err$ = ""
+    msg$ = ""
+    
+    token$ = param$("token")
+    slug$ = param$("slug")
+    
+    team_id% = 0
+    IF LEN(token$) > 0 THEN
+        DIM trows$(0,0)
+        trows$() = SQLITE_QUERY2D$(db%, "SELECT team_id FROM public_intake_links WHERE token = '" + token$ + "' AND active = 1")
+        IF ARRAY_ROWS%(trows$) > 0 THEN
+            team_id% = VAL(trows$(0,0))
+        END IF
+    ELSEIF LEN(slug$) > 0 THEN
+        DIM srows$(0,0)
+        srows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE slug = '" + slug$ + "'")
+        IF ARRAY_ROWS%(srows$) > 0 THEN
+            team_id% = VAL(srows$(0,0))
+        END IF
+    END IF
+    
+    IF team_id% == 0 THEN
+        team_id% = get_default_team_id%()
+    END IF
+
+    IF method$ == "POST" THEN
+        name$ = param$("name")
+        email$ = param$("email")
+        phone$ = param$("phone")
+
+        IF LEN(name$) == 0 OR LEN(email$) == 0 THEN
+            err$ = "Please fill in your name and email."
+        ELSE
+            // Check if user exists, or create pending user
+            DIM urows$(0,0)
+            urows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "'")
+            user_id% = 0
+            IF ARRAY_ROWS%(urows$) > 0 THEN
+                user_id% = VAL(urows$(0,0))
+                // Update phone if provided
+                IF LEN(phone$) > 0 THEN
+                    _ = SQLITE_EXEC%(db%, "UPDATE users SET name = '" + name$ + "', phone = '" + phone$ + "' WHERE id = " + STR$(user_id%))
+                END IF
+            ELSE
+                _ = SQLITE_EXEC%(db%, "INSERT INTO users (name, email, phone, created_at) VALUES ('" + name$ + "', '" + email$ + "', '" + phone$ + "', DATETIME('now'))")
+                user_id% = SQLITE_LAST_INSERT_ID%(db%)
+            END IF
+            
+            IF user_id% > 0 THEN
+                // Generate magic link
+                login_token$ = random_token$(32)
+                expires$ = "DATETIME('now', '+1 hour')"
+                _ = SQLITE_EXEC%(db%, "INSERT INTO email_login_tokens (user_id, token, purpose, team_id, expires_at, created_at) VALUES (" + STR$(user_id%) + ", '" + login_token$ + "', 'intake_confirm', " + STR$(team_id%) + ", " + expires$ + ", DATETIME('now'))")
+                
+                // In a real app, we'd send an email here.
+                // For the demo, we'll just show the link.
+                confirm_url$ = "confirm.basil?token=" + login_token$
+                msg$ = "A confirmation link has been 'emailed' to you. Since this is a demo, you can click it here: <a href=\"" + confirm_url$ + "\">Confirm and Continue</a>"
+            ELSE
+                err$ = "Failed to process intake."
+            END IF
+        END IF
+    END IF
+
+    _ = send_header_ok_html()
+    _ = layout_start("Submit a Ticket")
+?>
+
+<section class="intake-form">
+    <h2>Submit a Ticket</h2>
+    
+    <?basil IF LEN(msg$) > 0 THEN ?>
+        <div class="alert alert-success"><?= msg$ ?></div>
+    <?basil ELSE ?>
+        <p>Tell us who you are, and we will send you straight to the ticket form.</p>
+
+        <?basil IF LEN(err$) > 0 THEN ?>
+            <div class="alert alert-error"><?= err$ ?></div>
+        <?basil END IF ?>
+
+        <form method="POST" action="intake.basil">
+            <input type="hidden" name="token" value="<?= HTML$(token$) ?>">
+            <input type="hidden" name="slug" value="<?= HTML$(slug$) ?>">
+            
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+                <small>We will use this to confirm your account and send your auto-login link.</small>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number (Optional)</label>
+                <input type="text" id="phone" name="phone">
+                <small>Helpful for teams that may later enable notifications.</small>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Send Confirmation Link</button>
+            </div>
+        </form>
+    <?basil END IF ?>
+</section>
+
+<?basil
+    _ = layout_end()
+    SQLITE_CLOSE(db%)
+?>

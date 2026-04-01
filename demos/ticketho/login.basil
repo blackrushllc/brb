@@ -1,0 +1,60 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    method$ = ENV$("REQUEST_METHOD")
+    err$ = ""
+
+    IF method$ == "POST" THEN
+        email$ = param$("email")
+        pass$ = param$("password")
+
+        IF LEN(email$) == 0 OR LEN(pass$) == 0 THEN
+            err$ = "Please fill in all fields."
+        ELSE
+            DIM rows$(0,0)
+            rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "' AND password_hash = '" + pass$ + "'")
+            IF ARRAY_ROWS%(rows$) > 0 THEN
+                user_id% = VAL(rows$(0,0))
+                _ = set_cookie("auth_user_id", STR$(user_id%))
+                SQLITE_CLOSE(db%)
+                _ = send_header_redirect("dashboard.basil")
+                EXIT 0
+            ELSE
+                err$ = "Invalid email or password."
+            END IF
+        END IF
+    END IF
+
+    _ = send_header_ok_html()
+    _ = layout_start("Login")
+?>
+
+<section class="auth-form">
+    <h2>Login to TICKETHO</h2>
+    <p>Welcome back to the kingdom ticketing system.</p>
+
+    <?basil IF LEN(err$) > 0 THEN ?>
+        <div class="alert alert-error"><?= err$ ?></div>
+    <?basil END IF ?>
+
+    <form method="POST" action="login.basil">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+    </form>
+    <p class="auth-footer">Don't have an account? <a href="register.basil">Register here</a>.</p>
+</section>
+
+<?basil
+    _ = layout_end()
+    SQLITE_CLOSE(db%)
+?>

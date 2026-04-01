@@ -1,0 +1,83 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        _ = send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    team_id% = VAL(param$("team_id"))
+    IF team_id% == 0 THEN
+        _ = send_header_redirect("dashboard.basil")
+        EXIT 0
+    END IF
+
+    // Check if user is staff in team
+    role$ = get_user_role$(db%, team_id%, user_id%)
+    IF role$ == "" OR role$ == "reporter" THEN
+        _ = send_header_ok_html()
+        _ = layout_start("Access Denied")
+        PRINT "<div class=\"alert alert-error\">Only team members can view team tickets.</div>"
+        _ = layout_end()
+        SQLITE_CLOSE(db%)
+        EXIT 0
+    END IF
+
+    // Get team name
+    DIM trows$(0,0)
+    trows$() = SQLITE_QUERY2D$(db%, "SELECT name FROM teams WHERE id = " + STR$(team_id%))
+    team_name$ = "Team"
+    IF ARRAY_ROWS%(trows$) > 0 THEN team_name$ = trows$(0,0)
+
+    DIM rows$(0,0)
+    rows$() = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, u.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN users u ON t.reporter_user_id = u.id WHERE t.team_id = " + STR$(team_id%) + " ORDER BY t.created_at DESC")
+    
+    _ = send_header_ok_html()
+    _ = layout_start(team_name$ + " Tickets")
+?>
+
+<section class="team-tickets">
+    <h2>Tickets for <?= HTML$(team_name$) ?></h2>
+    
+    <div class="card">
+        <?basil IF ARRAY_ROWS%(rows$) == 0 THEN ?>
+            <p>No tickets for this team yet.</p>
+        <?basil ELSE ?>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Reporter</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?basil FOR i% = 0 TO ARRAY_ROWS%(rows$) - 1 ?>
+                        <tr>
+                            <td>#<?= rows$(i%, 0) ?></td>
+                            <td><?= HTML$(rows$(i%, 1)) ?></td>
+                            <td><?= HTML$(rows$(i%, 4)) ?></td>
+                            <td><span class="badge status-<?= HTML$(LOWER$(rows$(i%, 2))) ?>"><?= HTML$(rows$(i%, 2)) ?></span></td>
+                            <td><?= HTML$(rows$(i%, 3)) ?></td>
+                            <td><a href="ticket_detail.basil?id=<?= rows$(i%, 0) ?>" class="btn btn-small">View</a></td>
+                        </tr>
+                    <?basil NEXT ?>
+                </tbody>
+            </table>
+        <?basil END IF ?>
+    </div>
+    
+    <div class="actions">
+        <a href="dashboard.basil" class="btn btn-ghost">Back to Dashboard</a>
+    </div>
+</section>
+
+<?basil
+    _ = layout_end()
+    SQLITE_CLOSE(db%)
+?>

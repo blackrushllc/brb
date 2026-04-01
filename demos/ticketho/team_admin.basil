@@ -1,0 +1,142 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        _ = send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    team_id% = VAL(param$("team_id"))
+    IF team_id% == 0 THEN
+        _ = send_header_redirect("dashboard.basil")
+        EXIT 0
+    END IF
+
+    // Check if user is admin in team
+    role$ = get_user_role$(db%, team_id%, user_id%)
+    IF role$ <> "owner" AND role$ <> "admin" THEN
+        _ = send_header_ok_html()
+        _ = layout_start("Access Denied")
+        PRINT "<div class=\"alert alert-error\">You do not have administrative access to this team.</div>"
+        _ = layout_end()
+        SQLITE_CLOSE(db%)
+        EXIT 0
+    END IF
+
+    // Handle new intake link
+    IF ENV$("REQUEST_METHOD") == "POST" THEN
+        action$ = param$("action")
+        IF action$ == "create_link" THEN
+            label$ = param$("label")
+            token$ = random_token$(16)
+            _ = SQLITE_EXEC%(db%, "INSERT INTO public_intake_links (team_id, token, label, created_by, created_at) VALUES (" + STR$(team_id%) + ", '" + token$ + "', '" + label$ + "', " + STR$(user_id%) + ", DATETIME('now'))")
+        ELSEIF action$ == "promote" THEN
+            target_user_id% = VAL(param$("user_id"))
+            _ = SQLITE_EXEC%(db%, "UPDATE team_members SET role = 'member' WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(target_user_id%))
+        END IF
+    END IF
+
+    // Get team name
+    DIM trows$(0,0)
+    trows$() = SQLITE_QUERY2D$(db%, "SELECT name FROM teams WHERE id = " + STR$(team_id%))
+    team_name$ = "Team"
+    IF ARRAY_ROWS%(trows$) > 0 THEN team_name$ = trows$(0,0)
+
+    // Get intake links
+    DIM lrows$(0,0)
+    lrows$() = SQLITE_QUERY2D$(db%, "SELECT id, token, label, active, created_at FROM public_intake_links WHERE team_id = " + STR$(team_id%) + " ORDER BY created_at DESC")
+    
+    // Get members
+    DIM mrows$(0,0)
+    mrows$() = SQLITE_QUERY2D$(db%, "SELECT u.id, u.name, u.email, m.role, m.joined_at FROM users u JOIN team_members m ON u.id = m.user_id WHERE m.team_id = " + STR$(team_id%) + " ORDER BY m.joined_at ASC")
+
+    _ = send_header_ok_html()
+    _ = layout_start("Admin: " + team_name$)
+?>
+
+<section class="team-admin">
+    <div class="breadcrumb">
+        <a href="dashboard.basil">Dashboard</a> / Admin: <?= HTML$(team_name$) ?>
+    </div>
+    
+    <h2>Team Admin: <?= HTML$(team_name$) ?></h2>
+    
+    <div class="dashboard-grid">
+        <div class="card">
+            <h3>Public Intake Links</h3>
+            <p>Share these links to allow people to submit tickets to your team.</p>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Link</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?basil FOR i% = 0 TO ARRAY_ROWS%(lrows$) - 1 ?>
+                        <tr>
+                            <td><?= HTML$(lrows$(i%, 2)) ?></td>
+                            <td><code>intake.basil?token=<?= lrows$(i%, 1) ?></code></td>
+                            <td><?= (lrows$(i%, 3) == "1" ? "Active" : "Inactive") ?></td>
+                            <td><?= HTML$(lrows$(i%, 4)) ?></td>
+                        </tr>
+                    <?basil NEXT ?>
+                </tbody>
+            </table>
+            
+            <hr>
+            <h4>Create New Link</h4>
+            <form method="POST">
+                <input type="hidden" name="action" value="create_link">
+                <input type="hidden" name="team_id" value="<?= STR$(team_id%) ?>">
+                <div class="form-group">
+                    <label for="label">Label</label>
+                    <input type="text" id="label" name="label" placeholder="e.g. Website Feedback" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Generate Link</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3>Team Members</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?basil FOR i% = 0 TO ARRAY_ROWS%(mrows$) - 1 ?>
+                        <tr>
+                            <td><?= HTML$(mrows$(i%, 1)) ?><br><small><?= HTML$(mrows$(i%, 2)) ?></small></td>
+                            <td><?= HTML$(mrows$(i%, 3)) ?></td>
+                            <td><?= HTML$(mrows$(i%, 4)) ?></td>
+                            <td>
+                                <?basil IF mrows$(i%, 3) == "reporter" THEN ?>
+                                    <form method="POST" style="display:inline;">
+                                        <input type="hidden" name="action" value="promote">
+                                        <input type="hidden" name="user_id" value="<?= mrows$(i%, 0) ?>">
+                                        <button type="submit" class="btn btn-small">Promote to Member</button>
+                                    </form>
+                                <?basil END IF ?>
+                            </td>
+                        </tr>
+                    <?basil NEXT ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<?basil
+    _ = layout_end()
+    SQLITE_CLOSE(db%)
+?>
