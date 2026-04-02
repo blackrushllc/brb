@@ -17,8 +17,7 @@
             err$ = "Passwords do not match."
         ELSE
             // Check if user exists
-            DIM rows$(0,0)
-            rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "'")
+            rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "'")
             IF ARRAY_ROWS%(rows$) > 0 THEN
                 err$ = "Email already registered."
             ELSE

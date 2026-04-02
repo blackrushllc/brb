@@ -18,8 +18,7 @@
         ELSE
             // Check slug
             IF LEN(slug$) > 0 THEN
-                DIM rows$(0,0)
-                rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE slug = '" + slug$ + "'")
+                rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE slug = '" + slug$ + "'")
                 IF ARRAY_ROWS%(rows$) > 0 THEN
                     err$ = "Slug already taken."
                 END IF

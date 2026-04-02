@@ -8,8 +8,7 @@
     IF LEN(token$) == 0 THEN
         err$ = "Invalid token."
     ELSE
-        DIM rows$(0,0)
-        rows$() = SQLITE_QUERY2D$(db%, "SELECT user_id, purpose, team_id FROM email_login_tokens WHERE token = '" + token$ + "' AND used_at IS NULL AND expires_at > DATETIME('now')")
+        rows$ = SQLITE_QUERY2D$(db%, "SELECT user_id, purpose, team_id FROM email_login_tokens WHERE token = '" + token$ + "' AND used_at IS NULL AND expires_at > DATETIME('now')")
         
         IF ARRAY_ROWS%(rows$) > 0 THEN
             user_id% = VAL(rows$(0,0))
@@ -25,8 +24,7 @@
             // If it was an intake flow, add user to team as reporter
             IF purpose$ == "intake_confirm" THEN
                 // Check if already a member
-                DIM mrows$(0,0)
-                mrows$() = SQLITE_QUERY2D$(db%, "SELECT role FROM team_members WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(user_id%))
+                mrows$ = SQLITE_QUERY2D$(db%, "SELECT role FROM team_members WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(user_id%))
                 IF ARRAY_ROWS%(mrows$) == 0 THEN
                     _ = SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", 'reporter', DATETIME('now'))")
                 END IF

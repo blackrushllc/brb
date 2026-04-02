@@ -12,8 +12,7 @@
         IF LEN(email$) == 0 OR LEN(pass$) == 0 THEN
             err$ = "Please fill in all fields."
         ELSE
-            DIM rows$(0,0)
-            rows$() = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "' AND password_hash = '" + pass$ + "'")
+            rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "' AND password_hash = '" + pass$ + "'")
             IF ARRAY_ROWS%(rows$) > 0 THEN
                 user_id% = VAL(rows$(0,0))
                 _ = set_cookie("auth_user_id", STR$(user_id%))
