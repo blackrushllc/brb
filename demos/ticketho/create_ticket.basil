@@ -4,7 +4,7 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
@@ -17,10 +17,10 @@
     // Check if user is in team
     role$ = get_user_role$(db%, team_id%, user_id%)
     IF role$ == "" THEN
-        _ = send_header_ok_html()
-        _ = layout_start("Access Denied")
+        send_header_ok_html()
+        layout_start("Access Denied")
         PRINT "<div class=\"alert alert-error\">You do not have access to this team.</div>"
-        _ = layout_end()
+        layout_end()
         SQLITE_CLOSE(db%)
         EXIT 0
     END IF
@@ -38,11 +38,11 @@
             status_id% = 0
             IF ARRAY_ROWS%(srows$) > 0 THEN status_id% = VAL(srows$(0,0))
             
-            _ = SQLITE_EXEC%(db%, "INSERT INTO tickets (team_id, reporter_user_id, title, description, status_id, created_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", '" + title$ + "', '" + desc$ + "', " + STR$(status_id%) + ", DATETIME('now'))")
+            SQLITE_EXEC%(db%, "INSERT INTO tickets (team_id, reporter_user_id, title, description, status_id, created_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", '" + title$ + "', '" + desc$ + "', " + STR$(status_id%) + ", DATETIME('now'))")
             ticket_id% = SQLITE_LAST_INSERT_ID%(db%)
             
             IF ticket_id% > 0 THEN
-                _ = send_header_redirect("my_tickets.basil?msg=Ticket created successfully.")
+                send_header_redirect("my_tickets.basil?msg=Ticket created successfully.")
                 SQLITE_CLOSE(db%)
                 EXIT 0
             ELSE
@@ -51,8 +51,8 @@
         END IF
     END IF
 
-    _ = send_header_ok_html()
-    _ = layout_start("Create Ticket")
+    send_header_ok_html()
+    layout_start("Create Ticket")
 ?>
 
 <section class="create-ticket">
@@ -80,6 +80,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

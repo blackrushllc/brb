@@ -4,7 +4,7 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
@@ -12,8 +12,8 @@
 
     rows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.reporter_user_id = " + STR$(user_id%) + " ORDER BY t.created_at DESC")
     
-    _ = send_header_ok_html()
-    _ = layout_start("My Tickets")
+    send_header_ok_html()
+    layout_start("My Tickets")
 ?>
 
 <section class="my-tickets">
@@ -61,6 +61,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

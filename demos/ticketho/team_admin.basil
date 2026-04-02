@@ -4,23 +4,23 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
     team_id% = VAL(param$("team_id"))
     IF team_id% == 0 THEN
-        _ = send_header_redirect("dashboard.basil")
+        send_header_redirect("dashboard.basil")
         EXIT 0
     END IF
 
     // Check if user is admin in team
     role$ = get_user_role$(db%, team_id%, user_id%)
     IF role$ <> "owner" AND role$ <> "admin" THEN
-        _ = send_header_ok_html()
-        _ = layout_start("Access Denied")
+        send_header_ok_html()
+        layout_start("Access Denied")
         PRINT "<div class=\"alert alert-error\">You do not have administrative access to this team.</div>"
-        _ = layout_end()
+        layout_end()
         SQLITE_CLOSE(db%)
         EXIT 0
     END IF
@@ -31,10 +31,10 @@
         IF action$ == "create_link" THEN
             label$ = param$("label")
             token$ = random_token$(16)
-            _ = SQLITE_EXEC%(db%, "INSERT INTO public_intake_links (team_id, token, label, created_by, created_at) VALUES (" + STR$(team_id%) + ", '" + token$ + "', '" + label$ + "', " + STR$(user_id%) + ", DATETIME('now'))")
+            SQLITE_EXEC%(db%, "INSERT INTO public_intake_links (team_id, token, label, created_by, created_at) VALUES (" + STR$(team_id%) + ", '" + token$ + "', '" + label$ + "', " + STR$(user_id%) + ", DATETIME('now'))")
         ELSEIF action$ == "promote" THEN
             target_user_id% = VAL(param$("user_id"))
-            _ = SQLITE_EXEC%(db%, "UPDATE team_members SET role = 'member' WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(target_user_id%))
+            SQLITE_EXEC%(db%, "UPDATE team_members SET role = 'member' WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(target_user_id%))
         END IF
     END IF
 
@@ -49,8 +49,8 @@
     // Get members
     mrows$ = SQLITE_QUERY2D$(db%, "SELECT u.id, u.name, u.email, m.role, m.joined_at FROM users u JOIN team_members m ON u.id = m.user_id WHERE m.team_id = " + STR$(team_id%) + " ORDER BY m.joined_at ASC")
 
-    _ = send_header_ok_html()
-    _ = layout_start("Admin: " + team_name$)
+    send_header_ok_html()
+    layout_start("Admin: " + team_name$)
 ?>
 
 <section class="team-admin">
@@ -134,6 +134,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

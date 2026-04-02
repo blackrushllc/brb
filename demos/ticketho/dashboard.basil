@@ -4,7 +4,7 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
@@ -16,8 +16,8 @@
     // Get user teams
     trows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.name, m.role FROM teams t JOIN team_members m ON t.id = m.team_id WHERE m.user_id = " + STR$(user_id%))
     
-    _ = send_header_ok_html()
-    _ = layout_start("Dashboard")
+    send_header_ok_html()
+    layout_start("Dashboard")
 ?>
 
 <section class="dashboard">
@@ -58,6 +58,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

@@ -41,10 +41,10 @@
                 user_id% = VAL(urows$(0,0))
                 // Update phone if provided
                 IF LEN(phone$) > 0 THEN
-                    _ = SQLITE_EXEC%(db%, "UPDATE users SET name = '" + name$ + "', phone = '" + phone$ + "' WHERE id = " + STR$(user_id%))
+                    SQLITE_EXEC%(db%, "UPDATE users SET name = '" + name$ + "', phone = '" + phone$ + "' WHERE id = " + STR$(user_id%))
                 END IF
             ELSE
-                _ = SQLITE_EXEC%(db%, "INSERT INTO users (name, email, phone, created_at) VALUES ('" + name$ + "', '" + email$ + "', '" + phone$ + "', DATETIME('now'))")
+                SQLITE_EXEC%(db%, "INSERT INTO users (name, email, phone, created_at) VALUES ('" + name$ + "', '" + email$ + "', '" + phone$ + "', DATETIME('now'))")
                 user_id% = SQLITE_LAST_INSERT_ID%(db%)
             END IF
             
@@ -52,7 +52,7 @@
                 // Generate magic link
                 login_token$ = random_token$(32)
                 expires$ = "DATETIME('now', '+1 hour')"
-                _ = SQLITE_EXEC%(db%, "INSERT INTO email_login_tokens (user_id, token, purpose, team_id, expires_at, created_at) VALUES (" + STR$(user_id%) + ", '" + login_token$ + "', 'intake_confirm', " + STR$(team_id%) + ", " + expires$ + ", DATETIME('now'))")
+                SQLITE_EXEC%(db%, "INSERT INTO email_login_tokens (user_id, token, purpose, team_id, expires_at, created_at) VALUES (" + STR$(user_id%) + ", '" + login_token$ + "', 'intake_confirm', " + STR$(team_id%) + ", " + expires$ + ", DATETIME('now'))")
                 
                 // In a real app, we'd send an email here.
                 // For the demo, we'll just show the link.
@@ -64,8 +64,8 @@
         END IF
     END IF
 
-    _ = send_header_ok_html()
-    _ = layout_start("Submit a Ticket")
+    send_header_ok_html()
+    layout_start("Submit a Ticket")
 ?>
 
 <section class="intake-form">
@@ -106,6 +106,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

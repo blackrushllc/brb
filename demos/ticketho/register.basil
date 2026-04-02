@@ -22,18 +22,18 @@
                 err$ = "Email already registered."
             ELSE
                 // Create user
-                _ = SQLITE_EXEC%(db%, "INSERT INTO users (name, email, password_hash, created_at) VALUES ('" + name$ + "', '" + email$ + "', '" + pass$ + "', DATETIME('now'))")
+                SQLITE_EXEC%(db%, "INSERT INTO users (name, email, password_hash, created_at) VALUES ('" + name$ + "', '" + email$ + "', '" + pass$ + "', DATETIME('now'))")
                 user_id% = SQLITE_LAST_INSERT_ID%(db%)
                 
                 IF user_id% > 0 THEN
                     // Join default team
                     def_tid% = get_default_team_id%()
-                    _ = SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(def_tid%) + ", " + STR$(user_id%) + ", 'member', DATETIME('now'))")
+                    SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(def_tid%) + ", " + STR$(user_id%) + ", 'member', DATETIME('now'))")
                     
                     // Set cookie
-                    _ = set_cookie("auth_user_id", STR$(user_id%))
+                    set_cookie("auth_user_id", STR$(user_id%))
                     SQLITE_CLOSE(db%)
-                    _ = send_header_redirect("dashboard.basil")
+                    send_header_redirect("dashboard.basil")
                     EXIT 0
                 ELSE
                     err$ = "Registration failed."
@@ -42,8 +42,8 @@
         END IF
     END IF
 
-    _ = send_header_ok_html()
-    _ = layout_start("Register")
+    send_header_ok_html()
+    layout_start("Register")
 ?>
 
 <section class="auth-form">
@@ -79,6 +79,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

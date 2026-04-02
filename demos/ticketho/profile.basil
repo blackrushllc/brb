@@ -4,7 +4,7 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
@@ -41,7 +41,7 @@
                 query$ = query$ + ", avatar_path = '" + avatar_path$ + "'"
             END IF
             query$ = query$ + ", updated_at = DATETIME('now') WHERE id = " + STR$(user_id%)
-            _ = SQLITE_EXEC%(db%, query$)
+            SQLITE_EXEC%(db%, query$)
             msg$ = "Profile updated successfully."
         END IF
     END IF
@@ -53,8 +53,8 @@
     user_phone$ = urows$(0, 2)
     user_avatar$ = urows$(0, 3)
     
-    _ = send_header_ok_html()
-    _ = layout_start("My Profile")
+    send_header_ok_html()
+    layout_start("My Profile")
 ?>
 
 <section class="profile-page">
@@ -110,6 +110,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

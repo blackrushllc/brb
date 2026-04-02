@@ -4,7 +4,7 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
@@ -25,13 +25,13 @@
             END IF
             
             IF LEN(err$) == 0 THEN
-                _ = SQLITE_EXEC%(db%, "INSERT INTO teams (owner_id, name, slug, created_at) VALUES (" + STR$(user_id%) + ", '" + name$ + "', '" + slug$ + "', DATETIME('now'))")
+                SQLITE_EXEC%(db%, "INSERT INTO teams (owner_id, name, slug, created_at) VALUES (" + STR$(user_id%) + ", '" + name$ + "', '" + slug$ + "', DATETIME('now'))")
                 team_id% = SQLITE_LAST_INSERT_ID%(db%)
                 IF team_id% > 0 THEN
                     // Add creator as owner
-                    _ = SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", 'owner', DATETIME('now'))")
+                    SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", 'owner', DATETIME('now'))")
                     
-                    _ = send_header_redirect("dashboard.basil")
+                    send_header_redirect("dashboard.basil")
                     SQLITE_CLOSE(db%)
                     EXIT 0
                 ELSE
@@ -41,8 +41,8 @@
         END IF
     END IF
 
-    _ = send_header_ok_html()
-    _ = layout_start("Create Team")
+    send_header_ok_html()
+    layout_start("Create Team")
 ?>
 
 <section class="create-team">
@@ -73,6 +73,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

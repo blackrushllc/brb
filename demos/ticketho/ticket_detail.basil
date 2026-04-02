@@ -4,23 +4,24 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
     ticket_id% = VAL(param$("id"))
     IF ticket_id% == 0 THEN
-        _ = send_header_redirect("my_tickets.basil")
+        send_header_redirect("my_tickets.basil")
         EXIT 0
     END IF
 
+
     rows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, t.description, s.name, t.created_at, t.team_id, t.reporter_user_id, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.id = " + STR$(ticket_id%))
-    
+
     IF ARRAY_ROWS%(rows$) == 0 THEN
-        _ = send_header_ok_html()
-        _ = layout_start("Not Found")
+        send_header_ok_html()
+        layout_start("Not Found")
         PRINT "<div class=\"alert alert-error\">Ticket not found.</div>"
-        _ = layout_end()
+        layout_end()
         SQLITE_CLOSE(db%)
         EXIT 0
     END IF
@@ -31,23 +32,23 @@
     // Authorization check
     role$ = get_user_role$(db%, team_id%, user_id%)
     IF role$ == "" THEN
-        _ = send_header_ok_html()
-        _ = layout_start("Access Denied")
+        send_header_ok_html()
+        layout_start("Access Denied")
         PRINT "<div class=\"alert alert-error\">You do not have access to this ticket.</div>"
-        _ = layout_end()
+        layout_end()
         SQLITE_CLOSE(db%)
         EXIT 0
     ELSEIF role$ == "reporter" AND reporter_id% <> user_id% THEN
-        _ = send_header_ok_html()
-        _ = layout_start("Access Denied")
+        send_header_ok_html()
+        layout_start("Access Denied")
         PRINT "<div class=\"alert alert-error\">Reporters can only view their own tickets.</div>"
-        _ = layout_end()
+        layout_end()
         SQLITE_CLOSE(db%)
         EXIT 0
     END IF
     
-    _ = send_header_ok_html()
-    _ = layout_start("Ticket Detail")
+    send_header_ok_html()
+    layout_start("Ticket Detail")
 ?>
 
 <section class="ticket-detail">
@@ -81,6 +82,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

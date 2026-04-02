@@ -33,7 +33,7 @@ END FUNC
     IF check_login%(db%, u$, p$) THEN
         // Set cookie and redirect to user_home
         PRINT "Status: 302 Found\r\n"
-        __d% = set_cookie("user", u$)
+        set_cookie("user", u$)
         PRINT "Location: user_home.basil\r\n\r\n"
         SQLITE_CLOSE(db%)
         EXIT 0
@@ -46,13 +46,13 @@ END FUNC
 END FUNC
 
 // ----- GET or failed POST -> show form -----
-__d% = send_header_ok_html()
-__d% = layout_start("Log in")
+send_header_ok_html()
+layout_start("Log in")
 ?>
 <?basil PRINT READFILE$("views/login.html"); ?>
 <?basil
 IF LEN(err$) > 0 THEN
 PRINT "<p class=\"error\">" + HTML$(err$) + "</p>\n"
 END
-__d% = layout_end()
+layout_end()
 ?>

@@ -15,9 +15,9 @@
             rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "' AND password_hash = '" + pass$ + "'")
             IF ARRAY_ROWS%(rows$) > 0 THEN
                 user_id% = VAL(rows$(0,0))
-                _ = set_cookie("auth_user_id", STR$(user_id%))
+                set_cookie("auth_user_id", STR$(user_id%))
                 SQLITE_CLOSE(db%)
-                _ = send_header_redirect("dashboard.basil")
+                send_header_redirect("dashboard.basil")
                 EXIT 0
             ELSE
                 err$ = "Invalid email or password."
@@ -25,8 +25,8 @@
         END IF
     END IF
 
-    _ = send_header_ok_html()
-    _ = layout_start("Login")
+    send_header_ok_html()
+    layout_start("Login")
 ?>
 
 <section class="auth-form">
@@ -54,6 +54,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

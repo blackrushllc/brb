@@ -4,19 +4,19 @@
     db% = db_open%()
     user_id% = get_current_user_id%()
     IF user_id% == 0 THEN
-        _ = send_header_redirect("login.basil")
+        send_header_redirect("login.basil")
         EXIT 0
     END IF
 
     ticket_id% = VAL(param$("id"))
     IF ticket_id% == 0 THEN
-        _ = send_header_redirect("dashboard.basil")
+        send_header_redirect("dashboard.basil")
         EXIT 0
     END IF
 
     rows$ = SQLITE_QUERY2D$(db%, "SELECT team_id, title, status_id FROM tickets WHERE id = " + STR$(ticket_id%))
     IF ARRAY_ROWS%(rows$) == 0 THEN
-        _ = send_header_redirect("dashboard.basil")
+        send_header_redirect("dashboard.basil")
         EXIT 0
     END IF
     
@@ -26,10 +26,10 @@
     // Check if user is staff in team
     role$ = get_user_role$(db%, team_id%, user_id%)
     IF role$ == "" OR role$ == "reporter" THEN
-        _ = send_header_ok_html()
-        _ = layout_start("Access Denied")
+        send_header_ok_html()
+        layout_start("Access Denied")
         PRINT "<div class=\"alert alert-error\">You do not have permission to edit this ticket.</div>"
-        _ = layout_end()
+        layout_end()
         SQLITE_CLOSE(db%)
         EXIT 0
     END IF
@@ -38,8 +38,8 @@
         new_status_id% = VAL(param$("status_id"))
         notes$ = param$("notes")
         
-        _ = SQLITE_EXEC%(db%, "UPDATE tickets SET status_id = " + STR$(new_status_id%) + ", notes = '" + notes$ + "', updated_at = DATETIME('now') WHERE id = " + STR$(ticket_id%))
-        _ = send_header_redirect("ticket_detail.basil?id=" + STR$(ticket_id%))
+        SQLITE_EXEC%(db%, "UPDATE tickets SET status_id = " + STR$(new_status_id%) + ", notes = '" + notes$ + "', updated_at = DATETIME('now') WHERE id = " + STR$(ticket_id%))
+        send_header_redirect("ticket_detail.basil?id=" + STR$(ticket_id%))
         SQLITE_CLOSE(db%)
         EXIT 0
     END IF
@@ -47,8 +47,8 @@
     // Get statuses
     srows$ = SQLITE_QUERY2D$(db%, "SELECT id, name FROM statuses ORDER BY id ASC")
     
-    _ = send_header_ok_html()
-    _ = layout_start("Edit Ticket: " + rows$(0, 1))
+    send_header_ok_html()
+    layout_start("Edit Ticket: " + rows$(0, 1))
 ?>
 
 <section class="edit-ticket">
@@ -79,6 +79,6 @@
 </section>
 
 <?basil
-    _ = layout_end()
+    layout_end()
     SQLITE_CLOSE(db%)
 ?>

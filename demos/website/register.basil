@@ -59,7 +59,7 @@
             // ... after you’ve validated input and created the user:
             IF _id% > 0 THEN
               // set the session cookie
-              __d% = set_cookie("user", u$)
+              set_cookie("user", u$)
 
               // close DB if it’s open
               SQLITE_CLOSE(db%)
@@ -73,8 +73,8 @@
         SQLITE_CLOSE(db%)
     END
 
-    __d% = send_header_ok_html()
-    __d% = layout_start("Register")
+    send_header_ok_html()
+    layout_start("Register")
 ?>
 <?basil PRINT READFILE$("views/register.html"); ?>
 <?basil
@@ -86,5 +86,5 @@
 
     PRINT "<p class=\"error\">" + err$ + "</p>\n"
 
-    __d% = layout_end()
+    layout_end()
 ?>

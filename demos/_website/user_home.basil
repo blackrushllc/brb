@@ -18,12 +18,12 @@
 
   user$ = cookie$("user")
   IF LEN(user$) == 0 THEN
-    __d% = send_header_redirect("login.basil")
+    send_header_redirect("login.basil")
     EXIT 0
   END IF
 
-  __d% = send_header_ok_html()
-  __d% = layout_start("Your dashboard")
+  send_header_ok_html()
+  layout_start("Your dashboard")
 ?>
 <?basil
 
@@ -34,6 +34,6 @@ PRINT READFILE$("views/logged_in.html");
 
   PRINT "<p class=\"greet\">Welcome, <strong>" + HTML$(user$) + "</strong>!</p>\n"
   PRINT "<form method=\"post\" action=\"logout.basil\"><button class=\"btn\">Log out</button></form>\n"
-  __d% = layout_end()
+  layout_end()
 
 ?>
