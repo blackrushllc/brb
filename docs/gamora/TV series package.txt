@@ -1,0 +1,318 @@
+Create a new public-facing project page on GamoraPharma.com that presents our proof-of-concept TV series package for development outreach.
+
+This is not a joke page in the same tone as the fake pharma marketing pages. It should still visually belong to the GamoraPharma.com world, but this page is a more polished, semi-serious “industry packet hub” for the project behind the Gamora / Atomic Zone demo series reel.
+
+Goal:
+Build a single elegant long-form page that acts as a project landing page and documentation hub for the television development package. The page should present what already exists, explain the concept, and provide organized sections for package materials, assets, checklist items, and placeholders marked clearly as TBD for content we will add later.
+
+Important:
+- Keep the page visually stylish, cinematic, eerie, and polished.
+- It should feel like a “project dossier” or “industry package portal.”
+- Avoid making it feel corporate in the ordinary sense.
+- It should still feel connected to the strange Gamora universe.
+- Use strong typography, tasteful panels/cards, anchor navigation, and a premium one-page layout.
+- The page should work well on desktop and mobile.
+- Make it easy for me to later replace TBD text blocks with real content.
+
+Technical assumptions:
+- Build this inside the existing GamoraPharma.com site.
+- Use the existing Basil site conventions and theming already present in the project.
+- Use <?basil ?> templating where it is helpful.
+- If the site has shared header/footer/partials/layout helpers, use them.
+- Create this page in a clean maintainable way.
+- If helpful, put editable content arrays/objects near the top of the page or in a simple include/config structure so later editing is easy.
+- Do not over-engineer with a database unless the existing site already strongly prefers it.
+- Static/semi-static content is fine.
+
+Suggested route / file:
+- Add a new public page for the project package.
+- Preferred URL: /project
+- If needed by the site structure, use the appropriate Basil page path that maps to /project.
+
+Page title:
+Gamora Project Reel
+
+Hero / identity:
+This page presents a one-hour proof-of-concept reel and supporting development materials for a television series adaptation set in the Gamora / Atomic Zone universe.
+
+Primary content already available:
+Reel URL:
+https://atomicflix.sfo3.cdn.digitaloceanspaces.com/atomic_zone/Gamora%201%20thru%205.mp4
+
+Use the following actual copy where appropriate, but feel free to improve punctuation and layout presentation without changing the meaning.
+
+Series quick description:
+A sweet innocent girl from the call center gets promoted to the C-Suite of Gamora Pharmaceuticals where she witnesses unimaginable horrors, time slips, killer robots, a mad scientist who won't stay dead, a one-way portal to the Oort cloud, coke fiends, succubi, corrupt officials and treacherous body guards with an average life expectancy of half an episode.
+
+Episode list:
+Episode 1, “Moving Day”
+It is the very first day at the new Gamora Pharma building, and Nadine meets her new employers for the first time, on her first day working in the C-Suite and the unimaginable horrors are about to begin.
+
+Episode 2, “Savant”
+At Gamora Pharma, the Old Man has given Stebner a new task: To find a cure for Death. With a billion dollar budget, and another billion dollar bonus if he is successful, Stebner embarks on a quest for answers and soon discovers answers he did not expect to find, in The Atomic Zone.
+
+Episode 3, “Psych!”
+In this episode of The Atomic Zone, the Mad Scientist Stebner, already stressed over his assignment to complete the dying CEO's robot body, is suddenly given a new task that will change the pharma industry forever, and not in a good way.
+
+Episode 4, “Womp! Womp!”
+At Gamora Pharma, the lab has created a monster, but the monster is not the tech. The monster is the man who wields it, but something worse than Hell is waiting to show that you can't always escape from the consequences of your mistakes.
+
+Episode 5, “The Proxy”
+At Gamora Pharmaceuticals, corruption is policy, murder is succession planning, and power never dies quietly. Witnessed by the only two innocent employees: A half-dead CEO begins ruling the company through a terrifying robotic proxy, the scheming son and daughter who tried to kill him discover that in the boardroom of the damned, the last hostile takeover may be their own.
+
+Design direction:
+Blend these moods:
+- prestige pitch deck
+- eerie sci-fi dossier
+- darkly comic corporate horror
+- premium landing page
+- “confidential development file” energy, but public-safe
+
+The page should include these sections in this order:
+
+1. HERO SECTION
+Include:
+- Main title: Gamora Project Reel
+- Subtitle: Proof-of-Concept Series Package
+- Short intro paragraph
+- Strong CTA buttons/links:
+  - Watch Reel
+  - Jump to Series Overview
+  - Jump to Development Package
+- If practical, include a tasteful embedded video player for the reel, otherwise a prominent watch button/card
+- Add a small discreet status badge such as:
+  - Development Outreach Package
+  - Proof of Concept
+  - Seeking Development Partner
+Choose whichever looks best.
+
+Use this or similar copy:
+Gamora Project Reel is a one-hour proof-of-concept assembled from five interconnected episodes in The Atomic Zone universe. It is intended as a development-facing demonstration of tone, world, characters, mythology, and long-form series potential.
+
+2. WHAT THIS IS
+Create a section explaining exactly what this page is.
+
+Suggested copy:
+This page is a public-facing project hub for the Gamora television concept. It packages the currently completed reel together with development materials, project notes, and expansion plans intended for producers, representatives, development executives, and potential creative partners.
+
+Also include a brief note that this is not yet the final full package:
+This package is actively being expanded. Some materials are complete, while others are intentionally marked TBD pending final preparation.
+
+3. SERIES OVERVIEW
+Present the quick description in a prominent styled block.
+
+Label:
+Series Premise
+
+Use the supplied series quick description.
+
+Then add a compact grid with these fields:
+- Format: TBD_FORMAT
+- Genre: Corporate Horror / Sci-Fi / Dark Comedy / Supernatural Thriller
+- Tone: TBD_TONE
+- Audience: TBD_AUDIENCE
+- Comparable Titles: TBD_COMPS
+- Status: Proof-of-Concept Reel Complete
+
+Use my supplied genre blend where appropriate, but leave the user-friendly placeholders where needed.
+
+4. WHY IT WORKS AS A SERIES
+Add a section that sells the idea of the show as ongoing television.
+
+Write real copy for this section. Make it sound strong and professional, not silly.
+Suggested themes to mention:
+- expandable world
+- escalating mythology
+- anthology-like strangeness inside a continuing corporate setting
+- innocence thrown into institutional evil
+- rotating dangers, betrayals, experiments, and supernatural consequences
+- strong episodic hooks with serialized escalation
+
+You may write this section fully.
+
+5. EPISODE GUIDE
+Create five polished episode cards using the supplied episode descriptions.
+Each card should include:
+- episode number
+- title
+- summary
+- optional small “Key Elements” line if it looks nice, e.g. robots, proxy rule, portal, etc.
+
+6. REEL SECTION
+Create a section specifically for the 1-hour reel.
+
+Include:
+- title: One-Hour Proof-of-Concept Reel
+- the video embed or link
+- short explanation that the reel compiles five episodes into a continuous viewing experience
+- space for later metadata such as runtime, cut version, revision date, downloadable screener info
+
+Use placeholders such as:
+- Runtime: TBD_RUNTIME
+- Version: TBD_VERSION
+- Revision Date: TBD_REVISION_DATE
+- Screener Notes: TBD_SCREENER_NOTES
+
+7. DEVELOPMENT PACKAGE
+This is a major section. It should look like the core of the page.
+
+Create a structured checklist/grid of package items with status pills such as:
+- Complete
+- In Progress
+- TBD
+- Needs Review
+
+Items to include:
+- Logline — TBD_LOG_LINE
+- One-Page Series Overview — TBD_SERIES_OVERVIEW
+- Creator Statement — TBD_CREATOR_STATEMENT
+- Character Breakdowns — TBD_CHARACTER_BREAKDOWNS
+- Season One Arc — TBD_SEASON_ONE_ARC
+- Episode Guide — Present / Expand Later
+- Pilot Script or Sample Teleplay — TBD_PILOT_SCRIPT
+- Series Bible — TBD_SERIES_BIBLE
+- Pitch Deck PDF — TBD_PITCH_DECK
+- 90-Second Sizzle — TBD_SIZZLE_90
+- 3–5 Minute Industry Cut — TBD_INDUSTRY_CUT
+- Key Art / Poster — TBD_KEY_ART
+- Contact / Representation Info — TBD_CONTACT_INFO
+
+For each item, provide:
+- title
+- status
+- brief description of what belongs there
+- placeholder text in a visually distinct TBD block
+
+8. CHARACTER & WORLD MATERIALS
+Create another checklist section for materials we plan to add.
+
+Include cards/placeholders for:
+- Nadine — TBD_CHARACTER_NADINE
+- Stebner — TBD_CHARACTER_STEBNER
+- The Old Man — TBD_CHARACTER_OLD_MAN
+- Bella — TBD_CHARACTER_BELLA
+- Nedry — TBD_CHARACTER_NEDRY
+- Vince / Bodyguard Thread — TBD_CHARACTER_VINCE
+- Gamora Pharmaceuticals — TBD_WORLD_GAMORA
+- The Lab / Basement Mythology — TBD_WORLD_LAB
+- The Proxy Program — TBD_WORLD_PROXY
+- Oort Cloud Portal / Cosmic Elements — TBD_WORLD_OORT
+- Corporate Hierarchy / Succession / Corruption — TBD_WORLD_CORRUPTION
+
+Make this section easy to expand later.
+
+9. RIGHTS / MATERIALS / CLEARANCE SECTION
+This section is important. It should be serious, neat, and matter-of-fact.
+
+Create a section titled:
+Project Materials & Rights Review
+
+Include brief explanatory copy that this section tracks readiness of underlying materials for development outreach.
+
+Create a checklist/table for:
+- Underlying story / concept ownership — TBD_RIGHTS_STORY
+- Script / written materials ownership — TBD_RIGHTS_SCRIPT
+- Cast / contributor permissions — TBD_RIGHTS_CONTRIBUTORS
+- Artwork / image source review — TBD_RIGHTS_ARTWORK
+- Music rights review — Needs Review
+- Trailer / sizzle source clearances — TBD_RIGHTS_PROMO
+- Final outreach package legal review — TBD_RIGHTS_LEGAL
+
+For Music Rights Review, use wording like this:
+Current reel includes original music presently under rights review. Final development-facing package may retain, replace, or re-score this material pending confirmation of chain of title and outreach readiness.
+
+Do not write legal conclusions. Just present this as a project readiness note.
+
+10. CURRENT OUTREACH OBJECTIVE
+Create a section titled:
+Current Objective
+
+Use polished copy similar to:
+The immediate goal is not simply to present a finished video, but to secure interest from a producer, representative, development executive, or creative partner who sees the potential to expand Gamora into a fully developed television series.
+
+Then create a bullet/checklist style block for target outcomes:
+- Development partner
+- Producer attachment
+- Representation
+- Pilot development interest
+- Series packaging support
+- Festival / showcase readiness
+
+11. NEXT STEPS CHECKLIST
+Create a practical checklist section for the creator to work through.
+Use editable checkboxes or a styled checklist if actual form persistence is too much trouble.
+
+Items:
+- Finalize logline
+- Write one-page overview
+- Prepare creator statement
+- Build character breakdowns
+- Create season one arc summary
+- Cut 90-second sizzle
+- Cut 3–5 minute industry reel
+- Prepare pitch deck
+- Review music usage
+- Assemble outreach contacts
+- Add contact / representation pathway
+- Review page copy before public promotion
+
+12. CONTACT / INQUIRY SECTION
+Create a tasteful contact panel at the bottom.
+Do not fabricate representation.
+Use placeholder fields/text such as:
+Development inquiries: TBD_CONTACT_EMAIL
+Representation: TBD_REPRESENTATION
+Press / Screener requests: TBD_PRESS_CONTACT
+
+Add short copy:
+For development inquiries regarding the Gamora project reel and television adaptation potential, please use the contact information listed here.
+
+13. OPTIONAL SIDE NAV / ANCHOR NAVIGATION
+If it looks good, add a sticky side or top mini-nav linking to:
+- Overview
+- Episodes
+- Reel
+- Package
+- Rights Review
+- Next Steps
+- Contact
+
+Content style:
+- Keep copy polished and persuasive.
+- Avoid over-jokey writing in the project-facing sections.
+- The series premise and episode summaries can retain the strange, memorable flavor of the property.
+- Wherever content is missing, use highly visible placeholders in this exact style:
+  [TBD: SHORT DESCRIPTION]
+Example:
+[TBD: Add 1–2 paragraph creator statement]
+Use that exact bracketed TBD convention consistently.
+
+Implementation details:
+- Make the page attractive without requiring backend complexity.
+- Use reusable arrays or data blocks for the episode list and package checklist if convenient.
+- Keep future editing simple.
+- If a video embed from the remote mp4 is awkward, create a polished watch card with a direct link plus poster/thumbnail placeholder.
+- If helpful, create small helper components/partials for:
+  - status pill
+  - checklist card
+  - TBD block
+  - section heading
+
+Nice-to-have enhancements:
+- subtle cinematic background textures
+- faint red/amber accent tones
+- dossier card styling
+- print-friendly CSS for saving the page as a PDF later
+- small “Last Updated” field with placeholder:
+  [TBD: Last updated date]
+
+Deliverables:
+- The actual Basil page and any needed includes/styles
+- Any small helper partials/components needed
+- Clean copy placed directly into the page
+- Clear TBD placeholders throughout
+- No fake database content
+- No broken links
+- No unfinished lorem ipsum
+
+When done, make sure the page can stand on its own as a credible project package landing page for development outreach.
