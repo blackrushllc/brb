@@ -1,0 +1,66 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    msg$ = param$("msg")
+
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT t.id, t.title, s.name, t.created_at, team.name FROM tickets t JOIN statuses s ON t.status_id = s.id JOIN teams team ON t.team_id = team.id WHERE t.reporter_user_id = " + STR$(user_id%) + " ORDER BY t.created_at DESC")
+    
+    send_header_ok_html()
+    layout_start("My Tickets")
+?>
+
+<section class="my-tickets">
+    <h2>My Tickets</h2>
+    
+    <?basil IF LEN(msg$) > 0 THEN ?>
+        <div class="alert alert-success"><?= msg$ ?></div>
+    <?basil END IF ?>
+
+    <div class="card">
+        <?basil IF ARRAY_ROWS%(rows$) == 0 THEN ?>
+            <p>No tickets yet. A peaceful board is still a valid board.</p>
+        <?basil ELSE ?>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Team</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?basil FOR i% = 0 TO ARRAY_ROWS%(rows$) - 1 ?>
+                        <tr>
+                            <td>#<?= rows$(i%, 0) ?></td>
+                            <td><?= HTML$(rows$(i%, 1)) ?></td>
+                            <td><span class="badge status-<?= HTML$(LOWER$(rows$(i%, 2))) ?>"><?= HTML$(rows$(i%, 2)) ?></span></td>
+                            <td><?= HTML$(rows$(i%, 4)) ?></td>
+                            <td><?= HTML$(rows$(i%, 3)) ?></td>
+                            <td><a href="ticket_detail.basil?id=<?= rows$(i%, 0) ?>" class="btn btn-small">View</a></td>
+                        </tr>
+                    <?basil NEXT ?>
+                </tbody>
+            </table>
+        <?basil END IF ?>
+    </div>
+    
+    <div class="actions">
+        <a href="create_ticket.basil" class="btn btn-primary">Create New Ticket</a>
+        <a href="dashboard.basil" class="btn btn-ghost">Dashboard</a>
+    </div>
+</section>
+
+<?basil
+    layout_end()
+    SQLITE_CLOSE(db%)
+?>

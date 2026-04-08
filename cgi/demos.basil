@@ -29,7 +29,7 @@ SUB render_demos_page()
     REM In a typical CGI setup, this might be the project root or the cgi directory.
     REM Given the project structure, /demos/ is at the root.
 
-    LET demoDirs$@ = DIR$("/var/www/brb/demos/enabled/*")
+    LET demoDirs$@ = DIR$("/var/www/blackrush/blackrushbasic.com/demos/enabled/*")
 
     FOR EACH d$ IN demoDirs$@
         REM Ignore files, we only want directories
@@ -41,13 +41,13 @@ SUB render_demos_page()
             REM PRINTLN " CONTINUE"
         ELSE
             REM Construct paths
-            LET aboutPath$ = "/var/www/brb/demos/" + d$ + "/about.html"
+            LET aboutPath$ = "/var/www/blackrush/blackrushbasic.com/demos/" + d$ + "/about.html"
 
             REM Try to read about.html
             aboutContent$ = READFILE$(aboutPath$)
 
             PRINTLN "      <tr style=\"border-bottom: 1px solid #eee;\">"
-            PRINTLN "        <td style=\"padding: 1rem; vertical-align: top;\"><a href=\"/demos/" + d$ + "/\" style=\"font-weight: bold;\">" + d$ + "</a></td>"
+            PRINTLN "        <td style=\"padding: 1rem; vertical-align: top;\"><a href=\"/demos/" + d$ + "/index.basil\" style=\"font-weight: bold;\">" + d$ + "</a></td>"
             PRINTLN "        <td style=\"padding: 1rem; vertical-align: top;\">" + aboutContent$ + "</td>"
             PRINTLN "      </tr>"
         END IF

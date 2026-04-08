@@ -1,0 +1,85 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    team_id% = VAL(param$("team_id"))
+    IF team_id% == 0 THEN
+        // Fallback to default team if user is a member
+        team_id% = get_default_team_id%()
+    END IF
+
+    // Check if user is in team
+    role$ = get_user_role$(db%, team_id%, user_id%)
+    IF role$ == "" THEN
+        send_header_ok_html()
+        layout_start("Access Denied")
+        PRINT "<div class=\"alert alert-error\">You do not have access to this team.</div>"
+        layout_end()
+        SQLITE_CLOSE(db%)
+        EXIT 0
+    END IF
+
+    err$ = ""
+    IF ENV$("REQUEST_METHOD") == "POST" THEN
+        title$ = param$("title")
+        desc$ = param$("description")
+        
+        IF LEN(title$) == 0 OR LEN(desc$) == 0 THEN
+            err$ = "Please fill in all required fields."
+        ELSE
+            // Get default status (Pending)
+            srows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM statuses WHERE name = 'Pending' LIMIT 1")
+            status_id% = 0
+            IF ARRAY_ROWS%(srows$) > 0 THEN status_id% = VAL(srows$(0,0))
+            
+            SQLITE_EXEC%(db%, "INSERT INTO tickets (team_id, reporter_user_id, title, description, status_id, created_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", '" + title$ + "', '" + desc$ + "', " + STR$(status_id%) + ", DATETIME('now'))")
+            ticket_id% = SQLITE_LAST_INSERT_ID%(db%)
+            
+            IF ticket_id% > 0 THEN
+                send_header_redirect("my_tickets.basil?msg=Ticket created successfully.")
+                SQLITE_CLOSE(db%)
+                EXIT 0
+            ELSE
+                err$ = "Failed to create ticket."
+            END IF
+        END IF
+    END IF
+
+    send_header_ok_html()
+    layout_start("Create Ticket")
+?>
+
+<section class="create-ticket">
+    <h2>Create a New Ticket</h2>
+    <p>Please describe the issue or request for the team.</p>
+
+    <?basil IF LEN(err$) > 0 THEN ?>
+        <div class="alert alert-error"><?= err$ ?></div>
+    <?basil END IF ?>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="title">Title</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" rows="5" required></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Submit Ticket</button>
+            <a href="dashboard.basil" class="btn btn-ghost">Cancel</a>
+        </div>
+    </form>
+</section>
+
+<?basil
+    layout_end()
+    SQLITE_CLOSE(db%)
+?>

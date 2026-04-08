@@ -1,0 +1,78 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    err$ = ""
+    IF ENV$("REQUEST_METHOD") == "POST" THEN
+        name$ = param$("name")
+        slug$ = param$("slug")
+        
+        IF LEN(name$) == 0 THEN
+            err$ = "Team name is required."
+        ELSE
+            // Check slug
+            IF LEN(slug$) > 0 THEN
+                rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM teams WHERE slug = '" + slug$ + "'")
+                IF ARRAY_ROWS%(rows$) > 0 THEN
+                    err$ = "Slug already taken."
+                END IF
+            END IF
+            
+            IF LEN(err$) == 0 THEN
+                SQLITE_EXEC%(db%, "INSERT INTO teams (owner_id, name, slug, created_at) VALUES (" + STR$(user_id%) + ", '" + name$ + "', '" + slug$ + "', DATETIME('now'))")
+                team_id% = SQLITE_LAST_INSERT_ID%(db%)
+                IF team_id% > 0 THEN
+                    // Add creator as owner
+                    SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", 'owner', DATETIME('now'))")
+                    
+                    send_header_redirect("dashboard.basil")
+                    SQLITE_CLOSE(db%)
+                    EXIT 0
+                ELSE
+                    err$ = "Failed to create team."
+                END IF
+            END IF
+        END IF
+    END IF
+
+    send_header_ok_html()
+    layout_start("Create Team")
+?>
+
+<section class="create-team">
+    <h2>Create a New Team</h2>
+    <p>Give your team a name and optionally a public slug.</p>
+
+    <?basil IF LEN(err$) > 0 THEN ?>
+        <div class="alert alert-error"><?= err$ ?></div>
+    <?basil END IF ?>
+
+    <div class="card">
+        <form method="POST">
+            <div class="form-group">
+                <label for="name">Team Name</label>
+                <input type="text" id="name" name="name" required placeholder="e.g. Acme Support">
+            </div>
+            <div class="form-group">
+                <label for="slug">Public Slug (Optional)</label>
+                <input type="text" id="slug" name="slug" placeholder="e.g. acme">
+                <small>Used for custom intake URLs: <code>intake.basil?slug=your-slug</code></small>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Create Team</button>
+                <a href="dashboard.basil" class="btn btn-ghost">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<?basil
+    layout_end()
+    SQLITE_CLOSE(db%)
+?>

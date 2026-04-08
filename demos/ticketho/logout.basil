@@ -1,0 +1,6 @@
+#include "ticketho.inc"
+
+<?basil
+    delete_cookie("auth_user_id")
+    send_header_redirect("index.basil")
+?>

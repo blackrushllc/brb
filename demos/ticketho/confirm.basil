@@ -1,0 +1,63 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    token$ = param$("token")
+    err$ = ""
+
+    IF LEN(token$) == 0 THEN
+        err$ = "Invalid token."
+    ELSE
+        rows$ = SQLITE_QUERY2D$(db%, "SELECT user_id, purpose, team_id FROM email_login_tokens WHERE token = '" + token$ + "' AND used_at IS NULL AND expires_at > DATETIME('now')")
+        
+        IF ARRAY_ROWS%(rows$) > 0 THEN
+            user_id% = VAL(rows$(0,0))
+            purpose$ = rows$(0,1)
+            team_id% = VAL(rows$(0,2))
+            
+            // Mark token as used
+            SQLITE_EXEC%(db%, "UPDATE email_login_tokens SET used_at = DATETIME('now') WHERE token = '" + token$ + "'")
+            
+            // Confirm email
+            SQLITE_EXEC%(db%, "UPDATE users SET email_verified_at = DATETIME('now') WHERE id = " + STR$(user_id%))
+            
+            // If it was an intake flow, add user to team as reporter
+            IF purpose$ == "intake_confirm" THEN
+                // Check if already a member
+                mrows$ = SQLITE_QUERY2D$(db%, "SELECT role FROM team_members WHERE team_id = " + STR$(team_id%) + " AND user_id = " + STR$(user_id%))
+                IF ARRAY_ROWS%(mrows$) == 0 THEN
+                    SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(team_id%) + ", " + STR$(user_id%) + ", 'reporter', DATETIME('now'))")
+                END IF
+            END IF
+            
+            // Log in
+            set_cookie("auth_user_id", STR$(user_id%))
+            
+            // Redirect based on purpose
+            IF purpose$ == "intake_confirm" THEN
+                send_header_redirect("create_ticket.basil?team_id=" + STR$(team_id%))
+            ELSE
+                send_header_redirect("dashboard.basil")
+            END IF
+            
+            SQLITE_CLOSE(db%)
+            EXIT 0
+        ELSE
+            err$ = "Invalid or expired token."
+        END IF
+    END IF
+
+    send_header_ok_html()
+    layout_start("Confirm Email")
+?>
+
+<section class="auth-message">
+    <h2>Email Confirmation</h2>
+    <div class="alert alert-error"><?= err$ ?></div>
+    <p><a href="login.basil">Return to Login</a></p>
+</section>
+
+<?basil
+    layout_end()
+    SQLITE_CLOSE(db%)
+?>

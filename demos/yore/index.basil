@@ -77,7 +77,7 @@ PRINT READFILE$("views/home.html");
 ?>
 <?basil
   // After the view HTML, show current users table from the database
-  __d% = render_users();
+  render_users();
 
   IF LEN(user$) > 0 THEN BEGIN
     PRINT "<section class=\"notice\">You appear to be logged in as <strong>" + HTML$(user$) + "</strong>.\n";

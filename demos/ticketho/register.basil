@@ -1,0 +1,84 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    method$ = ENV$("REQUEST_METHOD")
+    err$ = ""
+
+    IF method$ == "POST" THEN
+        name$ = param$("name")
+        email$ = param$("email")
+        pass$ = param$("password")
+        pass2$ = param$("password_confirm")
+
+        IF LEN(name$) == 0 OR LEN(email$) == 0 OR LEN(pass$) == 0 THEN
+            err$ = "Please fill in all fields."
+        ELSEIF pass$ <> pass2$ THEN
+            err$ = "Passwords do not match."
+        ELSE
+            // Check if user exists
+            rows$ = SQLITE_QUERY2D$(db%, "SELECT id FROM users WHERE email = '" + email$ + "'")
+            IF ARRAY_ROWS%(rows$) > 0 THEN
+                err$ = "Email already registered."
+            ELSE
+                // Create user
+                SQLITE_EXEC%(db%, "INSERT INTO users (name, email, password_hash, created_at) VALUES ('" + name$ + "', '" + email$ + "', '" + pass$ + "', DATETIME('now'))")
+                user_id% = SQLITE_LAST_INSERT_ID%(db%)
+                
+                IF user_id% > 0 THEN
+                    // Join default team
+                    def_tid% = get_default_team_id%()
+                    SQLITE_EXEC%(db%, "INSERT INTO team_members (team_id, user_id, role, joined_at) VALUES (" + STR$(def_tid%) + ", " + STR$(user_id%) + ", 'member', DATETIME('now'))")
+                    
+                    // Set cookie
+                    set_cookie("auth_user_id", STR$(user_id%))
+                    SQLITE_CLOSE(db%)
+                    send_header_redirect("dashboard.basil")
+                    EXIT 0
+                ELSE
+                    err$ = "Registration failed."
+                END IF
+            END IF
+        END IF
+    END IF
+
+    send_header_ok_html()
+    layout_start("Register")
+?>
+
+<section class="auth-form">
+    <h2>Create your Account</h2>
+    <p>Join TICKETHO and start managing your team's tickets.</p>
+
+    <?basil IF LEN(err$) > 0 THEN ?>
+        <div class="alert alert-error"><?= err$ ?></div>
+    <?basil END IF ?>
+
+    <form method="POST" action="register.basil">
+        <div class="form-group">
+            <label for="name">Full Name</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-group">
+            <label for="password_confirm">Confirm Password</label>
+            <input type="password" id="password_confirm" name="password_confirm" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
+    </form>
+    <p class="auth-footer">Already have an account? <a href="login.basil">Login here</a>.</p>
+</section>
+
+<?basil
+    layout_end()
+    SQLITE_CLOSE(db%)
+?>

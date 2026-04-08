@@ -1,0 +1,84 @@
+#include "layout.inc"
+
+<?basil
+    db% = db_open%()
+    user_id% = get_current_user_id%()
+    IF user_id% == 0 THEN
+        send_header_redirect("login.basil")
+        EXIT 0
+    END IF
+
+    ticket_id% = VAL(param$("id"))
+    IF ticket_id% == 0 THEN
+        send_header_redirect("dashboard.basil")
+        EXIT 0
+    END IF
+
+    rows$ = SQLITE_QUERY2D$(db%, "SELECT team_id, title, status_id FROM tickets WHERE id = " + STR$(ticket_id%))
+    IF ARRAY_ROWS%(rows$) == 0 THEN
+        send_header_redirect("dashboard.basil")
+        EXIT 0
+    END IF
+    
+    team_id% = VAL(rows$(0, 0))
+    current_status_id% = VAL(rows$(0, 2))
+    
+    // Check if user is staff in team
+    role$ = get_user_role$(db%, team_id%, user_id%)
+    IF role$ == "" OR role$ == "reporter" THEN
+        send_header_ok_html()
+        layout_start("Access Denied")
+        PRINT "<div class=\"alert alert-error\">You do not have permission to edit this ticket.</div>"
+        layout_end()
+        SQLITE_CLOSE(db%)
+        EXIT 0
+    END IF
+
+    IF ENV$("REQUEST_METHOD") == "POST" THEN
+        new_status_id% = VAL(param$("status_id"))
+        notes$ = param$("notes")
+        
+        SQLITE_EXEC%(db%, "UPDATE tickets SET status_id = " + STR$(new_status_id%) + ", notes = '" + notes$ + "', updated_at = DATETIME('now') WHERE id = " + STR$(ticket_id%))
+        send_header_redirect("ticket_detail.basil?id=" + STR$(ticket_id%))
+        SQLITE_CLOSE(db%)
+        EXIT 0
+    END IF
+
+    // Get statuses
+    srows$ = SQLITE_QUERY2D$(db%, "SELECT id, name FROM statuses ORDER BY id ASC")
+    
+    send_header_ok_html()
+    layout_start("Edit Ticket: " + rows$(0, 1))
+?>
+
+<section class="edit-ticket">
+    <h2>Edit Ticket #<?= STR$(ticket_id%) ?>: <?= HTML$(rows$(0, 1)) ?></h2>
+    
+    <div class="card">
+        <form method="POST">
+            <div class="form-group">
+                <label for="status_id">Update Status</label>
+                <select id="status_id" name="status_id">
+                    <?basil FOR i% = 0 TO ARRAY_ROWS%(srows$) - 1 ?>
+                        <option value="<?= srows$(i%, 0) ?>" <?basil IF VAL(srows$(i%, 0)) == current_status_id% THEN ?>selected<?basil END IF ?>>
+                            <?= HTML$(srows$(i%, 1)) ?>
+                        </option>
+                    <?basil NEXT ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="notes">Internal Notes</label>
+                <textarea id="notes" name="notes" rows="4"></textarea>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update Ticket</button>
+                <a href="ticket_detail.basil?id=<?= STR$(ticket_id%) ?>" class="btn btn-ghost">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<?basil
+    layout_end()
+    SQLITE_CLOSE(db%)
+?>
