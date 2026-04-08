@@ -1,0 +1,12 @@
+<header class="top">
+    <div class="wrap flex">
+        <div class="logo">
+            <h1><a href="index.basil">Gamora</a></h1>
+        </div>
+        <nav>
+            <a href="index.basil" @IF(current_page$ == "home")class="active"@ENDIF>Home</a>
+            <a href="index.basil?page=about" @IF(current_page$ == "about")class="active"@ENDIF>About Gamora</a>
+            <a href="index.basil?page=contact" @IF(current_page$ == "contact")class="active"@ENDIF>Contact</a>
+        </nav>
+    </div>
+</header>

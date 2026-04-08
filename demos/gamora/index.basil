@@ -1,0 +1,86 @@
+#include "cgi.inc"
+
+<?basil
+  // Get requested page from query string (manual parse for simplicity)
+  qs$ = ENV$("QUERY_STRING")
+  page$ = param$("page") // Default to home if no page param
+  //IF INSTR(qs$, "page=about") > 0 THEN page$ = "about"
+  //IF INSTR(qs$, "page=contact") > 0 AND INSTR(qs$, "page=contact_submit") == 0 THEN page$ = "contact"
+  //IF INSTR(qs$, "page=contact_submit") > 0 THEN page$ = "contact_submit"
+
+  current_page$ = page$
+  
+  // POST Handling
+  IF page$ == "contact_submit" THEN BEGIN
+    // Use Fred @REQUEST inline to get parameters
+    name$ = param$("name")
+    email$ = param$("email")
+    org$ = param$("organization")
+    dept$ = param$("department")
+    sub$ = param$("subject")
+    msg$ = param$("message")
+    
+    // Simple validation
+    IF name$ == "null" OR email$ == "null" OR sub$ == "null" OR msg$ == "null" OR LEN(name$) == 0 OR LEN(email$) == 0 THEN BEGIN
+        set_cookie("flash_error", "Please fill in all required fields.")
+        send_header_redirect("index.basil?page=contact")
+        EXIT
+    END
+    
+    // Store submission
+    entry$ = "--- SUBMISSION ---\n"
+    entry$ = entry$ + "Date: " + DATE$() + " " + TIME$() + "\n"
+    entry$ = entry$ + "Name: " + name$ + "\n"
+    entry$ = entry$ + "Email: " + email$ + "\n"
+    entry$ = entry$ + "Organization: " + org$ + "\n"
+    entry$ = entry$ + "Department: " + dept$ + "\n"
+    entry$ = entry$ + "Subject: " + sub$ + "\n"
+    entry$ = entry$ + "Message: " + msg$ + "\n\n"
+    
+    APPENDFILE$("submissions.txt", entry$)
+    
+    set_cookie("flash_success", "Thank you for contacting Gamora Pharmaceuticals. Your inquiry has been received and routed to the appropriate department.")
+    send_header_redirect("index.basil?page=contact")
+    EXIT
+  END
+  
+  // Initialize flash messages from cookies
+  flash_success$ = cookie$("flash_success")
+  flash_error$ = cookie$("flash_error")
+
+  page_title$ = ""
+
+  // Prepare for rendering
+  IF page$ = "home" THEN
+    page_title$ = "Advancing Emotional Wellness"
+    page_view$ = "views/home.html"
+  END
+  IF page$ == "about" THEN
+    page_title$ = "About Gamora"
+    page_view$ = "views/about.html"
+  END
+  IF page$ == "contact" THEN
+    page_title$ = "Contact Us"
+    page_view$ = "views/contact.html"
+    // Form value placeholders for RENDER$
+    form_name$ = ""
+    form_email$ = ""
+    form_organization$ = ""
+    form_subject$ = ""
+    form_message$ = ""
+  END
+  IF page_title$ = "" THEN
+     page_title$ = "Advancing Emotional Wellness"
+        page_view$ = "views/home.html"
+  END
+
+  // Render the page partial content
+  page_content$ = READFILE$(page_view$);
+
+  // Header and layout
+  IF LEN(flash_success$) > 0 THEN set_cookie("flash_success", "")
+  IF LEN(flash_error$) > 0 THEN set_cookie("flash_error", "")
+  
+  _ = send_header_ok_html()
+  PRINT RENDER$("@INCLUDE(\"views/layout.html\")")
+?>

@@ -1,0 +1,492 @@
+:root {
+  --pharma-blue: #004b87;
+  --pharma-teal: #00a19a;
+  --pharma-gray: #f2f4f7;
+  --pharma-text: #333;
+  --pharma-muted: #666;
+  --pharma-white: #ffffff;
+  --pharma-success: #28a745;
+  --pharma-error: #dc3545;
+  --pharma-accent: #e1e4e8;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--pharma-text);
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  background-color: var(--pharma-white);
+}
+
+a {
+  color: var(--pharma-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+header.top {
+  background-color: var(--pharma-white);
+  border-bottom: 1px solid var(--pharma-accent);
+  padding: 20px 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+header.top .flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header.top h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--pharma-blue);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+header.top nav a {
+  text-decoration: none;
+  color: var(--pharma-muted);
+  margin-left: 30px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+header.top nav a:hover {
+  color: var(--pharma-blue);
+}
+
+header.top nav a.active {
+  color: var(--pharma-blue);
+  border-bottom: 2px solid var(--pharma-blue);
+}
+
+.hero {
+  background: linear-gradient(135deg, var(--pharma-blue), var(--pharma-teal));
+  color: var(--pharma-white);
+  padding: 100px 0;
+  text-align: center;
+}
+
+.hero h2 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  font-weight: 300;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  margin-bottom: 40px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  opacity: 0.9;
+}
+
+.btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s;
+  cursor: pointer;
+  border: none;
+  font-size: 1rem;
+}
+
+.btn.primary {
+  background-color: var(--pharma-white);
+  color: var(--pharma-blue);
+}
+
+.btn.primary:hover {
+  background-color: var(--pharma-gray);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn.secondary {
+  background-color: transparent;
+  color: var(--pharma-white);
+  border: 1px solid var(--pharma-white);
+}
+
+.btn.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn.solid {
+  background-color: var(--pharma-blue);
+  color: var(--pharma-white);
+}
+
+.btn.solid:hover {
+  background-color: #003d6d;
+}
+
+section {
+  padding: 80px 0;
+}
+
+.bg-gray {
+  background-color: var(--pharma-gray);
+}
+
+.section-title {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-title h2 {
+  font-size: 2.2rem;
+  color: var(--pharma-blue);
+  margin-bottom: 10px;
+}
+
+.section-title p {
+  color: var(--pharma-muted);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+}
+
+.card {
+  background-color: var(--pharma-white);
+  padding: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--pharma-accent);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+  color: var(--pharma-blue);
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.product-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  flex-wrap: wrap;
+}
+
+.product-spotlight .image {
+  flex: 1;
+  min-width: 300px;
+}
+
+.product-spotlight .image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.product-spotlight .content {
+  flex: 1.5;
+  min-width: 300px;
+}
+
+.product-spotlight h3 {
+  font-size: 2.5rem;
+  color: var(--pharma-blue);
+  margin-top: 0;
+}
+
+.disclaimer {
+  background-color: #f8f9fa;
+  border-left: 4px solid var(--pharma-muted);
+  padding: 25px;
+  font-size: 0.85rem;
+  color: var(--pharma-muted);
+  margin-top: 60px;
+  border-radius: 0 4px 4px 0;
+}
+
+.disclaimer strong {
+  display: block;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+}
+
+.leadership-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.leader {
+  text-align: center;
+}
+
+.leader .img-container {
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 25px;
+  position: relative;
+}
+
+.leader img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 6px solid var(--pharma-gray);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.leader h3 {
+  margin: 10px 0 5px;
+  color: var(--pharma-blue);
+  font-size: 1.5rem;
+}
+
+.leader p.title {
+  color: var(--pharma-teal);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+}
+
+.leader p.bio {
+  color: var(--pharma-muted);
+  font-size: 0.95rem;
+}
+
+.stats {
+  display: flex;
+  justify-content: space-around;
+  text-align: center;
+  margin: 40px 0;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.stat-item {
+  flex: 1;
+  min-width: 150px;
+}
+
+.stat-item h4 {
+  font-size: 3rem;
+  color: var(--pharma-teal);
+  margin: 0;
+  font-weight: 300;
+}
+
+.stat-item p {
+  color: var(--pharma-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.footer {
+  background-color: #1a1a1a;
+  color: var(--pharma-white);
+  padding: 80px 0 40px;
+}
+
+.footer .grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 60px;
+}
+
+.footer h4 {
+  color: var(--pharma-teal);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+  font-size: 0.9rem;
+}
+
+.footer p {
+  opacity: 0.7;
+  font-size: 0.95rem;
+}
+
+.footer-links a {
+  color: var(--pharma-white);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.footer-links a:hover {
+  opacity: 1;
+  text-decoration: none;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 60px;
+  padding-top: 30px;
+  font-size: 0.8rem;
+  opacity: 0.5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 60px;
+  align-items: start;
+}
+
+.contact-info h3 {
+  color: var(--pharma-blue);
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+.contact-details {
+  margin-bottom: 40px;
+}
+
+.contact-details p {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-form-container {
+  background-color: var(--pharma-gray);
+  padding: 50px;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--pharma-blue);
+}
+
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none;
+  border-color: var(--pharma-blue);
+}
+
+.form-group textarea {
+  height: 180px;
+  resize: vertical;
+}
+
+.flash {
+  padding: 20px;
+  margin-bottom: 30px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.flash.success {
+  background-color: #d4edda;
+  color: #155724;
+  border-left: 5px solid #28a745;
+}
+
+.flash.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-left: 5px solid #dc3545;
+}
+
+.culture-section {
+  background-color: var(--pharma-white);
+}
+
+.culture-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+.gallery-item .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0,0,0,0.8));
+  color: white;
+  padding: 20px;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .hero h2 { font-size: 2.2rem; }
+  .grid, .contact-layout, .footer .grid { grid-template-columns: 1fr; }
+  .product-spotlight { flex-direction: column; text-align: center; }
+  header.top .flex { flex-direction: column; gap: 15px; }
+  header.top nav a { margin: 0 10px; }
+}

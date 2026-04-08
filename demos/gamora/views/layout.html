@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title$ }} | Gamora Pharmaceuticals</title>
+    <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+
+@INCLUDE("views/header.html")
+
+@IF(flash_success$)
+<div class="wrap" style="margin-top: 20px;">
+    <div class="flash success">
+        {{ flash_success$ }}
+    </div>
+</div>
+@ENDIF
+
+@IF(flash_error$)
+<div class="wrap" style="margin-top: 20px;">
+    <div class="flash error">
+        {{ flash_error$ }}
+    </div>
+</div>
+@ENDIF
+
+{{ page_content$ }}
+
+@INCLUDE("views/footer.html")
+
+</body>
+</html>
